@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-from subprocess import run, PIPE
+from subprocess import call, PIPE
 
 import click
 
-from media_info import Options, CodecInfo, get_transcode_info
-from preferences import ENCODING_OPTIONS, COPY_OPTIONS, THREADS
+from .media_info import Options, CodecInfo, get_transcode_info
+from .preferences import ENCODING_OPTIONS, COPY_OPTIONS, THREADS
 
 
 FFMPEG_CMD = 'ffmpeg -fflags +genpts -i "%s" %s'
@@ -58,7 +58,7 @@ def convert_video(filename: str, threads: int=THREADS) -> str:
         print("No need to transcode %s" % filename)
         return
 
-    run(ffmpeg_cmd, shell=True, stdout=PIPE)
+    call(ffmpeg_cmd, shell=True, stdout=PIPE)
 
     return convert_filename(filename)
 
