@@ -54,9 +54,6 @@ Usage: cast_convert convert [OPTIONS] FILENAME
 Options:
   -t, --threads INTEGER  Count of threads for ffmpeg to use. Default: 4
   --help                 Show this message and exit.
-
-alex@mbp12,1:~$ cast_convert get_cmd Vids/Zoolander\ 2001\ \(1080p\ x265\ 10bit\ Joy\).mkv
-ffmpeg -fflags +genpts -i "Vids/Zoolander 2001 (1080p x265 10bit Joy).mkv" -c:v libx264 -preset ultrafast -crf 21 -c:a copy  -threads 4 "Vids/Zoolander 2001 (1080p x265 10bit Joy)_transcode.mp4"
 ```
 
 ### Print ffmpeg call
