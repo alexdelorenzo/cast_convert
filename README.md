@@ -57,8 +57,7 @@ Options:
 
 alex@mbp12,1:~$ cast_convert get_cmd Vids/Zoolander\ 2001\ \(1080p\ x265\ 10bit\ Joy\).mkv
 ffmpeg -fflags +genpts -i "Vids/Zoolander 2001 (1080p x265 10bit Joy).mkv" -c:v libx264 -preset ultrafast -crf 21 -c:a copy  -threads 4 "Vids/Zoolander 2001 (1080p x265 10bit Joy)_transcode.mp4"
-
-"""
+```
 
 ### Print ffmpeg call
 The conversion command calls ffmpeg to transcode video. The `get_cmd` command will print the ffmpeg call.
