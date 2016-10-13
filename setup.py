@@ -11,4 +11,5 @@ setup(name="cast_convert",
       zip_safe=True,
       install_requires=["click"],
       keywords=["chromecast", "ffmpeg", "transcode"],
+      entry_points={"console_scripts": ["cast_convert = cast_convert.convert:cmd"]}
       )
