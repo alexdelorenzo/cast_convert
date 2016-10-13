@@ -5,13 +5,13 @@ Convert audio, video and container to Chromecast supported types. Will only conv
 ## Requirements
 Requires a copy of ffmpeg with ffprobe along with liblamemp3 and libx264 encoders.
 
-Debian
+### Debian
 `sudo apt-get install ffmpeg lame libmp3lame0 x264`
 
-Mac OS X
+### Mac OS X
 `brew install ffmpeg lame x264`
 
-Windows
+### Windows
 `Good Luck(tm)`
 
 
