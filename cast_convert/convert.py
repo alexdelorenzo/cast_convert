@@ -68,6 +68,12 @@ def cmd(debug: bool=False):
     pass
 
 
+@click.command(help="Generate ffmpeg conversion command.")
+@click.argument("filename")
+def get_cmd(filename: str):
+    print(get_ffmpeg_cmd(filename))
+
+
 @click.command(help="Convert video to Chromecast compatible encodings and container")
 @click.argument("filename")
 @click.option("-t", "--threads", default=THREADS,  type=click.INT,
@@ -88,6 +94,7 @@ def inspect(filename: str):
         print("No need to transcode.")
 
 
+cmd.add_command(get_cmd)
 cmd.add_command(convert)
 cmd.add_command(inspect)
 
