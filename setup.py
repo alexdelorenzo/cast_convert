@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 setup(name="cast_convert",
-      version="0.1",
+      version="0.1.2",
       description="Convert and inspect video for Chromecast playback",
       url="https://github.com/thismachinechills/cast_convert",
       author="thismachinechills (Alex)",

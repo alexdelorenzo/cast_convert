@@ -3,8 +3,8 @@ from subprocess import getoutput
 from collections import defaultdict
 from typing import Dict, List, AnyStr, Union
 
-from chromecast_compat import COMPAT_AUDIO, COMPAT_CONTAINER, COMPAT_VIDEO
-from preferences import AUDIO_CODEC, VIDEO_CODEC, CONTAINER_TYPE
+from .chromecast_compat import COMPAT_AUDIO, COMPAT_CONTAINER, COMPAT_VIDEO
+from .preferences import AUDIO_CODEC, VIDEO_CODEC, CONTAINER_TYPE
 
 
 FFPROBE_CMD_FMT = 'ffprobe -show_format -show_streams -loglevel quiet -print_format json "%s"'
