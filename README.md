@@ -16,4 +16,4 @@ Requires a copy of ffmpeg with ffprobe along with libmp3lame and libx264 encoder
 
 
 ## License
-AGPL3
+See `LICENSE`
