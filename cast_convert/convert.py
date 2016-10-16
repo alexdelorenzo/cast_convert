@@ -8,7 +8,10 @@ from .media_info import Options, CodecInfo, get_transcode_info
 from .preferences import ENCODING_OPTIONS, COPY_OPTIONS, THREADS
 
 
-FFMPEG_CMD = 'ffmpeg -fflags +genpts -i "%s" %s'
+FFMPEG_CMD = 'ffmpeg ' \
+             '-fflags +genpts ' \
+             '-i "%s" %s'
+
 NEW_FILE_FMT = '%s_transcode.mp4'
 THREADS_FMT = " -threads %s"
 

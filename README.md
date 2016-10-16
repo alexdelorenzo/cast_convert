@@ -16,7 +16,7 @@ Requires a copy of ffmpeg with ffprobe along with libmp3lame and libx264 encoder
 
 ## Installation
 - Ensure you have installed all requirements.
-`pip3 install cast_convert`
+- `pip3 install cast_convert`
 
 ## Usage
 
