@@ -8,11 +8,11 @@ OLD_PYTHON_REQUIREMENTS = ['mypy-lang']
 with open('requirements.txt', 'r') as file:
     requirements = file.readlines()
 
-if version_info >= MIN_PYTHON_VERSION:
+if version_info < MIN_PYTHON_VERSION:
     requirements.extend(OLD_PYTHON_REQUIREMENTS)
 
 setup(name="cast_convert",
-      version="0.1.4.2",
+      version="0.1.4.3",
       description="Convert and inspect video for Chromecast playback",
       url="https://github.com/thismachinechills/cast_convert",
       author="thismachinechills (Alex)",
