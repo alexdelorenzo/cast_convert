@@ -1,18 +1,35 @@
 from json import loads
 from subprocess import getoutput
-from collections import defaultdict
-from typing import Dict, List, AnyStr, Union
+
+
+try:
+    from typing import Dict, List, Union
+
+except ImportError as e:
+    try:
+        from mypy.types import Dict, List, Union
+
+    except ImportError as e:
+        raise ImportError("Please install mypy from pip3") from e
+
 
 from .chromecast_compat import COMPAT_AUDIO, COMPAT_CONTAINER, COMPAT_VIDEO
 from .preferences import AUDIO_CODEC, VIDEO_CODEC, CONTAINER_TYPE
 
 
-FFPROBE_CMD_FMT = 'ffprobe -show_format -show_streams -loglevel quiet -print_format json "%s"'
-TRANSCODE_OPTS = {"audio": "", "video": "", "container": ""}
+FFPROBE_CMD_FMT = 'ffprobe ' \
+                  '-show_format ' \
+                  '-show_streams ' \
+                  '-loglevel quiet ' \
+                  '-print_format json "%s"'
+
+TRANSCODE_OPTS = {"audio": False,
+                  "video": False,
+                  "container": False}
 
 
 CodecInfo = Union[bool, str]
-Options = Dict[AnyStr, CodecInfo]
+Options = Dict[str, str]
 
 
 def get_media_info(filename: str) -> dict:

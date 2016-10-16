@@ -2,8 +2,11 @@ from multiprocessing import cpu_count
 
 
 ENCODING_OPTIONS = {
-    'mp3': '-c:a libmp3lame -vbr 3',
-    'h264': '-c:v libx264 -preset ultrafast -crf 21',
+    'mp3': '-c:a libmp3lame '
+           '-vbr 3',
+    'h264': '-c:v libx264 '
+            '-preset ultrafast '
+            '-crf 21',
     'mp4': '-f mp4'
 }
 
