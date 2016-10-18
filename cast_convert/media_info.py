@@ -38,8 +38,8 @@ Duration = namedtuple("Duration", "hour min sec")
 def get_media_info(filename: str) -> dict:
     json = loads(getoutput(FFPROBE_CMD_FMT % filename))
 
-    if not json:
-        raise IOError("File %s cannot be read by ffprobe." % filename)
+    #if not json:
+    #    raise IOError("File %s cannot be read by ffprobe." % filename)
 
     return json
 
