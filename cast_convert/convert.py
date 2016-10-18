@@ -60,47 +60,7 @@ def convert_video(filename: str, threads: int=THREADS) -> str:
         print("No need to transcode %s" % filename)
         return
 
-    call(ffmpeg_cmd, shell=True, stdout=PIPE, stdin=PIPE, stderr=PIPE)
+    call(ffmpeg_cmd, shell=True, stdout=PIPE)
 
     return convert_filename(filename)
-
-
-@click.group(help="Convert and inspect video for Chromecast compatibility")
-def cmd(debug: bool=False):
-    pass
-
-
-@click.command(help="Generate ffmpeg conversion command.")
-@click.argument("filename")
-def get_cmd(filename: str):
-    print(get_ffmpeg_cmd(filename))
-
-
-@click.command(help="Convert video to Chromecast compatible encodings and container")
-@click.argument("filename")
-@click.option("-t", "--threads", default=THREADS,  type=click.INT,
-              help="Count of threads for ffmpeg to use. Default: %s" % THREADS)
-def convert(filename: str, threads: int):
-    print("%s -> %s" % (filename, convert_video(filename, threads)))
-
-
-@click.command(help="Inspect video for transcoding options")
-@click.argument("filename")
-def inspect(filename: str):
-    info = get_transcode_info(filename)
-
-    if need_to_transcode(info):
-        print("Transcode video to %s" % str(info))
-
-    else:
-        print("No need to transcode %s.")
-
-
-cmd.add_command(get_cmd)
-cmd.add_command(convert)
-cmd.add_command(inspect)
-
-
-if __name__ == "__main__":
-    cmd()
 
