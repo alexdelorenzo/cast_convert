@@ -1,59 +1,92 @@
+from concurrent.futures import ThreadPoolExecutor as TPE
 from queue import Queue
-from time import sleep
+from time import sleep, time
 
+from os.path import getsize
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from queue import Queue
-from concurrent.futures import ThreadPoolExecutor as TPE
-
-from .media_info import get_media_info
+from .media_info import is_video
 from .convert import convert_video
 
 
-def is_video(path: str) -> bool:
-    media_info = get_media_info(path)
+SIZE_CHECK_WAIT = 1
 
-    if 'codec_type' in media_info:
-        return media_info['codec_type'] == 'video'
 
-    return False
+def file_size_stable(filename: str, wait: float = SIZE_CHECK_WAIT, previous: int = -1):
+    while True:
+        sleep(wait)
+
+        filesize = getsize(filename)
+
+        if filesize == previous:
+            return
+
+        previous = filesize
 
 
 def consume_video_queue(queue: Queue):
+    seen = set()
+
     while True:
-        video = queue.get()
-        convert_video(video)
+        filename = queue.get()
+
+        if filename in seen:
+            continue
+
+        file_size_stable(filename)
+
+        if is_video(filename):
+            print(convert_video(filename))
+
+        else:
+            print(filename, 'not video')
+
+        seen.add(filename)
 
 
 class AddedFileHandler(FileSystemEventHandler):
     def __init__(self, queue: Queue):
+        super().__init__()
         self.queue = queue
 
-    def on_created(self, event):
+    def on_modified(self, event):
         if event.is_directory:
             return
 
-        file = event.src_path
+        self.queue.put(event.src_path)
 
-        if is_video(file):
-            self.queue.put(file)
+    def on_moved(self, event):
+        self.on_modified(event)
 
-
-class TestHandler(FileSystemEventHandler):
     def on_created(self, event):
-        print(event, 'sleeping')
-        sleep(5)
-        print('woke up')
+        self.on_modified(event)
 
 
-def watch_directory(dir: str):
+def watch_directory(directory: str):
     observer = Observer()
     queue = Queue()
     handler = AddedFileHandler(queue)
-    thread_pool = TPE(1)
-    future = thread_pool.submit(consume_video_queue, queue)
 
-    observer.schedule(handler, dir, recursive=True)
+    thread_pool = TPE(1)
+    converter_future = thread_pool.submit(consume_video_queue, queue)
+
+    observer.schedule(handler, directory, recursive=True)
     observer.start()
+
+    try:
+        while True:
+            sleep(1)
+
+    except KeyboardInterrupt:
+        observer.stop()
+
+    try:
+        observer.join()
+        queue.join()
+        converter_future.cancel()
+        thread_pool.shutdown(wait=0.1)
+
+    except KeyboardInterrupt:
+        exit()
 
