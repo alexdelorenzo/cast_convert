@@ -38,8 +38,8 @@ Duration = namedtuple("Duration", "hour min sec")
 def get_media_info(filename: str) -> dict:
     json = loads(getoutput(FFPROBE_CMD_FMT % filename))
 
-    #if not json:
-    #    raise IOError("File %s cannot be read by ffprobe." % filename)
+    if not json:
+        raise IOError("File %s cannot be read by ffprobe." % filename)
 
     return json
 
@@ -121,3 +121,13 @@ def determine_transcodings(media_info: dict) -> Options:
 
 def get_transcode_info(filename: str) -> Options:
     return determine_transcodings(get_media_info(filename))
+
+
+def is_video(path: str) -> bool:
+    try:
+        media_info = get_media_info(path)
+
+        return bool(get_video_codec(media_info))
+
+    except IOError as e:
+        return False
