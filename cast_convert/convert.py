@@ -5,14 +5,13 @@ from subprocess import call, PIPE
 import click
 
 from .media_info import Options, CodecInfo, get_transcode_info
-from .preferences import ENCODING_OPTIONS, COPY_OPTIONS, THREADS
+from .preferences import ENCODING_OPTIONS, COPY_OPTIONS, THREADS, NEW_FILE_FMT
 
 
 FFMPEG_CMD = 'ffmpeg ' \
              '-fflags +genpts ' \
              '-i "%s" %s'
 
-NEW_FILE_FMT = '%s_transcode.mp4'
 THREADS_FMT = " -threads %s"
 
 
@@ -61,7 +60,7 @@ def convert_video(filename: str, threads: int=THREADS) -> str:
         print("No need to transcode %s" % filename)
         return
 
-    call(ffmpeg_cmd, shell=True, stdout=PIPE)
+    call(ffmpeg_cmd, shell=True, stdout=PIPE, stdin=PIPE, stderr=PIPE)
 
     return convert_filename(filename)
 
@@ -94,7 +93,7 @@ def inspect(filename: str):
         print("Transcode video to %s" % str(info))
 
     else:
-        print("No need to transcode.")
+        print("No need to transcode %s.")
 
 
 cmd.add_command(get_cmd)
