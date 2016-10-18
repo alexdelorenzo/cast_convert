@@ -23,3 +23,5 @@ VIDEO_CODEC = 'h264'
 CONTAINER_TYPE = 'mp4'
 
 NEW_FILE_FMT = '%s_castconvert.mp4'
+
+FILESIZE_CHECK_WAIT = 2.0

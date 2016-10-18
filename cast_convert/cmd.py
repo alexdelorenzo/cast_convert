@@ -34,7 +34,7 @@ def inspect(filename: str):
         print("Transcode video to %s" % str(info))
 
     else:
-        print("No need to transcode", info)
+        print("No need to transcode", filename)
 
 
 @click.command(help="Watch directory and convert newly added videos")
