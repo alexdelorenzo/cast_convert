@@ -1,19 +1,17 @@
 from concurrent.futures import ThreadPoolExecutor as TPE
-from queue import Queue
-from time import sleep, time
-
 from os.path import getsize
+from queue import Queue
+from time import sleep
+
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
-from .media_info import is_video
+from cast_convert.preferences import FILESIZE_CHECK_WAIT
 from .convert import convert_video
+from .media_info import is_video
 
 
-SIZE_CHECK_WAIT = 3
-
-
-def file_size_stable(filename: str, wait: float = SIZE_CHECK_WAIT, previous: int = -1):
+def wait_filesize_stable(filename: str, wait: float = FILESIZE_CHECK_WAIT, previous: int = -1):
     while True:
         sleep(wait)
 
@@ -34,7 +32,7 @@ def consume_video_queue(queue: Queue):
         if filename in seen:
             continue
 
-        file_size_stable(filename)
+        wait_filesize_stable(filename)
 
         if is_video(filename):
             print(convert_video(filename))
