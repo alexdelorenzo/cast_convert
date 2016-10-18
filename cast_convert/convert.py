@@ -8,7 +8,7 @@ from .media_info import Options, CodecInfo, get_transcode_info
 from .preferences import ENCODING_OPTIONS, COPY_OPTIONS, THREADS, NEW_FILE_FMT
 
 
-FFMPEG_CMD = 'ffmpeg ' \
+FFMPEG_CMD = 'ffmpeg -y' \
              '-fflags +genpts ' \
              '-i "%s" %s'
 

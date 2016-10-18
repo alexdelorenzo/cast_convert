@@ -1,4 +1,4 @@
-__version__ = '0.1.5.18'
+__version__ = '0.1.5.19'
 
 
 from .cmd import cmd as command
