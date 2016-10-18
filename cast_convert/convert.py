@@ -8,7 +8,7 @@ from .media_info import Options, CodecInfo, get_transcode_info
 from .preferences import ENCODING_OPTIONS, COPY_OPTIONS, THREADS, NEW_FILE_FMT
 
 
-FFMPEG_CMD = 'ffmpeg -y' \
+FFMPEG_CMD = 'ffmpeg -y ' \
              '-fflags +genpts ' \
              '-i "%s" %s'
 
@@ -58,7 +58,7 @@ def convert_video(filename: str, threads: int=THREADS) -> str:
 
     if not ffmpeg_cmd:
         print("No need to transcode %s" % filename)
-        return
+        return ""
 
     call(ffmpeg_cmd, shell=True, stdout=PIPE)
 

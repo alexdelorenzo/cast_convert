@@ -71,6 +71,8 @@ def watch_directory(directory: str):
     thread_pool = TPE(1)
     converter_future = thread_pool.submit(consume_video_queue, queue)
 
+    print("Watching %s for new videos..." % directory)
+
     observer.schedule(handler, directory, recursive=True)
     observer.start()
 
