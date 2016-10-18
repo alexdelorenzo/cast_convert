@@ -3,14 +3,14 @@ from queue import Queue
 from time import sleep, time
 
 from os.path import getsize
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
 from .media_info import is_video
 from .convert import convert_video
 
 
-SIZE_CHECK_WAIT = 1
+SIZE_CHECK_WAIT = 3
 
 
 def file_size_stable(filename: str, wait: float = SIZE_CHECK_WAIT, previous: int = -1):
@@ -45,9 +45,9 @@ def consume_video_queue(queue: Queue):
         seen.add(filename)
 
 
-class AddedFileHandler(FileSystemEventHandler):
-    def __init__(self, queue: Queue):
-        super().__init__()
+class AddedFileHandler(PatternMatchingEventHandler):
+    def __init__(self, queue: Queue, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.queue = queue
 
     def on_modified(self, event):
@@ -63,10 +63,10 @@ class AddedFileHandler(FileSystemEventHandler):
         self.on_modified(event)
 
 
-def watch_directory(directory: str):
+def watch_directory(directory: str, ignore_patterns: list=[]):
     observer = Observer()
     queue = Queue()
-    handler = AddedFileHandler(queue)
+    handler = AddedFileHandler(queue, ignore_patterns=ignore_patterns)
 
     thread_pool = TPE(1)
     converter_future = thread_pool.submit(consume_video_queue, queue)
