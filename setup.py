@@ -12,7 +12,7 @@ if version_info < MIN_PYTHON_VERSION:
     requirements.extend(OLD_PYTHON_REQUIREMENTS)
 
 setup(name="cast_convert",
-      version="0.1.4.5",
+      version="0.1.4.8",
       description="Convert and inspect video for Chromecast playback",
       url="https://github.com/thismachinechills/cast_convert",
       author="thismachinechills (Alex)",
