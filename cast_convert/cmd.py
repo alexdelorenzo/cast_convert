@@ -34,13 +34,17 @@ def inspect(filename: str):
         print("Transcode video to %s" % str(info))
 
     else:
-        print("No need to transcode %s.")
+        print("No need to transcode", info)
 
 
 @click.command(help="Watch directory and convert newly added videos")
+@click.option('-i', '--ignore',
+              help="File pattern to ignore. Flag can be used many times.",
+              multiple=True)
 @click.argument("directory")
-def watch(directory: str):
-    watch_directory(directory)
+def watch(directory: str, ignore: iter):
+    print("Ignoring", ', '.join(ignore) + '...')
+    watch_directory(directory, ignore_patterns=ignore)
 
 
 cmd.add_command(get_cmd)
