@@ -1,16 +1,17 @@
 from json import loads
+from os.path import getsize
 from subprocess import getoutput
-
+from collections import namedtuple
 
 try:
-    from typing import Dict, List, Union
+    from typing import Dict, List, Union, Tuple
 
 except ImportError as e:
     try:
-        from mypy.types import Dict, List, Union
+        from mypy.types import Dict, List, Union, Tuple
 
-    except ImportError as e:
-        raise ImportError("Please install mypy from pip3") from e
+    except ImportError as e2:
+        raise ImportError("Please install mypy via pip") from e2
 
 
 from .chromecast_compat import COMPAT_AUDIO, COMPAT_CONTAINER, COMPAT_VIDEO
@@ -30,6 +31,8 @@ TRANSCODE_OPTS = {"audio": False,
 
 CodecInfo = Union[bool, str]
 Options = Dict[str, str]
+
+Duration = namedtuple("Duration", "hour min sec")
 
 
 def get_media_info(filename: str) -> dict:
@@ -68,6 +71,25 @@ def get_container_format(media_info: dict) -> str:
             return fmt
 
     return name
+
+
+def duration_from_seconds(time: float) -> Duration:
+    m, s = divmod(time, 60)
+    h, m = divmod(m, 60)
+
+    return Duration(h, m, s)
+
+
+def get_duration(media_info: dict) -> float:
+    return media_info['format']['duration']
+
+
+def get_bitrate(media_info: dict) -> float:
+    return media_info['format']['bitrate']
+
+
+def get_size(filename: str) -> int:
+    return getsize(filename)
 
 
 def is_audio_compatible(codec: str) -> bool:
