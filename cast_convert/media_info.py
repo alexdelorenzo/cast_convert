@@ -1,7 +1,7 @@
+from collections import namedtuple
 from json import loads
 from os.path import getsize
 from subprocess import getoutput
-from collections import namedtuple
 
 try:
     from typing import Dict, List, Union, Tuple
@@ -14,8 +14,9 @@ except ImportError as e:
         raise ImportError("Please install mypy via pip") from e2
 
 
-from .chromecast_compat import COMPAT_AUDIO, COMPAT_CONTAINER, COMPAT_VIDEO
-from .preferences import AUDIO_CODEC, VIDEO_CODEC, CONTAINER_TYPE
+from .exceptions import StreamNotFoundException
+from .chromecast_compat import CAST_COMPAT
+from .preferences import CONVERT_TO_CODEC
 
 
 FFPROBE_CMD_FMT = 'ffprobe ' \
@@ -51,6 +52,8 @@ def get_codec(media_info: dict, codec_type: str) -> str:
         if stream['codec_type'] == codec_type:
             return stream['codec_name']
 
+    raise StreamNotFoundException("%s not found in file." % codec_type)
+
 
 def get_video_codec(media_info: dict) -> str:
     return get_codec(media_info, 'video')
@@ -67,10 +70,17 @@ def get_container_format(media_info: dict) -> str:
     # ffprobe might return a list of types
     # let's check each one for compatibility
     for fmt in name.split(','):
-        if fmt in COMPAT_CONTAINER:
+        if fmt in CAST_COMPAT['container']:
             return fmt
 
     return name
+
+
+VID_INFO_FUNCS = {
+    'audio': get_audio_codec,
+    'video': get_video_codec,
+    'container': get_container_format
+}
 
 
 def duration_from_seconds(time: float) -> Duration:
@@ -92,29 +102,31 @@ def get_size(filename: str) -> int:
     return getsize(filename)
 
 
-def is_audio_compatible(codec: str) -> bool:
-    return codec in COMPAT_AUDIO
+def is_compatible(codec_type: str, codec: str):
+    if codec_type is None:
+        return False
+
+    return codec in CAST_COMPAT[codec_type]
 
 
-def is_video_compatible(codec: str) -> bool:
-    return codec in COMPAT_VIDEO
+def update_transcoding_info(stream_type: str, media_info: Options, transcoding_info: Options):
+    get_codec_info = VID_INFO_FUNCS[stream_type]
 
+    try:
+        codec = get_codec_info(media_info)
 
-def is_container_compatible(container: str) -> bool:
-    return container in COMPAT_CONTAINER
+        if not is_compatible(stream_type, codec):
+            transcoding_info[stream_type] = CONVERT_TO_CODEC[stream_type]
+
+    except StreamNotFoundException as e:
+        transcoding_info[stream_type] = False
 
 
 def determine_transcodings(media_info: dict) -> Options:
     transcoding_info = TRANSCODE_OPTS.copy()
 
-    if not is_audio_compatible(get_audio_codec(media_info)):
-        transcoding_info['audio'] = AUDIO_CODEC
-
-    if not is_video_compatible(get_video_codec(media_info)):
-        transcoding_info['video'] = VIDEO_CODEC
-
-    if not is_container_compatible(get_container_format(media_info)):
-        transcoding_info['container'] = CONTAINER_TYPE
+    for stream_type in TRANSCODE_OPTS:
+        update_transcoding_info(stream_type, media_info, transcoding_info)
 
     return transcoding_info
 
@@ -126,8 +138,12 @@ def get_transcode_info(filename: str) -> Options:
 def is_video(path: str) -> bool:
     try:
         media_info = get_media_info(path)
+        codec = get_video_codec(media_info)
 
-        return bool(get_video_codec(media_info))
+        if codec == 'ansi':
+            return False
+
+        return bool(codec)
 
     except IOError as e:
         return False

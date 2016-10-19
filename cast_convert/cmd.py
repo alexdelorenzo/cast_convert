@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import click
 
 from .watch import watch_directory
@@ -41,10 +43,14 @@ def inspect(filename: str):
 @click.option('-i', '--ignore',
               help="File pattern to ignore. Flag can be used many times.",
               multiple=True)
+@click.option("-d", "--debug", help="Print debug statements", default=False)
+@click.option("-t", "--threads", help="Number of threads to pass to ffmpeg", default=THREADS)
 @click.argument("directory")
-def watch(directory: str, ignore: iter):
-    print("Ignoring", ', '.join(ignore) + '...')
-    watch_directory(directory, ignore_patterns=ignore)
+def watch(directory: str, ignore: tuple, debug: bool, threads: int):
+    if ignore:
+        print("Ignoring", ', '.join(ignore) + '...')
+
+    watch_directory(directory, ignore_patterns=ignore, threads=threads, debug=debug)
 
 
 cmd.add_command(get_cmd)

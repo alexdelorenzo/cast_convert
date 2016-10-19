@@ -1,11 +1,8 @@
-#!/usr/bin/env python3
 
 from subprocess import call, PIPE
 
-import click
-
 from .media_info import Options, CodecInfo, get_transcode_info
-from .preferences import ENCODING_OPTIONS, COPY_OPTIONS, THREADS, NEW_FILE_FMT
+from .preferences import ENCODER_OPTIONS, COPY_OPTIONS, THREADS, NEW_FILE_FMT
 
 
 FFMPEG_CMD = 'ffmpeg -y ' \
@@ -16,7 +13,7 @@ THREADS_FMT = " -threads %s"
 
 
 def get_option(media_type: str, codec: CodecInfo) -> str:
-    return ENCODING_OPTIONS[codec] if codec else COPY_OPTIONS[media_type]
+    return ENCODER_OPTIONS[codec] if codec else COPY_OPTIONS[media_type]
 
 
 def build_options(options: Options) -> str:
@@ -32,7 +29,7 @@ def build_cmd(filename: str, options: Options, threads: int=THREADS) -> str:
 
 
 def convert_filename(filename: str) -> str:
-    name, _, suffix = filename.rpartition('.')
+    name, dot, suffix = filename.rpartition('.')
 
     return NEW_FILE_FMT % name
 
