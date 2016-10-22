@@ -1,4 +1,3 @@
-
 from subprocess import call, PIPE
 
 from .media_info import Options, CodecInfo, get_transcode_info
