@@ -16,18 +16,17 @@ COPY_OPTIONS = {
     'container': ''
 }
 
-
 CONVERT_TO_CODEC = {
     'audio': 'mp3',
     'video': 'h264',
     'container': 'mp4',
-    None: None  # If stream isn't found
+    None: None  # stream isn't found
 }
 
 NEW_FILE_FMT = '%s_castconvert.mp4'
-
 FILESIZE_CHECK_WAIT = 2.0
 
 CPUS = cpu_count()
-FFMPEG_PROCESSES = 2 if CPUS >= 2 else 1
-THREADS = CPUS / FFMPEG_PROCESSES
+THREADS = (CPUS - 1) if CPUS >= 3 else CPUS
+
+FFMPEG_PROCESSES = 1 if CPUS >= 2 else 1

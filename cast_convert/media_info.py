@@ -30,8 +30,11 @@ TRANSCODE_OPTS = {"audio": False,
                   "container": False}
 
 
+NOT_VIDS = set('ansi mjpg png subrip'.split())
+
+
 CodecInfo = Union[bool, str]
-Options = Dict[str, str]
+Options = Dict[str, CodecInfo]
 
 Duration = namedtuple("Duration", "hour min sec")
 
@@ -52,7 +55,7 @@ def get_codec(media_info: dict, codec_type: str) -> str:
         if stream['codec_type'] == codec_type:
             return stream['codec_name']
 
-    raise StreamNotFoundException("%s not found in file." % codec_type)
+    raise StreamNotFoundException("%s stream not found in file." % codec_type.capitalize())
 
 
 def get_video_codec(media_info: dict) -> str:
@@ -98,10 +101,6 @@ def get_bitrate(media_info: dict) -> float:
     return media_info['format']['bitrate']
 
 
-def get_size(filename: str) -> int:
-    return getsize(filename)
-
-
 def is_compatible(codec_type: str, codec: str):
     if codec_type is None:
         return False
@@ -110,10 +109,10 @@ def is_compatible(codec_type: str, codec: str):
 
 
 def update_transcoding_info(stream_type: str, media_info: Options, transcoding_info: Options):
-    get_codec_info = VID_INFO_FUNCS[stream_type]
+    func_get_codec = VID_INFO_FUNCS[stream_type]
 
     try:
-        codec = get_codec_info(media_info)
+        codec = func_get_codec(media_info)
 
         if not is_compatible(stream_type, codec):
             transcoding_info[stream_type] = CONVERT_TO_CODEC[stream_type]
@@ -138,12 +137,13 @@ def get_transcode_info(filename: str) -> Options:
 def is_video(path: str) -> bool:
     try:
         media_info = get_media_info(path)
-        codec = get_video_codec(media_info)
-
-        if codec == 'ansi':
-            return False
-
-        return bool(codec)
 
     except IOError as e:
         return False
+
+    codec = get_video_codec(media_info)
+
+    if codec in NOT_VIDS:
+        return False
+
+    return bool(codec)
