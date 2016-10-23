@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__version__ = '0.1.7.17'
+__version__ = '0.1.7.18'
 
 
 from .cmd import cmd as command
