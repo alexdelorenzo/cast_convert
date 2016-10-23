@@ -7,7 +7,7 @@ MIN_PYTHON_VERSION = (3, 5)
 OLD_PYTHON_REQUIREMENTS = ['mypy-lang']
 
 with open('requirements.txt', 'r') as file:
-    requirements = file.readlines()
+    requirements = [line.strip() for line in file]
 
 if version_info < MIN_PYTHON_VERSION:
     requirements.extend(OLD_PYTHON_REQUIREMENTS)
