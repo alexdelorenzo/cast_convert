@@ -30,7 +30,12 @@ def convert(filename: str, threads: int):
 @click.command(help="Inspect video for transcoding options")
 @click.argument("filename")
 def inspect(filename: str):
-    info = get_transcode_info(filename)
+    try:
+        info = get_transcode_info(filename)
+
+    except OSError as e:
+        print(e)
+        return
 
     if need_to_transcode(info):
         print("Transcode video to %s" % str(info))

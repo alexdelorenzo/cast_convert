@@ -13,17 +13,23 @@ from .preferences import FILESIZE_CHECK_WAIT, THREADS, FFMPEG_PROCESSES
 
 
 debug_print = partial(print, "DEBUG ->")
+exc_print = partial(print, "EXCEPTION ->")
 
 
 def wait_for_stable_size(filename: str, wait: float = FILESIZE_CHECK_WAIT, previous: int = None):
     while True:
-        filesize = getsize(filename)
+        try:
+            filesize = getsize(filename)
 
-        if filesize == previous:
-            return filesize
+            if filesize == previous:
+                return filesize
 
-        previous = filesize
-        sleep(wait)
+            previous = filesize
+            sleep(wait)
+
+        except Exception as e:
+            exc_print(e)
+            previous = None
 
 
 def consume_video_queue(queue: Queue, threads: int = THREADS, debug: bool = False):
@@ -34,11 +40,16 @@ def consume_video_queue(queue: Queue, threads: int = THREADS, debug: bool = Fals
             debug_print("Getting %s size..." % filename)
 
         filesize = wait_for_stable_size(filename)
-        file_is_vid = is_video(filename)
 
         if debug:
             debug_print(filename, filesize)
+            debug_print("Determing if", filename, "is a video...")
+
+        file_is_vid = is_video(filename)
+
+        if debug:
             debug_print(filename, file_is_vid)
+            debug_print("Converting video...")
 
         if file_is_vid:
             print(convert_video(filename, threads=threads))
