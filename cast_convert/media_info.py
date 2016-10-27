@@ -1,6 +1,6 @@
 from collections import namedtuple
 from json import loads
-from os.path import getsize
+from os.path import isfile
 from subprocess import getoutput
 
 try:
@@ -135,10 +135,16 @@ def get_transcode_info(filename: str) -> Options:
 
 
 def is_video(path: str) -> bool:
+    if not isfile(path):
+        return False
+
     try:
         media_info = get_media_info(path)
 
     except IOError as e:
+        return False
+
+    except StreamNotFoundException as e:
         return False
 
     codec = get_video_codec(media_info)
