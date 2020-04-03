@@ -1,0 +1,33 @@
+@echo off
+echo ========== REMOVING SPACES ==========
+setlocal enabledelayedexpansion
+for %%j in (%1\%2\*.*) do (
+set filename=%%~nj
+set filename=!filename: =_!
+if not "!filename!"=="%%~nj" ren "%%j" "!filename!%%~xj"
+)
+
+echo ========== CONVERTING FILES ==========
+for %%f in (%1\%2\*.*) do cast_convert convert -t 2 %%f
+
+echo ========== CREATING DIRECTORIES ==========
+if not exist "\\LINKSYS-EA6400\My Book\Videos\%1\" mkdir "\\LINKSYS-EA6400\My Book\Videos\%1"
+if not exist "\\LINKSYS-EA6400\My Book\Videos\%1\%2\" mkdir "\\LINKSYS-EA6400\My Book\Videos\%1\%2"
+
+echo ========== TRANSFERRING FILES ==========
+move %1\%2\*castconvert.mkv "\\LINKSYS-EA6400\My Book\Videos\%1\%2\"
+
+echo ========== COPYING MP4/MKV FILES ==========
+copy %1\%2\*.mp4 "\\LINKSYS-EA6400\My Book\Videos\%1\%2\"
+copy %1\%2\*.mkv "\\LINKSYS-EA6400\My Book\Videos\%1\%2\"
+
+echo ========== BATCH SCRIPT DONE ==========
+pause
+
+:: usage on cmd.exe --> thisfile.bat My_Serie The_Season
+:: example --> thisfile.bat The_Walking_Dead S05
+
+::################ REQUIREMENTS #################
+:: - python3 & pip
+:: - pip install ffmpeg
+:: - pip install cast_convert
