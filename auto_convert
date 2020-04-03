@@ -28,6 +28,6 @@ pause
 :: example --> thisfile.bat The_Walking_Dead S05
 
 ::################ REQUIREMENTS #################
+:: - ffmpeg binaries
 :: - python3 & pip
-:: - pip install ffmpeg
 :: - pip install cast_convert
