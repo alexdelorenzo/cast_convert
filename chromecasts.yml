@@ -1,0 +1,144 @@
+images:
+  - APNG
+  - BMP
+  - GIF
+  - JPEG
+  - PNG
+  - WEBP
+
+containers:
+  - MP2T
+  - MP3
+  - MP4
+  - OGG
+  - WAV
+  - WebM
+
+audio:
+  - FLAC
+  - HE-AAC
+  - LC-AAC
+  - MP3
+  - Opus
+  - Vorbis
+  - WAV
+  - WebM
+
+
+codec: &codec
+ resolution: 1080
+ fps: 30
+ level: 0
+
+
+chromecast: &device
+  model: 1st Gen
+  codecs:
+    - h264:
+        <<: *codec
+        level: 4.1
+    - h264:
+        <<: *codec
+        resolution: 720
+        fps: 60
+        level: 4.1
+    - vp8:
+        <<: *codec
+    - vp8:
+        <<: *codec
+        resolution: 720
+        fps: 60
+
+
+devices:
+  Chromecast 1st Gen:
+    <<: *device
+
+  Chromecast 2nd Gen:
+    <<: *device
+
+  Chromecast 3rd Gen:
+    <<: *device
+    codecs:
+      - h264:
+          <<: *codec
+          fps: 60
+          level: 4.2
+      - vp8:
+          <<: *codec
+      - vp8:
+          <<: *codec
+          resolution: 720
+          fps: 60
+
+  Chromecast Ultra:
+    <<: *device
+    codecs:
+      - h264:
+          <<: *codec
+          fps: 60
+          level: 4.2
+      - vp8:
+          <<: *codec
+          resolution: 3840
+          fps: 60
+      - h265:
+          <<: *codec
+          fps: 60
+          resolution: 3840
+          level: 5.1
+      - vp9:
+          <<: *codec
+          resolution: 3840
+          fps: 60
+          level: 5.1
+      - hdr:
+          <<: *codec
+          resolution: 3840
+          fps: 60
+
+  Chromecast with Google TV:
+    <<: *device
+    codecs:
+      - h264:
+          <<: *codec
+          resolution: 3840
+          fps: 30
+          level: 5.1
+      - h265:
+          <<: *codec
+          fps: 60
+          resolution: 3840
+          level: 5.1
+      - vp9:
+          <<: *codec
+          resolution: 3840
+          fps: 60
+
+  Google Nest Hub:
+    <<: *device
+    codecs:
+      - h264:
+          <<: *codec
+          resolution: 720
+          fps: 60
+          level: 4.1
+      - vp9:
+          <<: *codec
+          resolution: 720
+          fps: 60
+          level: 4.0
+
+  Nest Hub Max:
+    <<: *device
+    codecs:
+      - h264:
+          <<: *codec
+          resolution: 720
+          fps: 60
+          level: 4.1
+      - vp9:
+          <<: *codec
+          resolution: 720
+          fps: 60
+          level: 4.0
