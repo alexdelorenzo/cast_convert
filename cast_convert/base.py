@@ -105,6 +105,7 @@ class VideoProfile(Profile, Unpackable):
 
 Format = VideoProfile | AudioProfile | Container
 
+
 class Formats(NamedTuple):
   container: Container | None = None
   video_profile: VideoProfile | None = None
