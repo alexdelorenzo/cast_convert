@@ -94,6 +94,7 @@ def get_devices(data: Yaml) -> Iterable[Device]:
   for name, device_info in data['devices'].items():
     yield get_device(name, device_info, data)
 
+
 def transcode_video(
   device: Device,
   video: Video,
