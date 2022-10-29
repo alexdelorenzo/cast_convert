@@ -14,7 +14,7 @@ from .parse import Yaml
 
 Codecs = AudioCodec | VideoCodec
 Profiles = AudioProfile | VideoProfile
-VideoMetadata = Codecs | Profiles
+VideoMetadata = Codecs | Profiles | Container
 
 
 @dataclass
@@ -109,6 +109,9 @@ def is_compatible(video: Video, other: VideoMetadata) -> bool:
     case AudioCodec() as codec:
       return audio_profile.codec == codec
 
+    case Container() as container:
+      return container == container
+
   raise TypeError(type(other))
 
 
@@ -128,7 +131,8 @@ def profile_to_level(profile: str | None) -> float:
     case [val]:
       return float(val)
 
-    case [big, small]:
+    case [big, *small]:
+      small = ''.join(small)
       return float(f'{big}.{small}')
 
   return DEFAULT_LEVEL
