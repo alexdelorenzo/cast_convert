@@ -30,27 +30,11 @@ class Video:
     data: MediaInfo = MediaInfo.parse(path)
 
     [general] = data.general_tracks
-    [video] = data.video_tracks
-    audio, *_ = data.audio_tracks
+    title = general.file_name or general.complete_name
 
-    title = general.complete_name
     container = Container.from_info(general.format)
-
-    video_codec = VideoCodec.from_info(video.format)
-    height, width = video.height, video.width
-    fps = video.original_frame_rate
-    profile = video.format_profile
-
-    video_profile = VideoProfile(
-      codec=video_codec,
-      resolution=int(height),
-      fps=float(fps if fps else DEFAULT_FPS),
-      level=profile_to_level(profile)
-    )
-
-    audio_name: str = audio.codec_id_hint or audio.format
-    audio_codec = AudioCodec.from_info(audio_name)
-    audio_profile = AudioProfile(audio_codec)
+    video_profile = get_video_profile(data)
+    audio_profile = get_audio_profile(data)
 
     formats = Formats(
       container=container,
@@ -61,12 +45,45 @@ class Video:
     return cls(
       name=title,
       path=path.absolute(),
-      data=data,
       formats=formats,
+      data=data,
     )
 
   def is_compatible(self, other: VideoMetadata) -> bool:
     return is_compatible(self, other)
+
+
+def get_audio_profile(data: MediaInfo) -> AudioProfile | None:
+  if not data.audio_tracks:
+    return None
+
+  audio, *_ = data.audio_tracks
+
+  audio_name: str = audio.codec_id_hint or audio.format
+  audio_codec = AudioCodec.from_info(audio_name)
+
+  return  AudioProfile(audio_codec)
+
+
+def get_video_profile(data: MediaInfo) -> VideoProfile | None:
+  if not data.video_tracks:
+    return None
+
+  [video] = data.video_tracks
+
+  if (codec := VideoCodec.from_info(video.format)) == VideoCodec.unknown:
+    codec = VideoCodec.from_info(video.codec_id or video.codec_id_hint)
+
+  height, width = video.height, video.width
+  fps = video.original_frame_rate
+  profile = video.format_profile
+
+  return VideoProfile(
+    codec=codec,
+    resolution=int(height),
+    fps=float(fps if fps else DEFAULT_FPS),
+    level=profile_to_level(profile)
+  )
 
 
 def is_compatible(video: Video, other: VideoMetadata) -> bool:
@@ -118,8 +135,10 @@ def profile_to_level(profile: str | None) -> float:
 
 
 def get_video_profiles(info: Yaml) -> Iterable[VideoProfile]:
-  for codec in info:
-    [name, attrs], *_ = codec.items()
+  codec_info: Yaml
+
+  for codec_info in info:
+    [name, attrs], *_ = codec_info.items()
     codec = VideoCodec.from_info(name)
 
     yield VideoProfile(

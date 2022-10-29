@@ -36,6 +36,8 @@ aliases:
     - h265
   mkv:
     - matroska
+  div3:
+    - divx
 
 
 # Codec record shape

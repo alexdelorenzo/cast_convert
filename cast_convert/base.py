@@ -37,8 +37,11 @@ class Normalize:
     return cls.unknown
 
   @classmethod
-  def from_info(cls: Type[Self], info: str) -> Self:
-    if not info or not isinstance(info, str):
+  def from_info(cls: Type[Self], info: str | None) -> Self:
+    if not info:
+      return cls.unknown
+
+    if not isinstance(info, str):
       raise TypeError(f"{cls.__name__}: Can't normalize: {info}")
 
     normalized = normalize_info(info)
@@ -54,6 +57,7 @@ class Container(Normalize, StrEnum):
   wav: str = auto()
   webm: str = auto()
   matroska: str = auto()
+  avi: str = auto()
 
   unknown: str = auto()
 
@@ -67,6 +71,8 @@ class VideoCodec(Normalize, StrEnum):
   vp8: str = auto()
   vp9: str = auto()
   hdr: str = auto()
+  xvid: str = auto()
+  divx: str = auto()
 
   unknown: str = auto()
 
@@ -82,6 +88,8 @@ class AudioCodec(Normalize, StrEnum):
   wav: str = auto()
   webm: str = auto()
   mp3: str = auto()
+  ac3: str = auto()
+  eac3: str = auto()
 
   unknown: str = auto()
 
