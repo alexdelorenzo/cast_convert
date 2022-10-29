@@ -3,7 +3,7 @@ from sys import version_info
 from cast_convert import __version__
 
 
-MIN_PYTHON_VERSION = (3, 5)
+MIN_PYTHON_VERSION = (3, 11)
 OLD_PYTHON_REQUIREMENTS = ['mypy-lang']
 
 with open('requirements.txt', 'r') as file:
