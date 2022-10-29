@@ -9,7 +9,8 @@ from yaml import safe_load
 Yaml = dict[str, ...]
 
 
-DEVICE_INFO: Final[Path] = Path('device-support.yml').absolute()
+SRC_DIR: Final[Path] = Path(__file__).parent.parent.absolute()
+DEVICE_INFO: Final[Path] = SRC_DIR / 'device-support.yml'
 
 
 def get_yaml(path: Path = DEVICE_INFO) -> Yaml:
