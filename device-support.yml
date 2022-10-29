@@ -65,6 +65,7 @@ _device: &device
         resolution: 720
         fps: 60
 
+
 # Device names and supported codecs from https://developers.google.com/cast/docs/media
 devices:
   Chromecast 1st Gen:
