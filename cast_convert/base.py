@@ -23,6 +23,7 @@ U = TypeVar('U')
 
 Item = T | U | None
 
+
 class Normalize:
   unknown: str
 
