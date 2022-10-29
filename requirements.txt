@@ -1,2 +1,4 @@
 click
 watchdog
+pyyaml
+pymediainfo
