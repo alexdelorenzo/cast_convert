@@ -9,6 +9,7 @@ OLD_PYTHON_REQUIREMENTS = ['mypy-lang']
 
 REQUIREMENTS = Path('requirements.txt').read_text().split('\n')
 
+
 if version_info < MIN_PYTHON_VERSION:
   REQUIREMENTS.extend(OLD_PYTHON_REQUIREMENTS)
 
