@@ -1,3 +1,4 @@
+# Supported formats from https://developers.google.com/cast/docs/media
 images:
   - APNG
   - BMP
@@ -26,7 +27,7 @@ audio:
   - FLAC
   - WAV
 
-
+# Formats can have different names, here are their equivalencies
 aliases:
   avc:
     - h264
@@ -37,14 +38,14 @@ aliases:
     - matroska
 
 
-
+# Codec record shape
 _codec: &codec
  resolution: 1080
  fps: 30
  level: 100.0
 
-
-_chromecast: &device
+# Device record shape
+_device: &device
   model: 1st Gen
   codecs:
     - avc:
@@ -62,7 +63,7 @@ _chromecast: &device
         resolution: 720
         fps: 60
 
-
+# Device names and supported codecs from https://developers.google.com/cast/docs/media
 devices:
   Chromecast 1st Gen:
     <<: *device

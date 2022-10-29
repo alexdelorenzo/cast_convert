@@ -8,7 +8,8 @@ from yaml import safe_load
 
 Yaml = dict[str, ...]
 
-DEVICE_INFO: Final[Path] = Path('chromecasts.yml').absolute()
+
+DEVICE_INFO: Final[Path] = Path('device-support.yml').absolute()
 
 
 def get_yaml(path: Path = DEVICE_INFO) -> Yaml:
