@@ -30,20 +30,21 @@ class Video:
   def from_path(cls, path: Path) -> Self:
     data: MediaInfo = MediaInfo.parse(path)
 
-    [gen] = data.general_tracks
+    [general] = data.general_tracks
     [video] = data.video_tracks
     audio, *_ = data.audio_tracks
 
-    title = gen.complete_name
-    container = Container.from_info(gen.format)
-    codec = VideoCodec.from_info(video.format)
+    title = general.complete_name
+    container = Container.from_info(general.format)
+
+    video_codec = VideoCodec.from_info(video.format)
     height, width = video.height, video.width
-    audio_codec = AudioCodec.from_info(audio.codec_id_hint)
     fps = video.original_frame_rate
     profile = video.format_profile
+    audio_codec = AudioCodec.from_info(audio.codec_id_hint)
 
     video_profile = VideoProfile(
-      codec=codec,
+      codec=video_codec,
       resolution=int(width),
       fps=float(fps if fps else DEFAULT_FPS),
       level=profile_to_level(profile)

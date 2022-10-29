@@ -4,8 +4,12 @@ from enum import StrEnum, auto
 from typing import Final, Self, Type
 from abc import ABC
 from pathlib import Path
+import logging
 
 from unpackable import Unpackable
+
+
+logging.basicConfig(level=logging.WARN)
 
 
 INFO: Final[Path] = Path('chromecasts.yml')

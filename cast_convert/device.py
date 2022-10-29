@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Iterable
+import logging
 
 from .base import VideoProfile, AudioProfile, Profile, Container, \
   AudioCodec, UnknownCodec, VideoCodec
@@ -37,6 +38,12 @@ class Device:
 
     can_video = any(video.is_compatible(profile) for profile in self.video_profiles)
     can_audio = any(video.is_compatible(profile) for profile in self.audio_profiles)
+
+    if not can_video:
+      logging.info(f"{video.video_profile} not compatible with {self.video_profiles}")
+
+    if not can_audio:
+      logging.info(f"{video.audio_profile} not compatible with {self.audio_profiles}")
 
     return can_video and can_audio
 
