@@ -9,12 +9,14 @@ from unpackable import Unpackable
 
 from .parse import INVERSED_ALIASES
 
+
 logging.basicConfig(level=logging.WARN)
 
 
 DEFAULT_FPS: Final[float] = 0.0
 DEFAULT_LEVEL: Final[float] = 0.0
 PROFILE_SEP: Final[str] = '@L'
+
 
 T = TypeVar('T')
 U = TypeVar('U')

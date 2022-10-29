@@ -76,7 +76,6 @@ class Device:
   def can_play(self, video: Video) -> bool:
     return self.can_play_audio(video) and self.can_play_video(video) and self.can_play_container(video)
 
-
   def transcode_to(self, video: Video) -> Formats | None:
     return transcode_to(self, video)
 
