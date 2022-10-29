@@ -1,17 +1,14 @@
-from dataclasses import dataclass, field
-from enum import StrEnum
-from typing import NamedTuple, Literal, Final, Iterable
+from __future__ import annotations
+from dataclasses import dataclass
+from enum import StrEnum, auto
+from typing import Final, Self, Type
 from abc import ABC
 from pathlib import Path
-import logging
 
-from yaml import safe_load
-
-
-INFO: Final[Path] = Path('../chromecasts.yml')
+from unpackable import Unpackable
 
 
-Yaml = dict[str, ...]
+INFO: Final[Path] = Path('chromecasts.yml')
 
 
 class CastConvertException(Exception):
@@ -27,13 +24,15 @@ class UnknownCodec(VideoError):
 
 
 class Normalize:
+  unknown: str
+
   @classmethod
   def _missing_(cls, value: str) -> Self:
-    logging.info(f"Couldn't find {value}")
+    print(f"[{cls.__name__}] Not enumerated: {value}")
     return cls.unknown
 
   @classmethod
-  def from_info(cls, info: str) -> Self:
+  def from_info(cls: Type[Self], info: str) -> Self:
     normalized = normalize_info(info)
     return cls(normalized)
 
@@ -51,7 +50,7 @@ class Container(Normalize, StrEnum):
   unknown: str = auto()
 
 
-class Codec(Normalize, StrEnum):
+class VideoCodec(Normalize, StrEnum):
   avc: str = auto()
   mpeg4: str = auto()
   h264: str = auto()
@@ -59,7 +58,12 @@ class Codec(Normalize, StrEnum):
   hevc: str = auto()
   vp8: str = auto()
   vp9: str = auto()
+  hdr: str = auto()
 
+  unknown: str = auto()
+
+
+class AudioCodec(Normalize, StrEnum):
   aac: str = auto()
   eacs: str = auto()
   flac: str = auto()
@@ -69,86 +73,29 @@ class Codec(Normalize, StrEnum):
   vorbis: str = auto()
   wav: str = auto()
   webm: str = auto()
+  mp3: str = auto()
 
   unknown: str = auto()
 
 
 @dataclass(eq=True, frozen=True)
-class BaseCodec(ABC):
-  name: str
-
-
-@dataclass(eq=True, frozen=True)
-class AudioCodec(BaseCodec):
+class Profile(ABC):
   pass
 
 
 @dataclass(eq=True, frozen=True)
-class VideoCodec(BaseCodec):
-  resolution: int
-  fps: float = 30
-  level: float = 0.0
-  codec: Codec = Codec.unknown
+class AudioProfile(Profile, Unpackable):
+  codec: AudioCodec = AudioCodec.unknown
 
 
-@dataclass
-class Device:
-  name: str
-
-  video: set[VideoCodec] = field(default_factory=set)
-  audio: set[AudioCodec] = field(default_factory=set)
-
-  containers: set[str] = field(default_factory=set)
-
-  def add_codec(codec: Codec):
-    match codec:
-      case VideoCodec():
-        self.video.append(codec)
-
-      case AudioCodec():
-        self. audio.append(codec)
-
-      case _:
-        raise TypeError("Not a Codec: {codec}")
+@dataclass(eq=True, frozen=True)
+class VideoProfile(Profile, Unpackable):
+  codec: VideoCodec = VideoCodec.unknown
+  resolution: int = 720
+  fps: float = 24.0
+  level: float | None = 0.0
 
 
-def get_yaml() -> Yaml:
-  text = INFO.read_text()
-  return safe_load(text)
-
-
-def get_video_codecs(info: Yaml) -> Iterable[Codec]:
-  for codec in info:
-    [name, attrs], *_ = codec.items()
-    codec = Codec.from_info(name)
-
-    yield VideoCodec(
-      name,
-      attrs.get('resolution'),
-      attrs.get('fps'),
-      attrs.get('level'),
-      codec=codec,
-    )
-
-
-def get_device(name: str, device_info: Yaml, data: Yaml) -> Device:
-  audio = set(map(AudioCodec, data['audio']))
-  video = set(get_video_codecs(device_info['codecs']))
-  containers = data['containers']
-
-  return Device(name, video, audio, containers)
-
-
-def get_devices(data: Yaml) -> Iterable[Device]:
-  for name, device_info in data['devices'].items():
-    yield get_device(name, device_info, data)
-
-
-def is_compatible(video: Video, codec: BaseCodec) -> bool:
-  pass
-
-
-if __name__ == "__main__":
-  data = get_yaml()
-  devices = list(get_devices(data))
-  print(devices)
+def normalize_info(info: str) -> str:
+  info = info.casefold()
+  return ''.join(char for char in info if char.isalnum())
