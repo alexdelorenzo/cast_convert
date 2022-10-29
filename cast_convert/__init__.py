@@ -3,7 +3,7 @@
 __version__ = '0.1.7.19'
 
 
-from .cmd import cmd as command
+from .old.cmd import cmd as command
 import click
 
 @click.command(help="Print version")
@@ -13,9 +13,9 @@ def version():
 
 command.add_command(version)
 
-from .watch import *
-from .convert import *
-from .media_info import *
+from .old.watch import *
+from .old.convert import *
+from .old.media_info import *
 from . import *
 
 

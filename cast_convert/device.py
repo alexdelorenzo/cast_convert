@@ -2,12 +2,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Self
-from itertools import chain
 import logging
 
-from .base import VideoProfile, AudioProfile, Profile, Container, \
+from .old.exceptions import UnknownCodec
+from .base import VideoProfile, AudioProfile, Container, \
   AudioCodec, VideoCodec, Formats, Format
-from .exceptions import UnknownCodec
 from .parse import Yaml, get_yaml, DEVICE_INFO
 from .video import Video, get_video_profiles
 

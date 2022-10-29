@@ -4,7 +4,7 @@ from multiprocessing import cpu_count
 ENCODER_OPTIONS = {
     'mp3': '-c:a libmp3lame '
            '-q:a 3 ',
-    'h264': '-c:v libx264 '
+    'avc': '-c:v libx264 '
             '-preset ultrafast '
             '-crf 21 ',
     'mp4': '-f mp4 '
@@ -18,7 +18,7 @@ COPY_OPTIONS = {
 
 CONVERT_TO_CODEC = {
     'audio': 'mp3',
-    'video': 'h264',
+    'video': 'avc',
     'container': 'mp4',
     None: None  # stream isn't found
 }
