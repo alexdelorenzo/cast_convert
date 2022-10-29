@@ -7,37 +7,50 @@ images:
   - WEBP
 
 containers:
-  - MP2T
-  - MP3
+  - Matroska
   - MP4
+  - WebM
+  - MP3
+  - MP2T
   - OGG
   - WAV
-  - WebM
 
 audio:
-  - FLAC
+  - MP3
+  - AAC
   - HE-AAC
   - LC-AAC
-  - MP3
   - Opus
   - Vorbis
-  - WAV
   - WebM
+  - FLAC
+  - WAV
 
 
-codec: &codec
+aliases:
+  avc:
+    - h264
+    - mp4
+  hevc:
+    - h265
+  mkv:
+    - matroska
+
+
+
+_codec: &codec
  resolution: 1080
  fps: 30
- level: 0
+ level: 100.0
 
 
-chromecast: &device
+_chromecast: &device
   model: 1st Gen
   codecs:
-    - h264:
+    - avc:
         <<: *codec
         level: 4.1
-    - h264:
+    - avc:
         <<: *codec
         resolution: 720
         fps: 60
@@ -60,7 +73,7 @@ devices:
   Chromecast 3rd Gen:
     <<: *device
     codecs:
-      - h264:
+      - avc:
           <<: *codec
           fps: 60
           level: 4.2
@@ -74,15 +87,15 @@ devices:
   Chromecast Ultra:
     <<: *device
     codecs:
-      - h264:
+      - avc:
           <<: *codec
           fps: 60
           level: 4.2
       - vp8:
           <<: *codec
           resolution: 3840
-          fps: 60
-      - h265:
+          fps: 30
+      - hevc:
           <<: *codec
           fps: 60
           resolution: 3840
@@ -100,12 +113,16 @@ devices:
   Chromecast with Google TV:
     <<: *device
     codecs:
-      - h264:
+      - avc:
+          <<: *codec
+          fps: 60
+          level: 5.1
+      - avc:
           <<: *codec
           resolution: 3840
           fps: 30
           level: 5.1
-      - h265:
+      - hevc:
           <<: *codec
           fps: 60
           resolution: 3840
@@ -118,7 +135,7 @@ devices:
   Google Nest Hub:
     <<: *device
     codecs:
-      - h264:
+      - avc:
           <<: *codec
           resolution: 720
           fps: 60
@@ -132,7 +149,7 @@ devices:
   Nest Hub Max:
     <<: *device
     codecs:
-      - h264:
+      - avc:
           <<: *codec
           resolution: 720
           fps: 60

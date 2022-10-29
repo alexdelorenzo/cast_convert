@@ -1,27 +1,24 @@
 from __future__ import annotations
-from typing import Iterable
+
+from pathlib import Path
+from typing import Final
 
 from yaml import safe_load
-
-from .base import INFO, VideoProfile, VideoCodec
 
 
 Yaml = dict[str, ...]
 
+DEVICE_INFO: Final[Path] = Path('chromecasts.yml').absolute()
 
-def get_yaml() -> Yaml:
-  text = INFO.read_text()
+
+def get_yaml(path: Path = DEVICE_INFO) -> Yaml:
+  text = path.read_text()
   return safe_load(text)
 
 
-def get_video_profiles(info: Yaml) -> Iterable[VideoProfile]:
-  for codec in info:
-    [name, attrs], *_ = codec.items()
-    codec = VideoCodec.from_info(name)
+DATA: Final[Yaml] = get_yaml()
+ALIASES: Final[dict[str, list[str]]] = DATA['aliases']
+INVERSED_ALIASES: Final[dict[str, str]] = \
+  {val: key for key, vals in ALIASES.items() for val in vals}
 
-    yield VideoProfile(
-      codec=codec,
-      resolution=attrs.get('resolution'),
-      fps=float(attrs.get('fps')),
-      level=float(attrs.get('level')),
-    )
+

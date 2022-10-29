@@ -1,18 +1,20 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final, Self
+from typing import Self, Iterable
 
 from pymediainfo import MediaInfo
 
-from .base import VideoProfile, AudioProfile, Container, AudioCodec, VideoCodec
+from .base import VideoProfile, AudioProfile, Container, \
+  AudioCodec, VideoCodec, normalize_info, DEFAULT_FPS, \
+  DEFAULT_LEVEL, PROFILE_SEP, Formats
+from .parse import Yaml
 
 
-PROFILE_SEP: Final[str] = '@L'
-DEFAULT_FPS: Final[float] = 0.0
-DEFAULT_LEVEL: Final[float] = 0.0
-
-
-VideoMetadata = AudioProfile | VideoProfile | AudioCodec | VideoCodec
+Codecs = AudioCodec | VideoCodec
+Profiles = AudioProfile | VideoProfile
+VideoMetadata = Codecs | Profiles
 
 
 @dataclass
@@ -20,10 +22,7 @@ class Video:
   name: str
   path: Path
 
-  container: Container
-  video_profile: VideoProfile
-  audio_profile: AudioProfile
-
+  formats: Formats
   data: MediaInfo
 
   @classmethod
@@ -41,24 +40,29 @@ class Video:
     height, width = video.height, video.width
     fps = video.original_frame_rate
     profile = video.format_profile
-    audio_codec = AudioCodec.from_info(audio.codec_id_hint)
 
     video_profile = VideoProfile(
       codec=video_codec,
-      resolution=int(width),
+      resolution=int(height),
       fps=float(fps if fps else DEFAULT_FPS),
       level=profile_to_level(profile)
     )
 
+    audio_name: str = audio.codec_id_hint or audio.format
+    audio_codec = AudioCodec.from_info(audio_name)
     audio_profile = AudioProfile(audio_codec)
+
+    formats = Formats(
+      container=container,
+      video_profile=video_profile,
+      audio_profile=audio_profile,
+    )
 
     return cls(
       name=title,
       path=path.absolute(),
-      container=container,
       data=data,
-      video_profile=video_profile,
-      audio_profile=audio_profile,
+      formats=formats,
     )
 
   def is_compatible(self, other: VideoMetadata) -> bool:
@@ -66,9 +70,11 @@ class Video:
 
 
 def is_compatible(video: Video, other: VideoMetadata) -> bool:
+  container, video_profile, audio_profile = video.formats
+
   match other:
     case VideoProfile(codec, resolution, fps, level):
-      _codec, _resolution, _fps, _level = video.video_profile
+      _codec, _resolution, _fps, _level = video_profile
 
       return (
         _codec == codec and
@@ -78,13 +84,13 @@ def is_compatible(video: Video, other: VideoMetadata) -> bool:
       )
 
     case AudioProfile(codec):
-      return video.audio_profile.codec == codec
+      return audio_profile.codec == codec
 
     case VideoCodec() as codec:
-      return video.video_profile.codec == codec
+      return video_profile.codec == codec
 
     case AudioCodec() as codec:
-      return video.audio_profile.codec == codec
+      return audio_profile.codec == codec
 
   raise TypeError(type(other))
 
@@ -96,10 +102,12 @@ def profile_to_level(profile: str | None) -> float:
   if PROFILE_SEP in level:
     name, level = level.split(PROFILE_SEP)
 
+  level = normalize_info(level)
+
   if not level.isnumeric():
     return DEFAULT_LEVEL
 
-  match level.split():
+  match [*level]:
     case [val]:
       return float(val)
 
@@ -107,3 +115,16 @@ def profile_to_level(profile: str | None) -> float:
       return float(f'{big}.{small}')
 
   return DEFAULT_LEVEL
+
+
+def get_video_profiles(info: Yaml) -> Iterable[VideoProfile]:
+  for codec in info:
+    [name, attrs], *_ = codec.items()
+    codec = VideoCodec.from_info(name)
+
+    yield VideoProfile(
+      codec=codec,
+      resolution=attrs.get('resolution'),
+      fps=float(attrs.get('fps')),
+      level=float(attrs.get('level')),
+    )
