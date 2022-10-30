@@ -30,7 +30,7 @@ DEFAULT_FPS: Final[Fps] = Fps()
 DEFAULT_LEVEL: Final[Level] = Level()
 
 
-class Normalize:
+class NormalizedFormat:
   unknown: str
 
   @classmethod
@@ -54,7 +54,7 @@ class Normalize:
     return cls(normalized)
 
 
-class Container(Normalize, StrEnum):
+class Container(NormalizedFormat, StrEnum):
   unknown: str = auto()
   avi: str = auto()
   matroska: str = auto()
@@ -73,7 +73,7 @@ class Container(Normalize, StrEnum):
     return EXTENSIONS[self]
 
 
-class VideoCodec(Normalize, StrEnum):
+class VideoCodec(NormalizedFormat, StrEnum):
   unknown: str = auto()
   avc: str = auto()
   divx: str = auto()
@@ -87,7 +87,7 @@ class VideoCodec(Normalize, StrEnum):
   xvid: str = auto()
 
 
-class AudioCodec(Normalize, StrEnum):
+class AudioCodec(NormalizedFormat, StrEnum):
   unknown: str = auto()
   aac: str = auto()
   ac3: str = auto()
