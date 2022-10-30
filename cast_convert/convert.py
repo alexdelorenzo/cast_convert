@@ -1,52 +1,85 @@
 from __future__ import annotations
-
+from enum import StrEnum, auto
+from pathlib import Path
 from typing import Final
 
 from .base import VideoProfile, VideoCodec, AudioProfile, AudioCodec, Container, Formats, \
-  Extension
+  Extension, first
 from .exceptions import UnknownFormat
+from .parse import ENCODERS
 from .video import Video, VideoMetadata
 from .device import Device
 
 import ffmpeg
 
 
-DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()
+DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()  # type: ignore
+SUFFIX: Final[str] = '_transcoded'
+
+
+class FfmpegArg(StrEnum):
+  acodec: str = auto()
+  vcodec: str = auto()
+  copy: str = auto()
+
+
+Arg = FfmpegArg | str
+Args = dict[Arg, Arg]
+
+
+DEFAULT_ARGS: Final[Args] = {
+  FfmpegArg.acodec: FfmpegArg.copy,
+  FfmpegArg.vcodec: FfmpegArg.copy,
+}
 
 
 def transcode_video(video: Video, formats: Formats) -> Video:
-  container, video_profile, audio_profile = video.formats
+  container, video_profile, audio_profile = formats
   video_codec, resolution, fps, level = video_profile
-  [audio_codec] = audio_profile
+  [audio_codec] = formats.audio_profile
 
-  _, video_profile, audio_profile = formats
+  args: Args = DEFAULT_ARGS.copy()
 
-  if formats.container:
+  if audio_codec:
+    encoders = ENCODERS[audio_codec]
+    args[FfmpegArg.acodec] = first(encoders)
+
+  if video_codec:
+    encoders = ENCODERS[video_codec]
+    args[FfmpegArg.vcodec] = first(encoders)
+
+  if fps:
+    pass
+
+  else:
+    pass
+
+  if resolution:
+    pass
+
+  else:
+    pass
+
+  if level:
+    pass
+
+  else:
+    pass
+
+  new_ext: str = video.path.suffix
+
+  if container:
     try:
-      new_ext = formats.container.to_extension()
+      new_ext = container.to_extension()
 
     except UnknownFormat as e:
       new_ext = DEFAULT_EXT
 
-  else:
-    new_ext = video.path.suffix
-
-  new_path = (
+  new_path: Path = (
     video.path
-    .with_stem(f'{video.path.stem}_transcoded')
+    .with_stem(f'{video.path.stem}{SUFFIX}')
     .with_suffix(new_ext)
   )
-
-  args: dict[str, str] = {}
-
-  if formats.audio_profile.codec:
-    args['acodec'] = 'copy'
-
-  else:
-    args['acodec'] = ''
-
-  if formats.video_profile.codec:
-    args['vcodec'] = 'copy'
 
   stream = (
     ffmpeg
@@ -55,5 +88,4 @@ def transcode_video(video: Video, formats: Formats) -> Video:
   )
   stream.run()
 
-  raise NotImplementedError("Not done yet")
   return Video.from_path(new_path)
