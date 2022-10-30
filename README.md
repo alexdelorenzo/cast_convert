@@ -1,7 +1,7 @@
 # 📽️ Cast Convert
 Identify and convert videos to formats that are supported by Chromecast devices.
 
-`cast_control` can tell you whether or not a video will play correctly on your casting device. If it won't, `cast_convert` can convert videos into formats that the device supports.
+`cast_convert` can tell you whether or not a video will play correctly on your casting device. If it won't, `cast_convert` can convert videos into formats that the device supports.
 
 [Click here to see a list of supported devices](/#supported-devices).
 
