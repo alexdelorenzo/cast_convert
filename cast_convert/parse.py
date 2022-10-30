@@ -13,8 +13,11 @@ DEVICE_INFO: Final[Path] = SRC_DIR / 'device-support.yml'
 Fmt = str
 Alias = str
 Aliases = list[Alias]
-Yaml = dict[str, ...]
 Extension = str
+
+Yaml = dict[str, ...]
+FmtAliases = dict[Fmt, Aliases]
+AliasFmts = dict[Alias, Fmt]
 
 
 def get_yaml(path: Path = DEVICE_INFO) -> Yaml:
@@ -25,11 +28,11 @@ def get_yaml(path: Path = DEVICE_INFO) -> Yaml:
 DATA: Final[Yaml] = get_yaml()
 
 EXTENSIONS: Final[dict[Fmt, Extension]] = DATA['extensions']
-FMT_ALIASES: Final[dict[Fmt, Aliases]] = DATA['aliases']
-ALIAS_FMTS: Final[dict[Alias, Fmt]] = {
+ENCODERS: Final[FmtAliases] = DATA['encoders']
+DECODERS: Final[FmtAliases] = DATA['decoders']
+
+FMT_ALIASES: Final[FmtAliases] = DATA['aliases']
+ALIAS_FMTS: Final[AliasFmts] = {
   alias: fmt for fmt, aliases in FMT_ALIASES.items()
   for alias in aliases
 }
-
-ENCODERS: Final[dict[Fmt, Aliases]] = DATA['encoders']
-DECODERS: Final[dict[Fmt, Aliases]] = DATA['decoders']
