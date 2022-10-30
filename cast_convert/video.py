@@ -109,8 +109,8 @@ def is_compatible(video: Video, other: VideoMetadata) -> bool:
     case AudioCodec() as codec:
       return audio_profile.codec == codec
 
-    case Container() as container:
-      return container == container
+    case Container() as _container:
+      return _container == container
 
   raise TypeError(type(other))
 
