@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum, auto
 from typing import Final, Self, Type, Iterable, TypeVar, NamedTuple
+from decimal import Decimal
 from abc import ABC
 import logging
 
@@ -14,8 +15,6 @@ from .parse import ALIAS_FMTS, EXTENSIONS, Extension
 logging.basicConfig(level=logging.WARN)
 
 
-DEFAULT_FPS: Final[float] = 0.0
-DEFAULT_LEVEL: Final[float] = 0.0
 PROFILE_SEP: Final[str] = '@L'
 
 
@@ -23,6 +22,12 @@ T = TypeVar('T')
 U = TypeVar('U')
 
 Item = T | U | None
+Level = Decimal
+Fps = Decimal
+
+
+DEFAULT_FPS: Final[Fps] = Fps()
+DEFAULT_LEVEL: Final[Level] = Level()
 
 
 class Normalize:
@@ -112,8 +117,8 @@ class AudioProfile(Profile, Unpackable):
 class VideoProfile(Profile, Unpackable):
   codec: VideoCodec | None = VideoCodec.unknown
   resolution: int | None = 720
-  fps: float | None = 24.0
-  level: float | None = 0.0
+  fps: Fps | None = Fps('24.0')
+  level: Level | None = Level('0.0')
 
 
 Format = VideoProfile | AudioProfile | Container

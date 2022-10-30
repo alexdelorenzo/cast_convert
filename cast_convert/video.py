@@ -8,7 +8,7 @@ from pymediainfo import MediaInfo
 
 from .base import VideoProfile, AudioProfile, Container, \
   AudioCodec, VideoCodec, normalize_info, DEFAULT_FPS, \
-  DEFAULT_LEVEL, PROFILE_SEP, Formats
+  DEFAULT_LEVEL, PROFILE_SEP, Formats, Level, Fps
 from .parse import Yaml
 
 
@@ -84,7 +84,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
   return VideoProfile(
     codec=codec,
     resolution=int(height),
-    fps=float(fps if fps else DEFAULT_FPS),
+    fps=Fps(fps if fps else DEFAULT_FPS),
     level=profile_to_level(profile)
   )
 
@@ -118,7 +118,7 @@ def is_compatible(video: Video, other: VideoMetadata) -> bool:
   raise TypeError(f'Cannot compare with {type(other).__name__}')
 
 
-def profile_to_level(profile: str | None) -> float:
+def profile_to_level(profile: str | None) -> Level:
   if not (level := profile):
     return DEFAULT_LEVEL
 
@@ -132,11 +132,11 @@ def profile_to_level(profile: str | None) -> float:
 
   match [*level]:
     case [val]:
-      return float(val)
+      return Level(val)
 
     case [big, *small]:
       small = ''.join(small)
-      return float(f'{big}.{small}')
+      return Level(f'{big}.{small}')
 
   return DEFAULT_LEVEL
 
@@ -150,7 +150,7 @@ def get_video_profiles(profiles: Yaml) -> Iterable[VideoProfile]:
 
     yield VideoProfile(
       codec=codec,
-      resolution=attrs.get('resolution'),
-      fps=float(attrs.get('fps')),
-      level=float(attrs.get('level')),
+      resolution=int(attrs.get('resolution')),
+      fps=Fps(attrs.get('fps')),
+      level=Level(attrs.get('level')),
     )

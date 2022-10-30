@@ -20,6 +20,7 @@ SUFFIX: Final[str] = '_transcoded'
 class FfmpegArg(StrEnum):
   acodec: str = auto()
   vcodec: str = auto()
+  scodec: str = auto()
   copy: str = auto()
 
 
@@ -30,6 +31,7 @@ Args = dict[Arg, Arg]
 DEFAULT_ARGS: Final[Args] = {
   FfmpegArg.acodec: FfmpegArg.copy,
   FfmpegArg.vcodec: FfmpegArg.copy,
+  FfmpegArg.scodec: FfmpegArg.copy,
 }
 
 
