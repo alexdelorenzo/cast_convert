@@ -7,7 +7,7 @@ import logging
 
 from unpackable import Unpackable
 
-from .parse import INVERSED_ALIASES
+from .parse import ALIAS_TO_FMT
 
 
 logging.basicConfig(level=logging.WARN)
@@ -31,7 +31,7 @@ class Normalize:
   def _missing_(cls: Type[Self], value: str) -> Self:
     logging.info(f"[{cls.__name__}] Not enumerated: {value}")
 
-    if name := INVERSED_ALIASES.get(value):
+    if name := ALIAS_TO_FMT.get(value):
       return cls(name)
 
     return cls.unknown

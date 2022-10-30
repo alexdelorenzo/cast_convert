@@ -22,9 +22,10 @@ def get_yaml(path: Path = DEVICE_INFO) -> Yaml:
 
 
 DATA: Final[Yaml] = get_yaml()
-ALIASES: Final[dict[Fmt, Aliases]] = DATA['aliases']
 
-INVERSED_ALIASES: Final[dict[Alias, Fmt]] = {
-  alias: fmt for fmt, aliases in ALIASES.items()
+FMT_TO_ALIASES: Final[dict[Fmt, Aliases]] = DATA['aliases']
+
+ALIAS_TO_FMT: Final[dict[Alias, Fmt]] = {
+  alias: fmt for fmt, aliases in FMT_TO_ALIASES.items()
   for alias in aliases
 }
