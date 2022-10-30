@@ -7,7 +7,8 @@ import logging
 
 from unpackable import Unpackable
 
-from .parse import ALIAS_TO_FMT
+from .exceptions import UnknownFormat
+from .parse import ALIAS_TO_FMT, EXTENSIONS, Extension
 
 
 logging.basicConfig(level=logging.WARN)
@@ -59,6 +60,12 @@ class Container(Normalize, StrEnum):
   ogg: str = auto()
   wav: str = auto()
   webm: str = auto()
+
+  def to_extension(self) -> Extension:
+    if self not in EXTENSIONS:
+      raise UnknownFormat(f"Can't find {self.name} in {EXTENSIONS}")
+
+    return EXTENSIONS[self]
 
 
 class VideoCodec(Normalize, StrEnum):

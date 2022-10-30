@@ -87,7 +87,7 @@ def get_device(name: str, device_info: Yaml, data: Yaml) -> Device:
   names = map(AudioCodec.from_info, data['audio'])
 
   audio = list(map(AudioProfile, names))
-  video = list(get_video_profiles(device_info['codecs']))
+  video = list(get_video_profiles(device_info['profiles']))
   containers = list(map(Container.from_info, data['containers']))
 
   return Device(name, video, audio, containers)
