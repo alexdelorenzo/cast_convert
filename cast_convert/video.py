@@ -115,7 +115,7 @@ def is_compatible(video: Video, other: VideoMetadata) -> bool:
     case Container() as _container:
       return _container is container
 
-  raise TypeError(type(other))
+  raise TypeError(f'Cannot compare with {type(other).__name__}')
 
 
 def profile_to_level(profile: str | None) -> float:
@@ -141,11 +141,11 @@ def profile_to_level(profile: str | None) -> float:
   return DEFAULT_LEVEL
 
 
-def get_video_profiles(info: Yaml) -> Iterable[VideoProfile]:
-  codec_info: Yaml
+def get_video_profiles(profiles: Yaml) -> Iterable[VideoProfile]:
+  profile: Yaml
 
-  for codec_info in info:
-    [name, attrs], *_ = codec_info.items()
+  for profile in profiles:
+    [name, attrs], *_ = profile.items()
     codec = VideoCodec.from_info(name)
 
     yield VideoProfile(
