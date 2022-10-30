@@ -1,9 +1,26 @@
 # 📽️ Cast Convert
-Convert videos to formats that are supported by Chromecast devices.
+Identify and convert videos to formats that are supported by Chromecast devices.
 
-Casting devices like the Chromecast support unique video & audio codec and container profiles, and `cast_convert` has detailed compatibility profiles for each individual device. 
+`cast_control` can tell you whether or not a video will play correctly on your casting device. If it won't, `cast_convert` can convert videos into formats that the device supports.
 
-`cast_convert` will inspect and only minimally transcode videos to save time and resources. Every video is scanned to determine exactly which attributes are not compatible with specific devices, and `cast_convert` will transcode only what is needed to successfully play the video.
+[Click here to see a list of supported devices](/#supported-devices).
+
+### What it helps with
+`cast_convert` can identify and correct a video's incompatibility with a device caused by the video's:
+ - Video codec
+ - Audio codec
+ - Encoder profile
+ - Encoder level
+ - Container file format
+ - Frames per second
+ - Resolution
+
+This utility can tell you if a video will or won't play correctly on your casting device. It can then efficiently modify the video so that it will play on the device.
+
+### About
+Individual casting devices like the Chromecast have unique video encoding, audio encoding and container support combinations for video files. Instead of looking up the specifics for the specific model you own,`cast_convert` already uses detailed compatibility profiles for each individual Chromecast model. 
+
+`cast_convert` will inspect video metadata to determine what video attributes must get changed for successful playback. To use resources efficiently, it will determine the minimum amount of transcoding needed to successfully play each video back.
 
 ### Supported devices
  - Chromecast 1st Gen
