@@ -149,7 +149,7 @@ decoders:
 _profile: &profile
  resolution: 1080
  fps: 30
- level: 100.0
+ level: '100.0'
 
 # Device record shape
 _device: &device
@@ -157,12 +157,12 @@ _device: &device
   profiles:
     - avc:
         <<: *profile
-        level: 4.1
+        level: '4.1'
     - avc:
         <<: *profile
         resolution: 720
         fps: 60
-        level: 4.1
+        level: '4.1'
     - vp8:
         <<: *profile
     - vp8:
@@ -185,7 +185,7 @@ devices:
       - avc:
           <<: *profile
           fps: 60
-          level: 4.2
+          level: '4.2'
       - vp8:
           <<: *profile
       - vp8:
@@ -199,7 +199,7 @@ devices:
       - avc:
           <<: *profile
           fps: 60
-          level: 4.2
+          level: '4.2'
       - vp8:
           <<: *profile
           resolution: 3840
@@ -208,12 +208,12 @@ devices:
           <<: *profile
           fps: 60
           resolution: 3840
-          level: 5.1
+          level: '5.1'
       - vp9:
           <<: *profile
           resolution: 3840
           fps: 60
-          level: 5.1
+          level: '5.1'
       - hdr:
           <<: *profile
           resolution: 3840
@@ -225,17 +225,17 @@ devices:
       - avc:
           <<: *profile
           fps: 60
-          level: 5.1
+          level: '5.1'
       - avc:
           <<: *profile
           resolution: 3840
           fps: 30
-          level: 5.1
+          level: '5.1'
       - hevc:
           <<: *profile
           fps: 60
           resolution: 3840
-          level: 5.1
+          level: '5.1'
       - vp9:
           <<: *profile
           resolution: 3840
@@ -248,12 +248,12 @@ devices:
           <<: *profile
           resolution: 720
           fps: 60
-          level: 4.1
+          level: '4.1'
       - vp9:
           <<: *profile
           resolution: 720
           fps: 60
-          level: 4.0
+          level: '4.0'
 
   Nest Hub Max:
     <<: *device
@@ -262,9 +262,9 @@ devices:
           <<: *profile
           resolution: 720
           fps: 60
-          level: 4.1
+          level: '4.1'
       - vp9:
           <<: *profile
           resolution: 720
           fps: 60
-          level: 4.0
+          level: '4.0'
