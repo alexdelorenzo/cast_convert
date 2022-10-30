@@ -136,6 +136,7 @@ def transcode_audio(
     default_audio, *_ = device.audio_profiles
 
   new_codec = None if codec == default_audio.codec else default_audio.codec
+
   return AudioProfile(
     codec=new_codec
   )
