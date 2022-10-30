@@ -42,7 +42,7 @@ class Device:
   def can_play_audio(self, video: Video) -> bool:
     *_, audio_profile = video.formats
 
-    if audio_profile.codec == AudioCodec.unknown:
+    if audio_profile.codec is AudioCodec.unknown:
       raise UnknownCodec(f"Missing codec for {video}")
 
     can_audio = any(video.is_compatible(profile) for profile in self.audio_profiles)
@@ -55,7 +55,7 @@ class Device:
   def can_play_video(self, video: Video) -> bool:
     _, video_profile, _ = video.formats
 
-    if video_profile.codec == VideoCodec.unknown:
+    if video_profile.codec is VideoCodec.unknown:
       raise UnknownCodec(f"Missing codec for {video}")
 
     can_video = any(video.is_compatible(profile) for profile in self.video_profiles)
@@ -109,7 +109,7 @@ def transcode_video(
   if not default_video:
     default_video, *_ = device.video_profiles
 
-  new_codec = None if codec == default_video.codec else default_video.codec
+  new_codec = None if codec is default_video.codec else default_video.codec
   new_resolution = None if resolution <= default_video.resolution else default_video.resolution
   new_fps = None if fps <= default_video.fps else default_video.fps
   new_level = None if level <= default_video.level else default_video.level
@@ -135,7 +135,7 @@ def transcode_audio(
   if not default_audio:
     default_audio, *_ = device.audio_profiles
 
-  new_codec = None if codec == default_audio.codec else default_audio.codec
+  new_codec = None if codec is default_audio.codec else default_audio.codec
 
   return AudioProfile(
     codec=new_codec
@@ -154,7 +154,7 @@ def transcode_container(
   if not default_container:
     default_container, *_ = device.containers
 
-  new_container = None if container == default_container else default_container
+  new_container = None if container is default_container else default_container
 
   return new_container
 

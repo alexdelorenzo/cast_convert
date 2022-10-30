@@ -71,7 +71,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
 
   [video] = data.video_tracks
 
-  if (codec := VideoCodec.from_info(video.format)) == VideoCodec.unknown:
+  if (codec := VideoCodec.from_info(video.format)) is VideoCodec.unknown:
     codec = VideoCodec.from_info(video.codec_id or video.codec_id_hint)
 
   height, width = video.height, video.width
@@ -94,23 +94,23 @@ def is_compatible(video: Video, other: VideoMetadata) -> bool:
       _codec, _resolution, _fps, _level = video_profile
 
       return (
-        _codec == codec and
+        _codec is codec and
         _resolution <= resolution and
         _fps <= fps and
         _level <= level
       )
 
     case AudioProfile(codec):
-      return audio_profile.codec == codec
+      return audio_profile.codec is codec
 
     case VideoCodec() as codec:
-      return video_profile.codec == codec
+      return video_profile.codec is codec
 
     case AudioCodec() as codec:
-      return audio_profile.codec == codec
+      return audio_profile.codec is codec
 
     case Container() as _container:
-      return _container == container
+      return _container is container
 
   raise TypeError(type(other))
 
