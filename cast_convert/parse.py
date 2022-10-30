@@ -14,6 +14,7 @@ Fmt = str
 Alias = str
 Aliases = list[Alias]
 Yaml = dict[str, ...]
+Extension = str
 
 
 def get_yaml(path: Path = DEVICE_INFO) -> Yaml:
@@ -23,6 +24,7 @@ def get_yaml(path: Path = DEVICE_INFO) -> Yaml:
 
 DATA: Final[Yaml] = get_yaml()
 
+EXTENSIONS: Final[dict[Fmt, Extension]] = DATA['extensions']
 FMT_TO_ALIASES: Final[dict[Fmt, Aliases]] = DATA['aliases']
 
 ALIAS_TO_FMT: Final[dict[Alias, Fmt]] = {
