@@ -55,7 +55,7 @@ def watch(directory: str, ignore: tuple, debug: bool, threads: int):
     if ignore:
         print("Ignoring patterns:", ', '.join(ignore) + '...')
 
-    watch_directory(directory, ignore_patterns=ignore, threads=threads, debug=debug)
+    watch_directory(directory, ignore_patterns=ignore, threads=threads, show_debug=debug)
 
 
 cmd.add_command(get_cmd)
