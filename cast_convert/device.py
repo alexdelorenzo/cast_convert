@@ -4,11 +4,11 @@ from pathlib import Path
 from typing import Iterable, Self
 import logging
 
-from .old.exceptions import UnknownFormat
 from .base import VideoProfile, AudioProfile, Container, \
   AudioCodec, VideoCodec, Formats, Format
 from .parse import Yaml, get_yaml, DEVICE_INFO
 from .video import Video, get_video_profiles
+from .exceptions import UnknownFormat
 
 
 @dataclass(eq=True, frozen=True)
@@ -181,6 +181,3 @@ def transcode_to(
     video_profile=new_video,
     audio_profile=new_audio,
   )
-
-
-

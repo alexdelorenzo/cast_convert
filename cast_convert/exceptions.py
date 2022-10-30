@@ -15,3 +15,7 @@ class VideoError(CastConvertException):
 
 class UnknownFormat(VideoError):
   pass
+
+
+class DeviceError(CastConvertException):
+  pass
