@@ -70,9 +70,12 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
     return None
 
   [video] = data.video_tracks
+  fmts = video.format, video.codec_id, video.codec_id_hint
+  codec: VideoCodec = VideoCodec.unknown  # type: ignore
 
-  if (codec := VideoCodec.from_info(video.format)) is VideoCodec.unknown:
-    codec = VideoCodec.from_info(video.codec_id or video.codec_id_hint)
+  for fmt in fmts:
+    if (codec := VideoCodec.from_info(fmt)) is not VideoCodec.unknown:
+      break
 
   height, width = video.height, video.width
   fps = video.original_frame_rate
