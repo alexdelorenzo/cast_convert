@@ -68,6 +68,9 @@ class Device:
   def can_play_container(self, video: Video) -> bool:
     container = video.formats.container
 
+    if container is Container.unknown:
+      raise UnknownFormat(f"Missing container for {video}")
+
     if not (can_container := container in self.containers):
       logging.info(f"{container} not compatible with {self.containers}")
 
