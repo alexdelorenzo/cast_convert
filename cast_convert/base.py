@@ -49,6 +49,9 @@ class Normalize:
 
 
 class Container(Normalize, StrEnum):
+  unknown: str = auto()
+  avi: str = auto()
+  matroska: str = auto()
   mp2t: str = auto()
   mp3: str = auto()
   mp4: str = auto()
@@ -56,42 +59,36 @@ class Container(Normalize, StrEnum):
   ogg: str = auto()
   wav: str = auto()
   webm: str = auto()
-  matroska: str = auto()
-  avi: str = auto()
-
-  unknown: str = auto()
 
 
 class VideoCodec(Normalize, StrEnum):
+  unknown: str = auto()
   avc: str = auto()
-  mpeg4: str = auto()
+  divx: str = auto()
   h264: str = auto()
   h265: str = auto()
+  hdr: str = auto()
   hevc: str = auto()
+  mpeg4: str = auto()
   vp8: str = auto()
   vp9: str = auto()
-  hdr: str = auto()
   xvid: str = auto()
-  divx: str = auto()
-
-  unknown: str = auto()
 
 
 class AudioCodec(Normalize, StrEnum):
+  unknown: str = auto()
   aac: str = auto()
+  ac3: str = auto()
+  eac3: str = auto()
   eacs: str = auto()
   flac: str = auto()
   heaac: str = auto()
   lcaac: str = auto()
+  mp3: str = auto()
   opus: str = auto()
   vorbis: str = auto()
   wav: str = auto()
   webm: str = auto()
-  mp3: str = auto()
-  ac3: str = auto()
-  eac3: str = auto()
-
-  unknown: str = auto()
 
 
 @dataclass(eq=True, frozen=True)
