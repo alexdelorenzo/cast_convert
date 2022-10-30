@@ -25,9 +25,11 @@ def get_yaml(path: Path = DEVICE_INFO) -> Yaml:
 DATA: Final[Yaml] = get_yaml()
 
 EXTENSIONS: Final[dict[Fmt, Extension]] = DATA['extensions']
-FMT_TO_ALIASES: Final[dict[Fmt, Aliases]] = DATA['aliases']
-
-ALIAS_TO_FMT: Final[dict[Alias, Fmt]] = {
-  alias: fmt for fmt, aliases in FMT_TO_ALIASES.items()
+FMT_ALIASES: Final[dict[Fmt, Aliases]] = DATA['aliases']
+ALIAS_FMTS: Final[dict[Alias, Fmt]] = {
+  alias: fmt for fmt, aliases in FMT_ALIASES.items()
   for alias in aliases
 }
+
+ENCODERS: Final[dict[Fmt, Aliases]] = DATA['encoders']
+DECODERS: Final[dict[Fmt, Aliases]] = DATA['decoders']

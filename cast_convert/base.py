@@ -8,7 +8,7 @@ import logging
 from unpackable import Unpackable
 
 from .exceptions import UnknownFormat
-from .parse import ALIAS_TO_FMT, EXTENSIONS, Extension
+from .parse import ALIAS_FMTS, EXTENSIONS, Extension
 
 
 logging.basicConfig(level=logging.WARN)
@@ -32,7 +32,7 @@ class Normalize:
   def _missing_(cls: Type[Self], value: str) -> Self:
     logging.info(f"[{cls.__name__}] Not enumerated: {value}")
 
-    if name := ALIAS_TO_FMT.get(value):
+    if name := ALIAS_FMTS.get(value):
       return cls(name)
 
     return cls.unknown

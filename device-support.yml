@@ -145,7 +145,7 @@ decoders:
     - flac
 
 
-# Codec record shape
+# Profile record shape
 _profile: &profile
  resolution: 1080
  fps: 30
