@@ -13,5 +13,5 @@ class VideoError(CastConvertException):
   pass
 
 
-class UnknownCodec(VideoError):
+class UnknownFormat(VideoError):
   pass

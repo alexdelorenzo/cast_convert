@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Iterable, Self
 import logging
 
-from .old.exceptions import UnknownCodec
+from .old.exceptions import UnknownFormat
 from .base import VideoProfile, AudioProfile, Container, \
   AudioCodec, VideoCodec, Formats, Format
 from .parse import Yaml, get_yaml, DEVICE_INFO
@@ -43,7 +43,7 @@ class Device:
     *_, audio_profile = video.formats
 
     if audio_profile.codec is AudioCodec.unknown:
-      raise UnknownCodec(f"Missing codec for {video}")
+      raise UnknownFormat(f"Missing codec for {video}")
 
     can_audio = any(video.is_compatible(profile) for profile in self.audio_profiles)
 
@@ -56,7 +56,7 @@ class Device:
     _, video_profile, _ = video.formats
 
     if video_profile.codec is VideoCodec.unknown:
-      raise UnknownCodec(f"Missing codec for {video}")
+      raise UnknownFormat(f"Missing codec for {video}")
 
     can_video = any(video.is_compatible(profile) for profile in self.video_profiles)
 
