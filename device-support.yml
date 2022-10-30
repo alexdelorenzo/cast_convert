@@ -39,9 +39,114 @@ aliases:
   div3:
     - divx
 
+extensions:
+  matroska: mkv
+  mp4: mp4
+  webm: webm
+  avi: avi
+
+# map of codecs to ffmpeg encoders
+encoders:
+  avc:
+    - h264_vaapi
+    - h264_amf
+    - h264_nvenc
+    - h264_qsv
+    - libx264
+
+  hevc:
+    - hevc_vaapi
+    - hevc_amf
+    - hevc_nvenc
+    - hevc_qsv
+    - libx265
+
+  vp8:
+    - h264_vaapi
+    - h264_amf
+    - h264_nvenc
+    - h264_qsv
+    - libvpx
+
+  vp9:
+    - vp9
+    - vp9_v4l2m2m
+    - libvpx-vp9
+    - vp9_cuvid
+    - vp9_qsv
+
+  mp3:
+    - libmp3lame
+
+  aac:
+    - aac
+
+  vorbis:
+    - vorbis
+    - libvorbis
+
+  opus:
+    - opus
+    - libopus
+
+  flac:
+    - flac
+
+# map of codecs to ffmpeg decoders
+decoders:
+  avc:
+    - h264
+    - h264_v4l2m2m
+    - h264_qsv
+    - h264_cuvid
+
+  hevc:
+    - hevc
+    - hevc_qsv
+    - hevc_v4l2m2m
+    - hevc_cuvid
+
+  vp8:
+    - vp8
+    - vp8_v4l2m2m
+    - libvpx
+    - vp8_cuvid
+    - vp8_qsv
+
+  vp9:
+    - vp9
+    - vp9_v4l2m2m
+    - libvpx-vp9
+    - vp9_cuvid
+    - vp9_qsv
+
+  mp3:
+    - mp3float
+    - mp3
+    - mp3adufloat
+    - mp3adu
+    - mp3on4float
+    - mp3on4
+
+  aac:
+    - aac
+    - aac_fixed
+    - aac_latm
+
+  vorbis:
+    - vorbis
+    - libvorbis
+
+  opus:
+    - opus
+    - libopus
+
+  flac:
+    - flac
+
 
 # Codec record shape
-_codec: &codec
+_profile: &profile
  resolution: 1080
  fps: 30
  level: 100.0
@@ -49,24 +154,24 @@ _codec: &codec
 # Device record shape
 _device: &device
   model: 1st Gen
-  codecs:
+  profiles:
     - avc:
-        <<: *codec
+        <<: *profile
         level: 4.1
     - avc:
-        <<: *codec
+        <<: *profile
         resolution: 720
         fps: 60
         level: 4.1
     - vp8:
-        <<: *codec
+        <<: *profile
     - vp8:
-        <<: *codec
+        <<: *profile
         resolution: 720
         fps: 60
 
 
-# Device names and supported codecs from https://developers.google.com/cast/docs/media
+# Device names and supported profiles from https://developers.google.com/cast/docs/media
 devices:
   Chromecast 1st Gen:
     <<: *device
@@ -76,90 +181,90 @@ devices:
 
   Chromecast 3rd Gen:
     <<: *device
-    codecs:
+    profiles:
       - avc:
-          <<: *codec
+          <<: *profile
           fps: 60
           level: 4.2
       - vp8:
-          <<: *codec
+          <<: *profile
       - vp8:
-          <<: *codec
+          <<: *profile
           resolution: 720
           fps: 60
 
   Chromecast Ultra:
     <<: *device
-    codecs:
+    profiles:
       - avc:
-          <<: *codec
+          <<: *profile
           fps: 60
           level: 4.2
       - vp8:
-          <<: *codec
+          <<: *profile
           resolution: 3840
           fps: 30
       - hevc:
-          <<: *codec
+          <<: *profile
           fps: 60
           resolution: 3840
           level: 5.1
       - vp9:
-          <<: *codec
+          <<: *profile
           resolution: 3840
           fps: 60
           level: 5.1
       - hdr:
-          <<: *codec
+          <<: *profile
           resolution: 3840
           fps: 60
 
   Chromecast with Google TV:
     <<: *device
-    codecs:
+    profiles:
       - avc:
-          <<: *codec
+          <<: *profile
           fps: 60
           level: 5.1
       - avc:
-          <<: *codec
+          <<: *profile
           resolution: 3840
           fps: 30
           level: 5.1
       - hevc:
-          <<: *codec
+          <<: *profile
           fps: 60
           resolution: 3840
           level: 5.1
       - vp9:
-          <<: *codec
+          <<: *profile
           resolution: 3840
           fps: 60
 
   Google Nest Hub:
     <<: *device
-    codecs:
+    profiles:
       - avc:
-          <<: *codec
+          <<: *profile
           resolution: 720
           fps: 60
           level: 4.1
       - vp9:
-          <<: *codec
+          <<: *profile
           resolution: 720
           fps: 60
           level: 4.0
 
   Nest Hub Max:
     <<: *device
-    codecs:
+    profiles:
       - avc:
-          <<: *codec
+          <<: *profile
           resolution: 720
           fps: 60
           level: 4.1
       - vp9:
-          <<: *codec
+          <<: *profile
           resolution: 720
           fps: 60
           level: 4.0
