@@ -53,29 +53,16 @@ def transcode_video(video: Video, formats: Formats) -> Video:
   if fps:
     pass
 
-  else:
-    pass
-
   if resolution:
-    pass
-
-  else:
     pass
 
   if level:
     pass
 
-  else:
-    pass
+  new_ext: Extension = video.path.suffix
 
-  new_ext: str = video.path.suffix
-
-  if container:
-    try:
-      new_ext = container.to_extension()
-
-    except UnknownFormat as e:
-      new_ext = DEFAULT_EXT
+  if container and not (new_ext := container.to_extension()):
+    new_ext = DEFAULT_EXT
 
   new_path: Path = (
     video.path

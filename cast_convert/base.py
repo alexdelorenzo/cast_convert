@@ -66,11 +66,13 @@ class Container(NormalizedFormat, StrEnum):
   wav: str = auto()
   webm: str = auto()
 
-  def to_extension(self) -> Extension:
-    if self not in EXTENSIONS:
-      raise UnknownFormat(f"Can't find {self.name} in {EXTENSIONS}")
+  def to_extension(self) -> Extension | None:
+    if ext := EXTENSIONS.get(self):
+      return ext
 
-    return EXTENSIONS[self]
+    logging.info(f"Can't find {self.name} in {EXTENSIONS}")
+    return None
+
 
 
 class VideoCodec(NormalizedFormat, StrEnum):
