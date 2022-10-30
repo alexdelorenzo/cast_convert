@@ -7,13 +7,14 @@ Identify and convert videos to formats that are Chromecast supported with `cast_
 
 ### What this project helps with
 `cast_convert` can identify and correct a video's incompatibility with a device caused by the video's:
- - Video codec
- - Audio codec
- - Encoder profile
- - Encoder level
- - Container file format
- - Frames per second
- - Resolution
+  * [*] Video encoding
+  * [*] Audio encoding
+  * [ ]Encoder profile
+  * [ ]Encoder level
+  * [*] Container file format
+  * [ ] Frames per second
+  * [ ] Resolution
+  * [ ] Subtitle format
 
 This utility can tell you if a video will or won't play correctly on your casting device. It can then efficiently modify the video so that it will play on the device.
 
