@@ -57,28 +57,28 @@ extensions:
 encoders:
   avc:
     - h264_vaapi
-    - h264_amf
-    - h264_nvenc
-    - h264_qsv
+#    - h264_amf
+#    - h264_nvenc
+#    - h264_qsv
     - libx264
   hevc:
-    - hevc_vaapi
-    - hevc_amf
-    - hevc_nvenc
-    - hevc_qsv
+#    - hevc_vaapi
+#    - hevc_amf
+#    - hevc_nvenc
+#    - hevc_qsv
     - libx265
   vp8:
-    - h264_vaapi
-    - h264_amf
-    - h264_nvenc
-    - h264_qsv
+#    - h264_vaapi
+#    - h264_amf
+#    - h264_nvenc
+#    - h264_qsv
     - libvpx
   vp9:
     - vp9
-    - vp9_v4l2m2m
-    - libvpx-vp9
-    - vp9_cuvid
-    - vp9_qsv
+#    - vp9_v4l2m2m
+    -  libvpx-vp9
+#    - vp9_cuvid
+#    - vp9_qsv
   mp3:
     - libmp3lame
   aac:
@@ -198,15 +198,15 @@ devices:
           fps: 60
           level: '4.2'
 
-      - vp8:
-          <<: *profile
-          fps: 30
-          resolution: 3840
-
       - hevc:
           <<: *profile
           fps: 60
           level: '5.1'
+          resolution: 3840
+
+      - vp8:
+          <<: *profile
+          fps: 30
           resolution: 3840
 
       - vp9:
@@ -269,6 +269,15 @@ devices:
           level: '4.1'
           resolution: 720
 
+      - vp9:
+          <<: *profile
+          fps: 60
+          level: '4.0'
+          resolution: 720
+
+  Test Device:
+    <<: *device
+    profiles:
       - vp9:
           <<: *profile
           fps: 60
