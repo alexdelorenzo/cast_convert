@@ -1,0 +1,123 @@
+# Device names and supported profiles from https://developers.google.com/cast/docs/media
+# Profile record shape
+_profile: &profile
+ resolution: 1080
+ fps: 30
+ level: '100.0'
+
+# Device record shape
+_device: &device
+  model: 1st Gen
+  profiles:
+    - avc:
+        <<: *profile
+        level: '4.1'
+    - avc:
+        <<: *profile
+        resolution: 720
+        fps: 60
+        level: '4.1'
+    - vp8:
+        <<: *profile
+    - vp8:
+        <<: *profile
+        resolution: 720
+        fps: 60
+
+
+devices:
+  Chromecast 1st Gen:
+    <<: *device
+
+  Chromecast 2nd Gen:
+    <<: *device
+
+  Chromecast 3rd Gen:
+    <<: *device
+    profiles:
+      - avc:
+          <<: *profile
+          fps: 60
+          level: '4.2'
+      - vp8:
+          <<: *profile
+      - vp8:
+          <<: *profile
+          resolution: 720
+          fps: 60
+
+  Chromecast Ultra:
+    <<: *device
+    profiles:
+      - avc:
+          <<: *profile
+          fps: 60
+          level: '4.2'
+      - vp8:
+          <<: *profile
+          resolution: 3840
+          fps: 30
+      - hevc:
+          <<: *profile
+          fps: 60
+          resolution: 3840
+          level: '5.1'
+      - vp9:
+          <<: *profile
+          resolution: 3840
+          fps: 60
+          level: '5.1'
+      - hdr:
+          <<: *profile
+          resolution: 3840
+          fps: 60
+
+  Chromecast with Google TV:
+    <<: *device
+    profiles:
+      - avc:
+          <<: *profile
+          fps: 60
+          level: '5.1'
+      - avc:
+          <<: *profile
+          resolution: 3840
+          fps: 30
+          level: '5.1'
+      - hevc:
+          <<: *profile
+          fps: 60
+          resolution: 3840
+          level: '5.1'
+      - vp9:
+          <<: *profile
+          resolution: 3840
+          fps: 60
+
+  Google Nest Hub:
+    <<: *device
+    profiles:
+      - avc:
+          <<: *profile
+          resolution: 720
+          fps: 60
+          level: '4.1'
+      - vp9:
+          <<: *profile
+          resolution: 720
+          fps: 60
+          level: '4.0'
+
+  Nest Hub Max:
+    <<: *device
+    profiles:
+      - avc:
+          <<: *profile
+          resolution: 720
+          fps: 60
+          level: '4.1'
+      - vp9:
+          <<: *profile
+          resolution: 720
+          fps: 60
+          level: '4.0'

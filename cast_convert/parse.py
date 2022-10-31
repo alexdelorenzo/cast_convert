@@ -5,9 +5,10 @@ from typing import Final
 from yaml import safe_load
 
 
-SRC_DIR: Final[Path] = Path(__file__).parent.parent.absolute()
-DEVICE_INFO: Final[Path] = SRC_DIR / 'support.yml'
-SUPPORT_INFO: Final[Path] = SRC_DIR / 'support.yml'
+SRC_DIR: Final[Path] = Path(__file__).parent.absolute()
+ASSET_DIR: Final[Path] = SRC_DIR / 'assets'
+DEVICE_INFO: Final[Path] = ASSET_DIR / 'support.yml'
+SUPPORT_INFO: Final[Path] = ASSET_DIR / 'support.yml'
 
 
 Fmt = str
@@ -29,17 +30,17 @@ def get_yaml(path: Path = DEVICE_INFO) -> Yaml:
   return safe_load(text)
 
 
-DATA: Final[Yaml] = get_yaml()
+DEVICE_DATA: Final[Yaml] = get_yaml()
 
-EXTENSIONS: Final[FmtExtensions] = DATA['extensions']
-ENCODERS: Final[FmtAliases] = DATA['encoders']
-DECODERS: Final[FmtAliases] = DATA['decoders']
-SUBTITLES: Final[FmtNames] = DATA['subtitles']
-CONTAINERS: Final[FmtNames] = DATA['containers']
-AUDIO: Final[FmtNames] = DATA['audio']
-DEVICES: Final[Yaml] = DATA['devices']
+EXTENSIONS: Final[FmtExtensions] = DEVICE_DATA['extensions']
+ENCODERS: Final[FmtAliases] = DEVICE_DATA['encoders']
+DECODERS: Final[FmtAliases] = DEVICE_DATA['decoders']
+SUBTITLES: Final[FmtNames] = DEVICE_DATA['subtitles']
+CONTAINERS: Final[FmtNames] = DEVICE_DATA['containers']
+AUDIO: Final[FmtNames] = DEVICE_DATA['audio']
+DEVICES: Final[Yaml] = DEVICE_DATA['devices']
 
-FMT_ALIASES: Final[FmtAliases] = DATA['aliases']
+FMT_ALIASES: Final[FmtAliases] = DEVICE_DATA['aliases']
 ALIAS_FMTS: Final[AliasFmts] = {
   alias: fmt
   for fmt, aliases in FMT_ALIASES.items()
