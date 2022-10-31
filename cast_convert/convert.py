@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import logging
 from enum import StrEnum, auto
 from pathlib import Path
 from typing import Final
@@ -13,24 +15,40 @@ from .device import Device
 import ffmpeg
 
 
+DOT: Final[str] = '.'
+
 DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()  # type: ignore
 TRANSCODE_SUFFIX: Final[str] = '_transcoded'
+HWACCEL: Final[Path] = Path('/dev/dri/renderD128')
 
 
 class FfmpegArg(StrEnum):
   acodec: str = auto()
   vcodec: str = auto()
   scodec: str = auto()
+
+  hwaccel: str = auto()
+  hwaccel_output_format: str = auto()
+  vaapi_device: str = auto()
+
   copy: str = auto()
+  vaapi: str = auto()
 
 
 Arg = FfmpegArg | str
 Args = dict[Arg, Arg]
 
+
 DEFAULT_ARGS: Final[Args] = {
   FfmpegArg.acodec: FfmpegArg.copy,
   FfmpegArg.vcodec: FfmpegArg.copy,
   FfmpegArg.scodec: FfmpegArg.copy,
+}
+
+HWACCEL_ARGS: Final[Args] = {
+  FfmpegArg.hwaccel: FfmpegArg.vaapi,
+  FfmpegArg.hwaccel_output_format: FfmpegArg.vaapi,
+  FfmpegArg.vaapi_device: str(HWACCEL),
 }
 
 
@@ -43,9 +61,13 @@ def transcode_video(video: Video, formats: Formats) -> Video:
 
   stream = (
     ffmpeg
-    .input(video.path)
-    .output(new_path, **args)
+    .input(str(video.path))
+    .output(str(new_path), **args)
   )
+
+  cmd: str = ' '.join(stream.compile())
+  logging.info(f'Running command: {cmd}')
+
   stream.run()
 
   return Video.from_path(new_path)
@@ -61,6 +83,9 @@ def get_new_path(
   if container and not (ext := container.to_extension()):
     ext = DEFAULT_EXT
 
+  if not ext.startswith(DOT):
+    ext = DOT + ext
+
   new_path: Path = (
     video.path
     .with_stem(f'{video.path.stem}{suffix}')
@@ -71,6 +96,7 @@ def get_new_path(
 
 
 def get_args(formats: Formats) -> Args:
+  # TODO: Finish this stub
   args: Args = DEFAULT_ARGS.copy()
 
   if (profile := formats.audio_profile) and (codec := profile.codec):
@@ -82,7 +108,6 @@ def get_args(formats: Formats) -> Args:
     args[FfmpegArg.vcodec] = first(encoders)
 
   if subtitle := formats.subtitle:
-    # TODO: Finish this stub
     pass
 
   if not profile:
