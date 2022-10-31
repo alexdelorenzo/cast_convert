@@ -157,13 +157,15 @@ def get_input_args(formats: Formats) -> Args:
 
 def get_filters(stream: ffmpeg.Stream, formats: Formats) -> ffmpeg.Stream | None:
   video_codec, resolution, fps, level = formats.video_profile
-  stream: ffmpeg.Stream | None = None
+  filters: ffmpeg.Stream | None = None
 
   if resolution:
-    stream = ffmpeg.filter(
+    scale = f'{resolution}:-1'
+
+    filters = ffmpeg.filter(
       stream,
       FfmpegArg.scale,
-      f'{resolution}:-1'
+      scale
     )
 
-  return stream
+  return filters
