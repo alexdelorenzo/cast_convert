@@ -27,7 +27,6 @@ class FfmpegArg(StrEnum):
 Arg = FfmpegArg | str
 Args = dict[Arg, Arg]
 
-
 DEFAULT_ARGS: Final[Args] = {
   FfmpegArg.acodec: FfmpegArg.copy,
   FfmpegArg.vcodec: FfmpegArg.copy,
@@ -72,19 +71,24 @@ def get_new_path(
 
 
 def get_args(formats: Formats) -> Args:
-  video_codec, resolution, fps, level = formats.video_profile
-  [audio_codec] = formats.audio_profile
-  subtitle = formats.subtitle
-
   args: Args = DEFAULT_ARGS.copy()
 
-  if audio_codec:
-    encoders = ENCODERS[audio_codec]
+  if (profile := formats.audio_profile) and (codec := profile.codec):
+    encoders = ENCODERS[codec]
     args[FfmpegArg.acodec] = first(encoders)
 
-  if video_codec:
-    encoders = ENCODERS[video_codec]
+  if (profile := formats.video_profile) and (codec := profile.codec):
+    encoders = ENCODERS[codec]
     args[FfmpegArg.vcodec] = first(encoders)
+
+  if subtitle := formats.subtitle:
+    # TODO: Finish this stub
+    pass
+
+  if not profile:
+    return args
+
+  video_codec, resolution, fps, level = profile
 
   if fps:
     pass
@@ -93,10 +97,6 @@ def get_args(formats: Formats) -> Args:
     pass
 
   if level:
-    pass
-
-  if subtitle:
-    # TODO: Finish this stub
     pass
 
   return args
