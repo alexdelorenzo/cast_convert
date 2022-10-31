@@ -28,8 +28,12 @@ Level = Decimal
 Fps = Decimal
 
 
-DEFAULT_FPS: Final[Fps] = Fps()
-DEFAULT_LEVEL: Final[Level] = Level()
+DEFAULT_VIDEO_FPS: Final[Fps] = Fps()
+DEFAULT_VIDEO_LEVEL: Final[Level] = Level()
+
+DEFAULT_PROFILE_FPS: Final[Fps] = Fps('24.0')
+DEFAULT_PROFILE_LEVEL: Final[Level] = Level('0.0')
+DEFAULT_PROFILE_RESOLUTION: Final[int] = 720
 
 
 class NormalizedFormat:
@@ -136,9 +140,9 @@ class AudioProfile(Profile, Unpackable):
 @dataclass(eq=True, frozen=True)
 class VideoProfile(Profile, Unpackable):
   codec: VideoCodec | None = VideoCodec.unknown
-  resolution: int | None = 720
-  fps: Fps | None = Fps('24.0')
-  level: Level | None = Level('0.0')
+  resolution: int | None = DEFAULT_PROFILE_RESOLUTION
+  fps: Fps | None = DEFAULT_PROFILE_FPS
+  level: Level | None = DEFAULT_PROFILE_LEVEL
 
 
 VideoProfiles = list[VideoProfile]

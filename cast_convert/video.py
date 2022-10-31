@@ -6,8 +6,8 @@ from typing import Self, Iterable
 from pymediainfo import MediaInfo
 
 from .base import VideoProfile, AudioProfile, Container, \
-  AudioCodec, VideoCodec, normalize_info, DEFAULT_FPS, \
-  DEFAULT_LEVEL, PROFILE_SEP, Formats, Level, Fps, Subtitle
+  AudioCodec, VideoCodec, normalize_info, DEFAULT_VIDEO_FPS, \
+  DEFAULT_VIDEO_LEVEL, PROFILE_SEP, Formats, Level, Fps, Subtitle
 from .parse import Yaml
 
 
@@ -86,7 +86,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
   return VideoProfile(
     codec=codec,
     resolution=int(height),
-    fps=Fps(fps if fps else DEFAULT_FPS),
+    fps=Fps(fps if fps else DEFAULT_VIDEO_FPS),
     level=profile_to_level(profile)
   )
 
@@ -122,7 +122,7 @@ def is_compatible(video: Video, other: VideoMetadata) -> bool:
 
 def profile_to_level(profile: str | None) -> Level:
   if not (level := profile):
-    return DEFAULT_LEVEL
+    return DEFAULT_VIDEO_LEVEL
 
   if PROFILE_SEP in level:
     name, level = level.split(PROFILE_SEP)
@@ -130,7 +130,7 @@ def profile_to_level(profile: str | None) -> Level:
   level = normalize_info(level)
 
   if not level.isnumeric():
-    return DEFAULT_LEVEL
+    return DEFAULT_VIDEO_LEVEL
 
   match [*level]:
     case [val]:
@@ -140,7 +140,7 @@ def profile_to_level(profile: str | None) -> Level:
       small = ''.join(small)
       return Level(f'{big}.{small}')
 
-  return DEFAULT_LEVEL
+  return DEFAULT_VIDEO_LEVEL
 
 
 def get_video_profiles(profiles: Yaml) -> Iterable[VideoProfile]:
