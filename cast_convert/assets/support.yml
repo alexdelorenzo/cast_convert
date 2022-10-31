@@ -28,8 +28,8 @@ audio:
   - WAV
 
 subtitles:
-  - TTML
   - VTT
+  - TTML
   - EIA-608
   - EIA-708
 
@@ -48,10 +48,10 @@ aliases:
     - mpeg4
 
 extensions:
+  avi: avi
   matroska: mkv
   mp4: mp4
   webm: webm
-  avi: avi
 
 # map of codecs to ffmpeg encoders
 encoders:
@@ -61,42 +61,34 @@ encoders:
     - h264_nvenc
     - h264_qsv
     - libx264
-
   hevc:
     - hevc_vaapi
     - hevc_amf
     - hevc_nvenc
     - hevc_qsv
     - libx265
-
   vp8:
     - h264_vaapi
     - h264_amf
     - h264_nvenc
     - h264_qsv
     - libvpx
-
   vp9:
     - vp9
     - vp9_v4l2m2m
     - libvpx-vp9
     - vp9_cuvid
     - vp9_qsv
-
   mp3:
     - libmp3lame
-
   aac:
     - aac
-
   vorbis:
     - vorbis
     - libvorbis
-
   opus:
     - opus
     - libopus
-
   flac:
     - flac
 
@@ -107,27 +99,23 @@ decoders:
     - h264_v4l2m2m
     - h264_qsv
     - h264_cuvid
-
   hevc:
     - hevc
     - hevc_qsv
     - hevc_v4l2m2m
     - hevc_cuvid
-
   vp8:
     - vp8
     - vp8_v4l2m2m
     - libvpx
     - vp8_cuvid
     - vp8_qsv
-
   vp9:
     - vp9
     - vp9_v4l2m2m
     - libvpx-vp9
     - vp9_cuvid
     - vp9_qsv
-
   mp3:
     - mp3float
     - mp3
@@ -135,20 +123,16 @@ decoders:
     - mp3adu
     - mp3on4float
     - mp3on4
-
   aac:
     - aac
     - aac_fixed
     - aac_latm
-
   vorbis:
     - vorbis
     - libvorbis
-
   opus:
     - opus
     - libopus
-
   flac:
     - flac
 
@@ -168,15 +152,15 @@ _device: &device
         level: '4.1'
     - avc:
         <<: *profile
-        resolution: 720
         fps: 60
         level: '4.1'
-    - vp8:
-        <<: *profile
-    - vp8:
-        <<: *profile
         resolution: 720
+    - vp8:
+        <<: *profile
+    - vp8:
+        <<: *profile
         fps: 60
+        resolution: 720
 
 
 # Device names and supported profiles from https://developers.google.com/cast/docs/media
@@ -198,8 +182,8 @@ devices:
           <<: *profile
       - vp8:
           <<: *profile
-          resolution: 720
           fps: 60
+          resolution: 720
 
   Chromecast Ultra:
     <<: *device
@@ -210,22 +194,22 @@ devices:
           level: '4.2'
       - vp8:
           <<: *profile
-          resolution: 3840
           fps: 30
+          resolution: 3840
       - hevc:
           <<: *profile
           fps: 60
-          resolution: 3840
           level: '5.1'
+          resolution: 3840
       - vp9:
           <<: *profile
-          resolution: 3840
           fps: 60
           level: '5.1'
+          resolution: 3840
       - hdr:
           <<: *profile
-          resolution: 3840
           fps: 60
+          resolution: 3840
 
   Chromecast with Google TV:
     <<: *device
@@ -236,43 +220,43 @@ devices:
           level: '5.1'
       - avc:
           <<: *profile
-          resolution: 3840
           fps: 30
           level: '5.1'
+          resolution: 3840
       - hevc:
           <<: *profile
           fps: 60
-          resolution: 3840
           level: '5.1'
+          resolution: 3840
       - vp9:
           <<: *profile
-          resolution: 3840
           fps: 60
+          resolution: 3840
 
   Google Nest Hub:
     <<: *device
     profiles:
       - avc:
           <<: *profile
-          resolution: 720
           fps: 60
           level: '4.1'
+          resolution: 720
       - vp9:
           <<: *profile
-          resolution: 720
           fps: 60
           level: '4.0'
+          resolution: 720
 
   Nest Hub Max:
     <<: *device
     profiles:
       - avc:
           <<: *profile
-          resolution: 720
           fps: 60
           level: '4.1'
+          resolution: 720
       - vp9:
           <<: *profile
-          resolution: 720
           fps: 60
           level: '4.0'
+          resolution: 720
