@@ -12,7 +12,7 @@ Identify and convert videos to formats that are Chromecast supported.
   - Encoder profile
   - Encoder level
   - Container file format
-  - Frames per second
+  - Framerate
   - Resolution
   - Subtitle format
 
