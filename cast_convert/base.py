@@ -36,14 +36,6 @@ DEFAULT_PROFILE_LEVEL: Final[Level] = Level('0.0')
 DEFAULT_PROFILE_RESOLUTION: Final[int] = 720
 
 
-def get_name(obj: Any) -> str:
-  match obj:
-    case type() as cls:
-      return cls.__name__
-
-    case _:
-      return type(obj).__name__
-
 
 class NormalizedFormat:
   unknown: str
@@ -78,10 +70,11 @@ class Container(NormalizedFormat, StrEnum):
   unknown: str = auto()
   avi: str = auto()
   matroska: str = auto()
+  mkv: str = matroska  # alias
   mp2t: str = auto()
   mp3: str = auto()
   mp4: str = auto()
-  # mpeg4: str = auto()
+  mpeg4: str = mp4  # alias
   ogg: str = auto()
   wav: str = auto()
   webm: str = auto()
@@ -97,12 +90,14 @@ class Container(NormalizedFormat, StrEnum):
 class VideoCodec(NormalizedFormat, StrEnum):
   unknown: str = auto()
   avc: str = auto()
-  divx: str = auto()
-  h264: str = auto()
-  h265: str = auto()
-  hdr: str = auto()
+  h264: str = avc  # alias
+  div3: str = auto()
+  divx: str = div3  # alias
   hevc: str = auto()
+  h265: str = hevc  # alias
+  hdr: str = auto()
   mpeg4: str = auto()
+  mp4: str = avc  # alias
   vp8: str = auto()
   vp9: str = auto()
   xvid: str = auto()
@@ -115,8 +110,8 @@ class AudioCodec(NormalizedFormat, StrEnum):
   eac3: str = auto()
   eacs: str = auto()
   flac: str = auto()
-  heaac: str = auto()
-  lcaac: str = auto()
+  heaac: str = aac  # alias
+  lcaac: str = aac  # alias
   mp3: str = auto()
   opus: str = auto()
   vorbis: str = auto()
@@ -131,6 +126,7 @@ class Subtitle(NormalizedFormat, StrEnum):
   srt: str = auto()
   ssa: str = auto()
   vtt: str = auto()
+  webvtt: str = vtt  # alias
   ttml: str = auto()
   eia608: str = auto()
   eia708: str = auto()
@@ -150,6 +146,15 @@ class Subtitle(NormalizedFormat, StrEnum):
 @dataclass(eq=True, frozen=True)
 class Profile(ABC):
   pass
+
+
+def get_name(obj: Any) -> str:
+  match obj:
+    case type() as cls:
+      return cls.__name__
+
+    case _:
+      return type(obj).__name__
 
 
 @dataclass(eq=True, frozen=True)
@@ -196,3 +201,5 @@ def normalize_info(info: str) -> str:
 def first(iterable: Iterable[T], default: Item = None) -> Item:
   iterator = iter(iterable)
   return next(iterator, default)
+
+
