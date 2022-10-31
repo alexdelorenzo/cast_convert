@@ -8,7 +8,7 @@ from pymediainfo import MediaInfo
 from .base import VideoProfile, AudioProfile, Container, \
   AudioCodec, VideoCodec, normalize_info, DEFAULT_VIDEO_FPS, \
   DEFAULT_VIDEO_LEVEL, PROFILE_SEP, Formats, Level, Fps, Subtitle, \
-  VideoMetadata, get_name
+  VideoFormat, get_name
 from .parse import Yaml
 
 
@@ -47,7 +47,7 @@ class Video:
       data=data,
     )
 
-  def is_compatible(self, other: VideoMetadata) -> bool:
+  def is_compatible(self, other: VideoFormat) -> bool:
     return is_compatible(self, other)
 
 
@@ -87,7 +87,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
   )
 
 
-def is_compatible(video: Video, other: VideoMetadata) -> bool:
+def is_compatible(video: Video, other: VideoFormat) -> bool:
   container, video_profile, audio_profile, subtitle = video.formats
 
   match other:

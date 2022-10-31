@@ -36,7 +36,6 @@ DEFAULT_PROFILE_LEVEL: Final[Level] = Level('0.0')
 DEFAULT_PROFILE_RESOLUTION: Final[int] = 720
 
 
-
 class NormalizedFormat:
   unknown: str
 
@@ -46,6 +45,10 @@ class NormalizedFormat:
   @classmethod
   def _missing_(cls: Type[Self], value: str) -> Self:
     name = get_name(cls)
+    logging.info(f"Missing: {value}")
+
+    if hasattr(cls, value):
+      return getattr(cls, value)
 
     if alias := ALIAS_FMTS.get(value):
       logging.info(f"[{name}] Using {alias} as an alias for {value}")
@@ -110,8 +113,8 @@ class AudioCodec(NormalizedFormat, StrEnum):
   eac3: str = auto()
   eacs: str = auto()
   flac: str = auto()
-  heaac: str = aac  # alias
-  lcaac: str = aac  # alias
+  heaac: str = auto()
+  lcaac: str = auto()
   mp3: str = auto()
   opus: str = auto()
   vorbis: str = auto()
@@ -180,10 +183,8 @@ Subtitles = list[Subtitle]
 
 Codecs = AudioCodec | VideoCodec
 Profiles = AudioProfile | VideoProfile
-VideoMetadata = Codecs | Profiles | Container
-
-MediaFormat = VideoProfile | AudioProfile | Container | Subtitle
-MediaFormats = Iterable[MediaFormat]
+VideoFormat = Codecs | Profiles | Container | Subtitle
+VideoFormats = Iterable[VideoFormat]
 
 
 class Formats(NamedTuple):
@@ -201,5 +202,3 @@ def normalize_info(info: str) -> str:
 def first(iterable: Iterable[T], default: Item = None) -> Item:
   iterator = iter(iterable)
   return next(iterator, default)
-
-

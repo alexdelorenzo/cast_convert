@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Final
 
 from .base import VideoProfile, VideoCodec, AudioProfile, AudioCodec, \
-  Container, Formats, Extension, first, VideoMetadata
+  Container, Formats, Extension, first, VideoFormat
 from .exceptions import UnknownFormat
 from .parse import ENCODERS
 from .video import Video
@@ -36,6 +36,8 @@ class FfmpegArg(StrEnum):
   copy: str = auto()
   vaapi: str = auto()
 
+  scale: str = auto()
+
 
 Arg = FfmpegArg | str
 Args = dict[Arg, Arg]
@@ -62,14 +64,20 @@ def transcode_video(video: Video, formats: Formats) -> Video:
 
   input_args = get_input_args(formats)
   output_args = get_output_args(formats)
-  filters = get_filters(formats)
 
   new_path = get_new_path(video, container)
 
-  stream = (
-    ffmpeg
-    .input(str(video.path), **input_args)
-    .output(str(new_path), **output_args)
+  stream = ffmpeg.input(
+    str(video.path),
+    **input_args
+  )
+
+  if filters := get_filters(stream, formats):
+    stream = filters
+
+  stream = stream.output(
+    str(new_path),
+    **output_args
   )
 
   cmd: str = ' '.join(stream.compile())
@@ -147,5 +155,15 @@ def get_input_args(formats: Formats) -> Args:
   return args
 
 
-def get_filters(formats: Formats):
-  pass
+def get_filters(stream: ffmpeg.Stream, formats: Formats) -> ffmpeg.Stream | None:
+  video_codec, resolution, fps, level = formats.video_profile
+  stream: ffmpeg.Stream | None = None
+
+  if resolution:
+    stream = ffmpeg.filter(
+      stream,
+      FfmpegArg.scale,
+      f'{resolution}:-1'
+    )
+
+  return stream

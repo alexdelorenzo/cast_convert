@@ -6,8 +6,8 @@ from typing import Iterable, Self
 import logging
 
 from .base import VideoProfile, AudioProfile, Container, \
-  AudioCodec, VideoCodec, Formats, MediaFormat, VideoProfiles, \
-  AudioProfiles, Containers, MediaFormats, Subtitles, Subtitle
+  AudioCodec, VideoCodec, Formats, VideoFormat, VideoProfiles, \
+  AudioProfiles, Containers, VideoFormats, Subtitles, Subtitle
 from .parse import Yaml, get_yaml, DEVICE_INFO, FmtNames
 from .video import Video, get_video_profiles
 from .exceptions import UnknownFormat
@@ -28,7 +28,7 @@ class Device:
     yaml = get_yaml(path)
     yield from get_devices(yaml)
 
-  def add_format(self, fmt: MediaFormat):
+  def add_format(self, fmt: VideoFormat):
     match fmt:
       case VideoProfile() as profile:
         self.video_profiles.append(profile)
@@ -45,7 +45,7 @@ class Device:
       case _:
         raise TypeError(f"Not a format: {fmt}")
 
-  def add_formats(self, fmts: MediaFormats):
+  def add_formats(self, fmts: VideoFormats):
     for fmt in fmts:
       self.add_format(fmt)
 
