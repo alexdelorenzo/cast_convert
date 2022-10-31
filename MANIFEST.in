@@ -1,1 +1,5 @@
-include README.md requirements.txt LICENSE
+include README.md
+include requirements.txt
+include LICENSE
+
+include cast_convert/assets/*.yml
