@@ -4,17 +4,17 @@ from pathlib import Path
 from typing import Final
 
 from .base import VideoProfile, VideoCodec, AudioProfile, AudioCodec, \
-  Container, Formats, Extension, first
+  Container, Formats, Extension, first, VideoMetadata
 from .exceptions import UnknownFormat
 from .parse import ENCODERS
-from .video import Video, VideoMetadata
+from .video import Video
 from .device import Device
 
 import ffmpeg
 
 
 DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()  # type: ignore
-SUFFIX: Final[str] = '_transcoded'
+TRANSCODE_SUFFIX: Final[str] = '_transcoded'
 
 
 class FfmpegArg(StrEnum):
@@ -52,7 +52,11 @@ def transcode_video(video: Video, formats: Formats) -> Video:
   return Video.from_path(new_path)
 
 
-def get_new_path(video: Video, container: Container) -> Path:
+def get_new_path(
+  video: Video,
+  container: Container,
+  suffix: str = TRANSCODE_SUFFIX
+) -> Path:
   ext: Extension = video.path.suffix
 
   if container and not (ext := container.to_extension()):
@@ -60,7 +64,7 @@ def get_new_path(video: Video, container: Container) -> Path:
 
   new_path: Path = (
     video.path
-    .with_stem(f'{video.path.stem}{SUFFIX}')
+    .with_stem(f'{video.path.stem}{suffix}')
     .with_suffix(ext)
   )
 
@@ -70,7 +74,7 @@ def get_new_path(video: Video, container: Container) -> Path:
 def get_args(formats: Formats) -> Args:
   video_codec, resolution, fps, level = formats.video_profile
   [audio_codec] = formats.audio_profile
-  subtitle = formats.subtitle  # TODO: Finish this stub
+  subtitle = formats.subtitle
 
   args: Args = DEFAULT_ARGS.copy()
 
@@ -89,6 +93,10 @@ def get_args(formats: Formats) -> Args:
     pass
 
   if level:
+    pass
+
+  if subtitle:
+    # TODO: Finish this stub
     pass
 
   return args
