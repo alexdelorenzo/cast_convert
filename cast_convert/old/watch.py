@@ -18,7 +18,7 @@ def debug(*items: str | int | bool):
   logging.debug(' '.join(items))
 
 
-def exception(*items: str):
+def exception(*items: str | Exception):
   logging.exception(' '.join(items))
 
 
@@ -122,4 +122,4 @@ def watch_directory(
     observer.stop()
     observer.join()
     queue.join()
-    thread_pool.shutdown(wait=0.1)
+    thread_pool.shutdown(wait=False)
