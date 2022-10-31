@@ -150,13 +150,16 @@ _device: &device
     - avc:
         <<: *profile
         level: '4.1'
+
     - avc:
         <<: *profile
         fps: 60
         level: '4.1'
         resolution: 720
+
     - vp8:
         <<: *profile
+
     - vp8:
         <<: *profile
         fps: 60
@@ -178,8 +181,10 @@ devices:
           <<: *profile
           fps: 60
           level: '4.2'
+
       - vp8:
           <<: *profile
+
       - vp8:
           <<: *profile
           fps: 60
@@ -192,20 +197,24 @@ devices:
           <<: *profile
           fps: 60
           level: '4.2'
+
       - vp8:
           <<: *profile
           fps: 30
           resolution: 3840
+
       - hevc:
           <<: *profile
           fps: 60
           level: '5.1'
           resolution: 3840
+
       - vp9:
           <<: *profile
           fps: 60
           level: '5.1'
           resolution: 3840
+
       - hdr:
           <<: *profile
           fps: 60
@@ -218,16 +227,19 @@ devices:
           <<: *profile
           fps: 60
           level: '5.1'
+
       - avc:
           <<: *profile
           fps: 30
           level: '5.1'
           resolution: 3840
+
       - hevc:
           <<: *profile
           fps: 60
           level: '5.1'
           resolution: 3840
+
       - vp9:
           <<: *profile
           fps: 60
@@ -241,6 +253,7 @@ devices:
           fps: 60
           level: '4.1'
           resolution: 720
+
       - vp9:
           <<: *profile
           fps: 60
@@ -255,6 +268,7 @@ devices:
           fps: 60
           level: '4.1'
           resolution: 720
+
       - vp9:
           <<: *profile
           fps: 60
