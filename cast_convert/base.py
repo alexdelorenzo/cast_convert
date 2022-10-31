@@ -16,6 +16,7 @@ logging.basicConfig(level=logging.WARN)
 
 
 PROFILE_SEP: Final[str] = '@L'
+SUBTITLE_SEP: Final[str] = '/'
 
 
 T = TypeVar('T')
@@ -115,11 +116,10 @@ class Subtitle(NormalizedFormat, StrEnum):
     if not info:
       return None
 
-    elif '/' in info:
-      info, *_ = info.split('/')
+    elif SUBTITLE_SEP in info:
+      info, *_ = info.split(SUBTITLE_SEP)
 
     info = info.strip()
-
     return super().from_info(info)
 
 
