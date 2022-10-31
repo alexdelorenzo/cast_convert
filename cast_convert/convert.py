@@ -19,13 +19,15 @@ DOT: Final[str] = '.'
 
 DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()  # type: ignore
 TRANSCODE_SUFFIX: Final[str] = '_transcoded'
-HWACCEL: Final[Path] = Path('/dev/dri/renderD128')
+HWACCEL_DEVICE: Final[Path] = Path('/dev/dri/renderD128')
 
 
 class FfmpegArg(StrEnum):
   acodec: str = auto()
   vcodec: str = auto()
   scodec: str = auto()
+  fps: str = auto()
+  r: str = auto()
 
   hwaccel: str = auto()
   hwaccel_output_format: str = auto()
@@ -39,7 +41,7 @@ Arg = FfmpegArg | str
 Args = dict[Arg, Arg]
 
 
-DEFAULT_ARGS: Final[Args] = {
+DEFAULT_OUTPUT_ARGS: Final[Args] = {
   FfmpegArg.acodec: FfmpegArg.copy,
   FfmpegArg.vcodec: FfmpegArg.copy,
   FfmpegArg.scodec: FfmpegArg.copy,
@@ -48,21 +50,26 @@ DEFAULT_ARGS: Final[Args] = {
 HWACCEL_ARGS: Final[Args] = {
   FfmpegArg.hwaccel: FfmpegArg.vaapi,
   FfmpegArg.hwaccel_output_format: FfmpegArg.vaapi,
-  FfmpegArg.vaapi_device: str(HWACCEL),
+  FfmpegArg.vaapi_device: str(HWACCEL_DEVICE),
 }
+
+DEFAULT_INPUT_ARGS: Final[Args] = {}
 
 
 def transcode_video(video: Video, formats: Formats) -> Video:
   # TODO: Finish this stub
   container, video_profile, audio_profile, subtitle = formats
-  new_path = get_new_path(video, container)
 
-  args = get_args(formats)
+  input_args = get_input_args(formats)
+  output_args = get_output_args(formats)
+  filters = get_filters(formats)
+
+  new_path = get_new_path(video, container)
 
   stream = (
     ffmpeg
-    .input(str(video.path))
-    .output(str(new_path), **args)
+    .input(str(video.path), **input_args)
+    .output(str(new_path), **output_args)
   )
 
   cmd: str = ' '.join(stream.compile())
@@ -95,9 +102,9 @@ def get_new_path(
   return new_path
 
 
-def get_args(formats: Formats) -> Args:
+def get_output_args(formats: Formats) -> Args:
   # TODO: Finish this stub
-  args: Args = DEFAULT_ARGS.copy()
+  args: Args = DEFAULT_OUTPUT_ARGS.copy()
 
   if (profile := formats.audio_profile) and (codec := profile.codec):
     encoders = ENCODERS[codec]
@@ -116,7 +123,7 @@ def get_args(formats: Formats) -> Args:
   video_codec, resolution, fps, level = profile
 
   if fps:
-    pass
+    args[FfmpegArg.r] = str(fps)
 
   if resolution:
     pass
@@ -125,3 +132,20 @@ def get_args(formats: Formats) -> Args:
     pass
 
   return args
+
+
+def get_input_args(formats: Formats) -> Args:
+  video_codec, resolution, fps, level = formats.video_profile
+  args: Args = DEFAULT_INPUT_ARGS.copy()
+
+  if resolution:
+    pass
+
+  if level:
+    pass
+
+  return args
+
+
+def get_filters(formats: Formats):
+  pass
