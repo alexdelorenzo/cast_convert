@@ -9,7 +9,7 @@ from .watch import watch_directory
 
 
 @click.group(help="Convert and inspect video for Chromecast compatibility")
-def cmd(debug: bool=False):
+def cmd(debug: bool = False):
   pass
 
 
@@ -21,7 +21,7 @@ def get_cmd(filename: str):
 
 @click.command(help="Convert video to Chromecast compatible encodings and container")
 @click.argument("filename")
-@click.option("-t", "--threads", default=THREADS,  type=click.INT,
+@click.option("-t", "--threads", default=THREADS, type=click.INT,
               help="Count of threads for ffmpeg to use. Default: %s" % THREADS)
 def convert(filename: str, threads: int):
   print(filename, "->", convert_video(filename, threads))
@@ -62,7 +62,6 @@ cmd.add_command(get_cmd)
 cmd.add_command(convert)
 cmd.add_command(inspect)
 cmd.add_command(watch)
-
 
 if __name__ == "__main__":
   cmd()

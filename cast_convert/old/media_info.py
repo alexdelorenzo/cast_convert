@@ -3,6 +3,7 @@ from json import loads
 from os.path import isfile
 from subprocess import getoutput
 
+
 try:
   from typing import Dict, List, Union, Tuple
 
@@ -13,25 +14,26 @@ except ImportError as e:
   except ImportError as e2:
     raise ImportError("Please install mypy via pip") from e2
 
-
 from ..exceptions import StreamNotFoundException
 from .chromecast_compat import CAST_COMPAT
 from .preferences import CONVERT_TO_CODEC
 
 
-FFPROBE_CMD_FMT = 'ffprobe ' \
-                  '-show_format ' \
-                  '-show_streams ' \
-                  '-loglevel quiet ' \
-                  '-print_format json "%s"'
+FFPROBE_CMD_FMT = (
+  'ffprobe '
+  '-show_format '
+  '-show_streams '
+  '-loglevel quiet '
+  '-print_format json "%s"'
+)
 
-TRANSCODE_OPTS = {"audio": False,
-                  "video": False,
-                  "container": False}
-
+TRANSCODE_OPTS = {
+  "audio": False,
+  "video": False,
+  "container": False
+}
 
 NOT_VIDS = set('ansi mjpg png subrip'.split())
-
 
 CodecInfo = Union[bool, str]
 Options = Dict[str, CodecInfo]

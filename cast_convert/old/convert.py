@@ -4,9 +4,10 @@ from .media_info import Options, CodecInfo, get_transcode_info
 from .preferences import ENCODER_OPTIONS, COPY_OPTIONS, THREADS, NEW_FILE_FMT
 
 
-FFMPEG_CMD = 'ffmpeg -y ' \
-             '-fflags +genpts ' \
-             '-i "%s" %s'
+FFMPEG_CMD = \
+  'ffmpeg -y ' \
+  '-fflags +genpts ' \
+  '-i "%s" %s'
 
 THREADS_FMT = " -threads %s"
 
@@ -16,11 +17,13 @@ def get_option(media_type: str, codec: CodecInfo) -> str:
 
 
 def build_options(options: Options) -> str:
-  return ' '.join(get_option(media_type, codec)
-                  for media_type, codec in options.items())
+  return ' '.join(
+    get_option(media_type, codec)
+    for media_type, codec in options.items()
+  )
 
 
-def build_cmd(filename: str, options: Options, threads: int=THREADS) -> str:
+def build_cmd(filename: str, options: Options, threads: int = THREADS) -> str:
   threads = THREADS_FMT % str(threads)
   opts = build_options(options) + threads
 
@@ -37,7 +40,7 @@ def need_to_transcode(transcode_info: Options) -> bool:
   return any(new_codec for new_codec in transcode_info.values())
 
 
-def get_ffmpeg_cmd(filename: str, threads: int=THREADS) -> str:
+def get_ffmpeg_cmd(filename: str, threads: int = THREADS) -> str:
   transcode_info = get_transcode_info(filename)
 
   if not need_to_transcode(transcode_info):
@@ -49,7 +52,7 @@ def get_ffmpeg_cmd(filename: str, threads: int=THREADS) -> str:
   return cmd + ' "%s"' % filename
 
 
-def convert_video(filename: str, threads: int=THREADS) -> str:
+def convert_video(filename: str, threads: int = THREADS) -> str:
   ffmpeg_cmd = get_ffmpeg_cmd(filename, threads)
 
   if not ffmpeg_cmd:
@@ -59,4 +62,3 @@ def convert_video(filename: str, threads: int=THREADS) -> str:
   call(ffmpeg_cmd, shell=True, stdout=PIPE)
 
   return convert_filename(filename)
-
