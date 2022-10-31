@@ -12,7 +12,7 @@ from .exceptions import UnknownFormat
 from .parse import ALIAS_FMTS, EXTENSIONS, Extension
 
 
-logging.basicConfig(level=logging.WARN)
+logging.basicConfig(level=logging.INFO)
 
 
 PROFILE_SEP: Final[str] = '@L'
@@ -67,7 +67,7 @@ class Container(NormalizedFormat, StrEnum):
   mp2t: str = auto()
   mp3: str = auto()
   mp4: str = auto()
-  mpeg4: str = auto()
+  # mpeg4: str = auto()
   ogg: str = auto()
   wav: str = auto()
   webm: str = auto()
@@ -156,6 +156,10 @@ AudioProfiles = list[AudioProfile]
 Containers = list[Container]
 Subtitles = list[Subtitle]
 
+Codecs = AudioCodec | VideoCodec
+Profiles = AudioProfile | VideoProfile
+VideoMetadata = Codecs | Profiles | Container
+
 MediaFormat = VideoProfile | AudioProfile | Container | Subtitle
 MediaFormats = Iterable[MediaFormat]
 
@@ -175,3 +179,6 @@ def normalize_info(info: str) -> str:
 def first(iterable: Iterable[T], default: Item = None) -> Item:
   iterator = iter(iterable)
   return next(iterator, default)
+
+
+

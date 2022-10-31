@@ -7,13 +7,9 @@ from pymediainfo import MediaInfo
 
 from .base import VideoProfile, AudioProfile, Container, \
   AudioCodec, VideoCodec, normalize_info, DEFAULT_VIDEO_FPS, \
-  DEFAULT_VIDEO_LEVEL, PROFILE_SEP, Formats, Level, Fps, Subtitle
+  DEFAULT_VIDEO_LEVEL, PROFILE_SEP, Formats, Level, Fps, Subtitle, \
+  VideoMetadata
 from .parse import Yaml
-
-
-Codecs = AudioCodec | VideoCodec
-Profiles = AudioProfile | VideoProfile
-VideoMetadata = Codecs | Profiles | Container
 
 
 @dataclass
