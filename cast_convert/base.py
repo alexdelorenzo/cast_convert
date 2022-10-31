@@ -22,6 +22,7 @@ T = TypeVar('T')
 U = TypeVar('U')
 
 Item = T | U | None
+
 Level = Decimal
 Fps = Decimal
 
@@ -74,7 +75,6 @@ class Container(NormalizedFormat, StrEnum):
     return None
 
 
-
 class VideoCodec(NormalizedFormat, StrEnum):
   unknown: str = auto()
   avc: str = auto()
@@ -105,6 +105,24 @@ class AudioCodec(NormalizedFormat, StrEnum):
   webm: str = auto()
 
 
+class Subtitle(NormalizedFormat, StrEnum):
+  unknown: str = auto()
+  ass: str = auto()
+  utf8: str = auto()
+
+  @classmethod
+  def from_info(cls: Type[Self], info: str | None) -> Self | None:
+    if not info:
+      return None
+
+    elif '/' in info:
+      info, *_ = info.split('/')
+
+    info = info.strip()
+
+    return super().from_info(info)
+
+
 @dataclass(eq=True, frozen=True)
 class Profile(ABC):
   pass
@@ -123,13 +141,20 @@ class VideoProfile(Profile, Unpackable):
   level: Level | None = Level('0.0')
 
 
-Format = VideoProfile | AudioProfile | Container
+VideoProfiles = list[VideoProfile]
+AudioProfiles = list[AudioProfile]
+Containers = list[Container]
+Subtitles = list[Subtitle]
+
+MediaFormat = VideoProfile | AudioProfile | Container | Subtitle
+MediaFormats = Iterable[MediaFormat]
 
 
 class Formats(NamedTuple):
   container: Container | None = None
   video_profile: VideoProfile | None = None
   audio_profile: AudioProfile | None = None
+  subtitle: Subtitle | None = None
 
 
 def normalize_info(info: str) -> str:

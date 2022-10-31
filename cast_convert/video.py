@@ -7,7 +7,7 @@ from pymediainfo import MediaInfo
 
 from .base import VideoProfile, AudioProfile, Container, \
   AudioCodec, VideoCodec, normalize_info, DEFAULT_FPS, \
-  DEFAULT_LEVEL, PROFILE_SEP, Formats, Level, Fps
+  DEFAULT_LEVEL, PROFILE_SEP, Formats, Level, Fps, Subtitle
 from .parse import Yaml
 
 
@@ -32,6 +32,8 @@ class Video:
     title = general.file_name or general.complete_name
 
     container = Container.from_info(general.format)
+    subtitle = Subtitle.from_info(general.text_codecs)
+
     video_profile = get_video_profile(data)
     audio_profile = get_audio_profile(data)
 
@@ -39,6 +41,7 @@ class Video:
       container=container,
       video_profile=video_profile,
       audio_profile=audio_profile,
+      subtitle=subtitle,
     )
 
     return cls(
@@ -89,7 +92,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
 
 
 def is_compatible(video: Video, other: VideoMetadata) -> bool:
-  container, video_profile, audio_profile = video.formats
+  container, video_profile, audio_profile, subtitle = video.formats
 
   match other:
     case VideoProfile(codec, resolution, fps, level):
@@ -131,9 +134,9 @@ def profile_to_level(profile: str | None) -> Level:
 
   match [*level]:
     case [val]:
-      return Level(val)
+      return Level(f'{val}.0')
 
-    case [big, *small]:
+    case big, *small:
       small = ''.join(small)
       return Level(f'{big}.{small}')
 

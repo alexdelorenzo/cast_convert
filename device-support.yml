@@ -27,6 +27,9 @@ audio:
   - FLAC
   - WAV
 
+subtitles:
+  - ASS
+
 # Formats can have different names, here are their equivalencies
 aliases:
   avc:

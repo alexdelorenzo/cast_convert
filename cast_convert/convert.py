@@ -36,17 +36,8 @@ DEFAULT_ARGS: Final[Args] = {
 
 
 def transcode_video(video: Video, formats: Formats) -> Video:
-  container, video_profile, audio_profile = formats
-  new_ext: Extension = video.path.suffix
-
-  if container and not (new_ext := container.to_extension()):
-    new_ext = DEFAULT_EXT
-
-  new_path: Path = (
-    video.path
-    .with_stem(f'{video.path.stem}{SUFFIX}')
-    .with_suffix(new_ext)
-  )
+  container, video_profile, audio_profile, subtitle = formats
+  new_path = get_new_path(video, container)
 
   args = get_args(formats)
 
@@ -58,6 +49,21 @@ def transcode_video(video: Video, formats: Formats) -> Video:
   stream.run()
 
   return Video.from_path(new_path)
+
+
+def get_new_path(video: Video, container: Container) -> Path:
+  ext: Extension = video.path.suffix
+
+  if container and not (ext := container.to_extension()):
+    ext = DEFAULT_EXT
+
+  new_path: Path = (
+    video.path
+    .with_stem(f'{video.path.stem}{SUFFIX}')
+    .with_suffix(ext)
+  )
+
+  return new_path
 
 
 def get_args(formats: Formats) -> Args:

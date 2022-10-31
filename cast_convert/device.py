@@ -1,12 +1,14 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from itertools import chain
 from pathlib import Path
 from typing import Iterable, Self
 import logging
 
 from .base import VideoProfile, AudioProfile, Container, \
-  AudioCodec, VideoCodec, Formats, Format
-from .parse import Yaml, get_yaml, DEVICE_INFO
+  AudioCodec, VideoCodec, Formats, MediaFormat, VideoProfiles, \
+  AudioProfiles, Containers, MediaFormats, Subtitles, Subtitle
+from .parse import Yaml, get_yaml, DEVICE_INFO, FmtNames
 from .video import Video, get_video_profiles
 from .exceptions import UnknownFormat
 
@@ -15,17 +17,18 @@ from .exceptions import UnknownFormat
 class Device:
   name: str
 
-  video_profiles: list[VideoProfile] = field(default_factory=list)
-  audio_profiles: list[AudioProfile] = field(default_factory=list)
+  video_profiles: VideoProfiles = field(default_factory=VideoProfiles)
+  audio_profiles: AudioProfiles = field(default_factory=AudioProfiles)
 
-  containers: list[Container] = field(default_factory=list)
+  containers: Containers = field(default_factory=Containers)
+  subtitles: Subtitles = field(default_factory=Subtitles)
 
   @classmethod
   def from_yaml(cls, path: Path = DEVICE_INFO) -> Iterable[Self]:
     yaml = get_yaml(path)
     yield from get_devices(yaml)
 
-  def add_format(self, fmt: Format):
+  def add_format(self, fmt: MediaFormat):
     match fmt:
       case VideoProfile() as profile:
         self.video_profiles.append(profile)
@@ -36,11 +39,18 @@ class Device:
       case Container() as container:
         self.containers.append(container)
 
+      case Subtitle() as subtitle:
+        self.subtitles.append(subtitle)
+
       case _:
-        raise TypeError(f"Not encodable: {fmt}")
+        raise TypeError(f"Not a format: {fmt}")
+
+  def add_formats(self, fmts: MediaFormats):
+    for fmt in fmts:
+      self.add_format(fmt)
 
   def can_play_audio(self, video: Video) -> bool:
-    *_, audio_profile = video.formats
+    *_, audio_profile, _ = video.formats
 
     if audio_profile.codec is AudioCodec.unknown:
       raise UnknownFormat(f"Missing codec for {video}")
@@ -53,7 +63,7 @@ class Device:
     return can_audio
 
   def can_play_video(self, video: Video) -> bool:
-    _, video_profile, _ = video.formats
+    _, video_profile, *_ = video.formats
 
     if video_profile.codec is VideoCodec.unknown:
       raise UnknownFormat(f"Missing codec for {video}")
@@ -76,26 +86,51 @@ class Device:
 
     return can_container
 
+  def can_play_subtitle(self, video: Video) -> bool:
+    *_, subtitle = video.formats
+    return True
+
   def can_play(self, video: Video) -> bool:
-    return self.can_play_audio(video) and self.can_play_video(video) and self.can_play_container(video)
+    return (
+      self.can_play_audio(video) and
+      self.can_play_video(video) and
+      self.can_play_container(video) and
+      self.can_play_subtitle(video)
+    )
 
   def transcode_to(self, video: Video) -> Formats | None:
     return transcode_to(self, video)
 
 
-def get_device(name: str, device_info: Yaml, data: Yaml) -> Device:
-  names = map(AudioCodec.from_info, data['audio'])
+def get_device(
+  name: str,
+  profiles: Yaml,
+  container_names: FmtNames,
+  audio_names: FmtNames,
+  subtitle_names: FmtNames,
+) -> Device:
+  device = Device(name)
 
-  audio = list(map(AudioProfile, names))
-  video = list(get_video_profiles(device_info['profiles']))
-  containers = list(map(Container.from_info, data['containers']))
+  video = get_video_profiles(profiles)
+  containers = map(Container.from_info, container_names)
+  codecs = map(AudioCodec.from_info, audio_names)
+  audio = map(AudioProfile, codecs)
+  subtitles = map(Subtitle, subtitle_names)
 
-  return Device(name, video, audio, containers)
+  formats = chain(audio, video, containers, subtitles)
+  device.add_formats(formats)
+
+  return device
 
 
 def get_devices(data: Yaml) -> Iterable[Device]:
+  containers: FmtNames = data['containers']
+  audio: FmtNames = data['audio']
+  subtitles: FmtNames = data['subtitles']
+
   for name, device_info in data['devices'].items():
-    yield get_device(name, device_info, data)
+    profiles: Yaml = device_info['profiles']
+    yield get_device(name, profiles, containers, audio, subtitles)
 
 
 def transcode_video(
@@ -106,7 +141,7 @@ def transcode_video(
   if device.can_play_video(video):
     return None
 
-  _, video_profile, _ = video.formats
+  _, video_profile, *_ = video.formats
   codec, resolution, fps, level = video_profile
 
   if not default_video:
@@ -132,7 +167,7 @@ def transcode_audio(
   if device.can_play_audio(video):
     return None
 
-  *_,  audio_profile = video.formats
+  *_,  audio_profile, _ = video.formats
   [codec] = audio_profile
 
   if not default_audio:
@@ -161,6 +196,14 @@ def transcode_container(
 
   return new_container
 
+
+def transcode_subtitle(
+  device: Device,
+  video: Video,
+  default_subtitle: Subtitle | None = None,
+) -> Subtitle | None:
+  *_, subtitle = video.formats
+  return None
 
 def transcode_to(
   device: Device,
