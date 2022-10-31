@@ -4,14 +4,14 @@ from os.path import isfile
 from subprocess import getoutput
 
 try:
-    from typing import Dict, List, Union, Tuple
+  from typing import Dict, List, Union, Tuple
 
 except ImportError as e:
-    try:
-        from mypy.types import Dict, List, Union, Tuple
+  try:
+    from mypy.types import Dict, List, Union, Tuple
 
-    except ImportError as e2:
-        raise ImportError("Please install mypy via pip") from e2
+  except ImportError as e2:
+    raise ImportError("Please install mypy via pip") from e2
 
 
 from ..exceptions import StreamNotFoundException
@@ -40,116 +40,116 @@ Duration = namedtuple("Duration", "hour min sec")
 
 
 def get_media_info(filename: str) -> dict:
-    json = loads(getoutput(FFPROBE_CMD_FMT % filename))
+  json = loads(getoutput(FFPROBE_CMD_FMT % filename))
 
-    if not json:
-        raise IOError("File %s cannot be read by ffprobe." % filename)
+  if not json:
+    raise IOError("File %s cannot be read by ffprobe." % filename)
 
-    return json
+  return json
 
 
 def get_codec(media_info: dict, codec_type: str) -> str:
-    streams = media_info['streams']
+  streams = media_info['streams']
 
-    for stream in streams:
-        if stream['codec_type'] == codec_type:
-            return stream['codec_name']
+  for stream in streams:
+    if stream['codec_type'] == codec_type:
+      return stream['codec_name']
 
-    raise StreamNotFoundException("%s stream not found in file." % codec_type.capitalize())
+  raise StreamNotFoundException("%s stream not found in file." % codec_type.capitalize())
 
 
 def get_video_codec(media_info: dict) -> str:
-    return get_codec(media_info, 'video')
+  return get_codec(media_info, 'video')
 
 
 def get_audio_codec(media_info: dict) -> str:
-    return get_codec(media_info, 'audio')
+  return get_codec(media_info, 'audio')
 
 
 def get_container_format(media_info: dict) -> str:
-    format_info = media_info['format']
-    name = format_info['format_name']
+  format_info = media_info['format']
+  name = format_info['format_name']
 
-    # ffprobe might return a list of types
-    # let's check each one for compatibility
-    for fmt in name.split(','):
-        if fmt in CAST_COMPAT['container']:
-            return fmt
+  # ffprobe might return a list of types
+  # let's check each one for compatibility
+  for fmt in name.split(','):
+    if fmt in CAST_COMPAT['container']:
+      return fmt
 
-    return name
+  return name
 
 
 VID_INFO_FUNCS = {
-    'audio': get_audio_codec,
-    'video': get_video_codec,
-    'container': get_container_format
+  'audio': get_audio_codec,
+  'video': get_video_codec,
+  'container': get_container_format
 }
 
 
 def duration_from_seconds(time: float) -> Duration:
-    m, s = divmod(time, 60)
-    h, m = divmod(m, 60)
+  m, s = divmod(time, 60)
+  h, m = divmod(m, 60)
 
-    return Duration(h, m, s)
+  return Duration(h, m, s)
 
 
 def get_duration(media_info: dict) -> float:
-    return media_info['format']['duration']
+  return media_info['format']['duration']
 
 
 def get_bitrate(media_info: dict) -> float:
-    return media_info['format']['bitrate']
+  return media_info['format']['bitrate']
 
 
 def is_compatible(codec_type: str, codec: str):
-    if codec_type is None:
-        return False
+  if codec_type is None:
+    return False
 
-    return codec in CAST_COMPAT[codec_type]
+  return codec in CAST_COMPAT[codec_type]
 
 
 def update_transcoding_info(stream_type: str, media_info: Options, transcoding_info: Options):
-    func_get_codec = VID_INFO_FUNCS[stream_type]
+  func_get_codec = VID_INFO_FUNCS[stream_type]
 
-    try:
-        codec = func_get_codec(media_info)
+  try:
+    codec = func_get_codec(media_info)
 
-        if not is_compatible(stream_type, codec):
-            transcoding_info[stream_type] = CONVERT_TO_CODEC[stream_type]
+    if not is_compatible(stream_type, codec):
+      transcoding_info[stream_type] = CONVERT_TO_CODEC[stream_type]
 
-    except StreamNotFoundException as e:
-        transcoding_info[stream_type] = False
+  except StreamNotFoundException as e:
+    transcoding_info[stream_type] = False
 
 
 def determine_transcodings(media_info: dict) -> Options:
-    transcoding_info = TRANSCODE_OPTS.copy()
+  transcoding_info = TRANSCODE_OPTS.copy()
 
-    for stream_type in TRANSCODE_OPTS:
-        update_transcoding_info(stream_type, media_info, transcoding_info)
+  for stream_type in TRANSCODE_OPTS:
+    update_transcoding_info(stream_type, media_info, transcoding_info)
 
-    return transcoding_info
+  return transcoding_info
 
 
 def get_transcode_info(filename: str) -> Options:
-    return determine_transcodings(get_media_info(filename))
+  return determine_transcodings(get_media_info(filename))
 
 
 def is_video(path: str) -> bool:
-    if not isfile(path):
-        return False
+  if not isfile(path):
+    return False
 
-    try:
-        media_info = get_media_info(path)
+  try:
+    media_info = get_media_info(path)
 
-    except IOError as e:
-        return False
+  except IOError as e:
+    return False
 
-    except StreamNotFoundException as e:
-        return False
+  except StreamNotFoundException as e:
+    return False
 
-    codec = get_video_codec(media_info)
+  codec = get_video_codec(media_info)
 
-    if codec in NOT_VIDS:
-        return False
+  if codec in NOT_VIDS:
+    return False
 
-    return bool(codec)
+  return bool(codec)

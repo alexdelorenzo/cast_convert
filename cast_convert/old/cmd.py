@@ -10,13 +10,13 @@ from .watch import watch_directory
 
 @click.group(help="Convert and inspect video for Chromecast compatibility")
 def cmd(debug: bool=False):
-    pass
+  pass
 
 
 @click.command(help="Generate ffmpeg conversion command.")
 @click.argument("filename")
 def get_cmd(filename: str):
-    print(get_ffmpeg_cmd(filename))
+  print(get_ffmpeg_cmd(filename))
 
 
 @click.command(help="Convert video to Chromecast compatible encodings and container")
@@ -24,24 +24,24 @@ def get_cmd(filename: str):
 @click.option("-t", "--threads", default=THREADS,  type=click.INT,
               help="Count of threads for ffmpeg to use. Default: %s" % THREADS)
 def convert(filename: str, threads: int):
-    print(filename, "->", convert_video(filename, threads))
+  print(filename, "->", convert_video(filename, threads))
 
 
 @click.command(help="Inspect video for transcoding options")
 @click.argument("filename")
 def inspect(filename: str):
-    try:
-        info = get_transcode_info(filename)
+  try:
+    info = get_transcode_info(filename)
 
-    except OSError as e:
-        print(e)
-        return
+  except OSError as e:
+    print(e)
+    return
 
-    if need_to_transcode(info):
-        print("Transcode video to %s" % str(info))
+  if need_to_transcode(info):
+    print("Transcode video to %s" % str(info))
 
-    else:
-        print("No need to transcode", filename)
+  else:
+    print("No need to transcode", filename)
 
 
 @click.command(help="Watch directory and convert newly added videos")
@@ -52,10 +52,10 @@ def inspect(filename: str):
 @click.option("-t", "--threads", help="Number of threads to pass to ffmpeg", default=THREADS)
 @click.argument("directory")
 def watch(directory: str, ignore: tuple, debug: bool, threads: int):
-    if ignore:
-        print("Ignoring patterns:", ', '.join(ignore) + '...')
+  if ignore:
+    print("Ignoring patterns:", ', '.join(ignore) + '...')
 
-    watch_directory(directory, ignore_patterns=ignore, threads=threads, show_debug=debug)
+  watch_directory(directory, ignore_patterns=ignore, threads=threads, show_debug=debug)
 
 
 cmd.add_command(get_cmd)
@@ -65,4 +65,4 @@ cmd.add_command(watch)
 
 
 if __name__ == "__main__":
-    cmd()
+  cmd()
