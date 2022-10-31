@@ -36,6 +36,15 @@ DEFAULT_PROFILE_LEVEL: Final[Level] = Level('0.0')
 DEFAULT_PROFILE_RESOLUTION: Final[int] = 720
 
 
+def get_name(obj: Any) -> str:
+  match obj:
+    case type() as cls:
+      return cls.__name__
+
+    case _:
+      return type(obj).__name__
+
+
 class NormalizedFormat:
   unknown: str
 
@@ -187,12 +196,3 @@ def normalize_info(info: str) -> str:
 def first(iterable: Iterable[T], default: Item = None) -> Item:
   iterator = iter(iterable)
   return next(iterator, default)
-
-
-def get_name(obj: Any) -> str:
-  match obj:
-    case type() as cls:
-      return cls.__name__
-
-    case _:
-      return type(obj).__name__
