@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import Final, Self, Type, Iterable, TypeVar, NamedTuple
+from typing import Final, Self, Type, Iterable, TypeVar, NamedTuple, Any
 from decimal import Decimal
 from abc import ABC
 import logging
@@ -58,6 +58,10 @@ class NormalizedFormat:
 
     normalized = normalize_info(info)
     return cls(normalized)
+
+  def __repr__(self) -> str:
+    name = get_name(self)
+    return f"{name}({self})"
 
 
 class Container(NormalizedFormat, StrEnum):
@@ -142,6 +146,10 @@ class Profile(ABC):
 class AudioProfile(Profile, Unpackable):
   codec: AudioCodec | None = AudioCodec.unknown
 
+  def __repr__(self) -> str:
+    name = get_name(self)
+    return f"{name}({self.codec})"
+
 
 @dataclass(eq=True, frozen=True)
 class VideoProfile(Profile, Unpackable):
@@ -181,4 +189,6 @@ def first(iterable: Iterable[T], default: Item = None) -> Item:
   return next(iterator, default)
 
 
+def get_name(obj: Any) -> str:
+  return type(obj).__name__
 

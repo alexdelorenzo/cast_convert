@@ -8,7 +8,7 @@ from pymediainfo import MediaInfo
 from .base import VideoProfile, AudioProfile, Container, \
   AudioCodec, VideoCodec, normalize_info, DEFAULT_VIDEO_FPS, \
   DEFAULT_VIDEO_LEVEL, PROFILE_SEP, Formats, Level, Fps, Subtitle, \
-  VideoMetadata
+  VideoMetadata, get_name
 from .parse import Yaml
 
 
@@ -119,7 +119,7 @@ def is_compatible(video: Video, other: VideoMetadata) -> bool:
 
       return _subtitle is subtitle
 
-  raise TypeError(f'Cannot compare with {type(other).__name__}')
+  raise TypeError(f'Cannot compare with {get_name(other)}')
 
 
 def profile_to_level(profile: str | None) -> Level:
