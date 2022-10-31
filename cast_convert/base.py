@@ -39,6 +39,9 @@ DEFAULT_PROFILE_RESOLUTION: Final[int] = 720
 class NormalizedFormat:
   unknown: str
 
+  def __repr__(self) -> str:
+    return f"{get_name(self)}({self})"
+
   @classmethod
   def _missing_(cls: Type[Self], value: str) -> Self:
     logging.info(f"[{get_name(cls)}] Not enumerated: {value}")
@@ -58,9 +61,6 @@ class NormalizedFormat:
 
     normalized = normalize_info(info)
     return cls(normalized)
-
-  def __repr__(self) -> str:
-    return f"{get_name(self)}({self})"
 
 
 class Container(NormalizedFormat, StrEnum):
@@ -146,8 +146,7 @@ class AudioProfile(Profile, Unpackable):
   codec: AudioCodec | None = AudioCodec.unknown
 
   def __repr__(self) -> str:
-    name = get_name(self)
-    return f"{name}({self.codec})"
+    return f"{get_name(self)}({self.codec})"
 
 
 @dataclass(eq=True, frozen=True)
