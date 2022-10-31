@@ -44,13 +44,13 @@ class NormalizedFormat:
 
   @classmethod
   def _missing_(cls: Type[Self], value: str) -> Self:
-    cls_name = get_name(cls)
+    name = get_name(cls)
 
-    if name := ALIAS_FMTS.get(value):
-      logging.info(f"[{cls_name}] Using {name} as an alias for {value}")
-      return cls(name)
+    if alias := ALIAS_FMTS.get(value):
+      logging.info(f"[{name}] Using {alias} as an alias for {value}")
+      return cls(alias)
 
-    logging.info(f"[{cls_name}] Not found, using `unknown` instead of {value}")
+    logging.info(f"[{name}] Not found, using `unknown` instead of {value}")
     return cls.unknown
 
   @classmethod
