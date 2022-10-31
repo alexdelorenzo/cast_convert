@@ -180,9 +180,7 @@ def transcode_audio(
 
   new_codec = None if codec is default_audio.codec else default_audio.codec
 
-  return AudioProfile(
-    codec=new_codec
-  )
+  return AudioProfile(new_codec)
 
 def transcode_container(
   device: Device,

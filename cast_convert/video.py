@@ -111,13 +111,13 @@ def is_compatible(video: Video, other: VideoMetadata) -> bool:
       return audio_profile.codec is codec
 
     case Container() as _container:
-      return _container is container
+      return container is _container
 
     case Subtitle() as _subtitle:
       if not _subtitle:
         return True
 
-      return _subtitle is subtitle
+      return subtitle is _subtitle
 
   raise TypeError(f'Cannot compare with {get_name(other)}')
 
