@@ -36,6 +36,7 @@ DEFAULT_ARGS: Final[Args] = {
 
 
 def transcode_video(video: Video, formats: Formats) -> Video:
+  # TODO: Finish this stub
   container, video_profile, audio_profile, subtitle = formats
   new_path = get_new_path(video, container)
 
@@ -69,6 +70,7 @@ def get_new_path(video: Video, container: Container) -> Path:
 def get_args(formats: Formats) -> Args:
   video_codec, resolution, fps, level = formats.video_profile
   [audio_codec] = formats.audio_profile
+  subtitle = formats.subtitle  # TODO: Finish this stub
 
   args: Args = DEFAULT_ARGS.copy()
 

@@ -117,6 +117,12 @@ def is_compatible(video: Video, other: VideoMetadata) -> bool:
     case Container() as _container:
       return _container is container
 
+    case Subtitle() as _subtitle:
+      if not _subtitle:
+        return True
+
+      return _subtitle is subtitle
+
   raise TypeError(f'Cannot compare with {type(other).__name__}')
 
 

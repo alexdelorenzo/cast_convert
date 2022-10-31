@@ -87,7 +87,12 @@ class Device:
     return can_container
 
   def can_play_subtitle(self, video: Video) -> bool:
+    # TODO: Finish this stub
     *_, subtitle = video.formats
+
+    if not subtitle:
+      return True
+
     return True
 
   def can_play(self, video: Video) -> bool:
@@ -202,8 +207,10 @@ def transcode_subtitle(
   video: Video,
   default_subtitle: Subtitle | None = None,
 ) -> Subtitle | None:
+  # TODO: Finish this stub
   *_, subtitle = video.formats
   return None
+
 
 def transcode_to(
   device: Device,
@@ -211,6 +218,7 @@ def transcode_to(
   default_video: VideoProfile | None = None,
   default_audio: AudioProfile | None = None,
   default_container: Container | None = None,
+  default_subtitle: Subtitle | None = None,
 ) -> Formats | None:
   if device.can_play(video):
     return None
@@ -218,9 +226,11 @@ def transcode_to(
   new_video = transcode_video(device, video, default_video)
   new_audio = transcode_audio(device, video, default_audio)
   new_container = transcode_container(device, video, default_container)
+  new_subtitle = transcode_subtitle(device, video, default_subtitle)
 
   return Formats(
     container=new_container,
     video_profile=new_video,
     audio_profile=new_audio,
+    subtitle=new_subtitle,
   )
