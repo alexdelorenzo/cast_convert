@@ -41,7 +41,7 @@ class NormalizedFormat:
 
   @classmethod
   def _missing_(cls: Type[Self], value: str) -> Self:
-    logging.info(f"[{cls.__name__}] Not enumerated: {value}")
+    logging.info(f"[{get_name(cls)}] Not enumerated: {value}")
 
     if name := ALIAS_FMTS.get(value):
       return cls(name)
@@ -54,14 +54,13 @@ class NormalizedFormat:
       return cls.unknown
 
     if not isinstance(info, str):
-      raise TypeError(f"{cls.__name__}: Can't normalize: {info}")
+      raise TypeError(f"[{get_name(cls)}] Can't normalize: {info}")
 
     normalized = normalize_info(info)
     return cls(normalized)
 
   def __repr__(self) -> str:
-    name = get_name(self)
-    return f"{name}({self})"
+    return f"{get_name(self)}({self})"
 
 
 class Container(NormalizedFormat, StrEnum):
@@ -190,5 +189,9 @@ def first(iterable: Iterable[T], default: Item = None) -> Item:
 
 
 def get_name(obj: Any) -> str:
-  return type(obj).__name__
+  match obj:
+    case type() as cls:
+      return cls.__name__
 
+    case _:
+      return type(obj).__name__
