@@ -114,6 +114,12 @@ class Subtitle(NormalizedFormat, StrEnum):
   unknown: str = auto()
   ass: str = auto()
   utf8: str = auto()
+  srt: str = auto()
+  ssa: str = auto()
+  vtt: str = auto()
+  ttml: str = auto()
+  eia608: str = auto()
+  eia708: str = auto()
 
   @classmethod
   def from_info(cls: Type[Self], info: str | None) -> Self | None:

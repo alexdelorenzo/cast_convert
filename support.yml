@@ -28,7 +28,10 @@ audio:
   - WAV
 
 subtitles:
-  - ASS
+  - TTML
+  - VTT
+  - EIA-608
+  - EIA-708
 
 # Formats can have different names, here are their equivalencies
 aliases:

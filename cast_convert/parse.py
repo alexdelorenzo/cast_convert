@@ -6,7 +6,8 @@ from yaml import safe_load
 
 
 SRC_DIR: Final[Path] = Path(__file__).parent.parent.absolute()
-DEVICE_INFO: Final[Path] = SRC_DIR / 'device-support.yml'
+DEVICE_INFO: Final[Path] = SRC_DIR / 'support.yml'
+SUPPORT_INFO: Final[Path] = SRC_DIR / 'support.yml'
 
 
 Fmt = str
@@ -34,6 +35,9 @@ EXTENSIONS: Final[FmtExtensions] = DATA['extensions']
 ENCODERS: Final[FmtAliases] = DATA['encoders']
 DECODERS: Final[FmtAliases] = DATA['decoders']
 SUBTITLES: Final[FmtNames] = DATA['subtitles']
+CONTAINERS: Final[FmtNames] = DATA['containers']
+AUDIO: Final[FmtNames] = DATA['audio']
+DEVICES: Final[Yaml] = DATA['devices']
 
 FMT_ALIASES: Final[FmtAliases] = DATA['aliases']
 ALIAS_FMTS: Final[AliasFmts] = {

@@ -120,7 +120,7 @@ def get_device(
   containers = map(Container.from_info, container_names)
   codecs = map(AudioCodec.from_info, audio_names)
   audio = map(AudioProfile, codecs)
-  subtitles = map(Subtitle, subtitle_names)
+  subtitles = map(Subtitle.from_info, subtitle_names)
 
   formats = chain(audio, video, containers, subtitles)
   device.add_formats(formats)
