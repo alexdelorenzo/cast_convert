@@ -134,7 +134,7 @@ def get_output_args(video: Video, formats: Formats) -> Args:
   if not profile:
     return args
 
-  video_codec, resolution, fps, level = profile
+  *_, fps, level = profile
 
   if fps:
     args[FfmpegArg.r] = str(fps)
