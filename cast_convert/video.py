@@ -60,7 +60,7 @@ def get_audio_profile(data: MediaInfo) -> AudioProfile | None:
   name: str = audio.codec_id_hint or audio.format
   codec = AudioCodec.from_info(name)
 
-  return  AudioProfile(codec)
+  return AudioProfile(codec)
 
 
 def get_video_profile(data: MediaInfo) -> VideoProfile | None:

@@ -55,12 +55,12 @@ class Device:
     if audio_profile.codec is AudioCodec.unknown:
       raise UnknownFormat(f"Missing codec for {video}")
 
-    can_audio = any(video.is_compatible(profile) for profile in self.audio_profiles)
+    can_play = any(video.is_compatible(profile) for profile in self.audio_profiles)
 
-    if not can_audio:
+    if not can_play:
       logging.info(f"{audio_profile} not compatible with {self.audio_profiles}")
 
-    return can_audio
+    return can_play
 
   def can_play_video(self, video: Video) -> bool:
     _, video_profile, *_ = video.formats
@@ -68,12 +68,12 @@ class Device:
     if video_profile.codec is VideoCodec.unknown:
       raise UnknownFormat(f"Missing codec for {video}")
 
-    can_video = any(video.is_compatible(profile) for profile in self.video_profiles)
+    can_play = any(video.is_compatible(profile) for profile in self.video_profiles)
 
-    if not can_video:
+    if not can_play:
       logging.info(f"{video_profile} not compatible with {self.video_profiles}")
 
-    return can_video
+    return can_play
 
   def can_play_container(self, video: Video) -> bool:
     container = video.formats.container
@@ -81,10 +81,10 @@ class Device:
     if container is Container.unknown:
       raise UnknownFormat(f"Missing container for {video}")
 
-    if not (can_container := container in self.containers):
+    if not (can_play := container in self.containers):
       logging.info(f"{container} not compatible with {self.containers}")
 
-    return can_container
+    return can_play
 
   def can_play_subtitle(self, video: Video) -> bool:
     # TODO: Finish this stub
@@ -164,6 +164,7 @@ def transcode_video(
     level=new_level,
   )
 
+
 def transcode_audio(
   device: Device,
   video: Video,
@@ -172,7 +173,7 @@ def transcode_audio(
   if device.can_play_audio(video):
     return None
 
-  *_,  audio_profile, _ = video.formats
+  *_, audio_profile, _ = video.formats
   [codec] = audio_profile
 
   if not default_audio:
@@ -181,6 +182,7 @@ def transcode_audio(
   new_codec = None if codec is default_audio.codec else default_audio.codec
 
   return AudioProfile(new_codec)
+
 
 def transcode_container(
   device: Device,
