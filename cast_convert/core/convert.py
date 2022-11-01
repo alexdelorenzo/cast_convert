@@ -7,8 +7,8 @@ import logging
 
 import ffmpeg
 
-from .base import Container, Formats, Extension, first, Codecs
-from .parse import ENCODERS, Alias
+from .base import Container, Formats, Extension, first, Codecs, VideoCodec, AudioCodec, Subtitle
+from .parse import ENCODERS, Alias, Aliases, AUDIO_ENCODERS, VIDEO_ENCODERS, SUBTITLE_ENCODERS
 from .video import Video
 
 
@@ -59,7 +59,21 @@ DEFAULT_INPUT_ARGS: Final[Args] = {}
 
 
 def get_encoder(codec: Codecs) -> Alias:
-  encoders = ENCODERS[codec]
+  encoders: Aliases
+
+  match codec:
+    case AudioCodec():
+      encoders = AUDIO_ENCODERS[codec]
+
+    case VideoCodec():
+      encoders = VIDEO_ENCODERS[codec]
+
+    case Subtitle():
+      encoders = SUBTITLE_ENCODERS[codec]
+
+    case obj:
+      raise TypeError(f"{obj} not a codec")
+
   return first(encoders)
 
 
@@ -163,3 +177,4 @@ def get_filters(stream: ffmpeg.Stream, formats: Formats) -> ffmpeg.Stream | None
     )
 
   return filters
+
