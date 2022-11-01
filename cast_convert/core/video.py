@@ -135,9 +135,7 @@ def profile_to_level(profile: str | None) -> Level:
     case (_, level) | (_, level, _):
       level = level
 
-  level = normalize_info(level)
-
-  if not level.isnumeric():
+  if not (level := normalize_info(level, str.isnumeric)):
     return DEFAULT_VIDEO_LEVEL
 
   match [*level]:
