@@ -5,8 +5,10 @@ from typing import Final
 from yaml import safe_load
 
 
-SRC_DIR: Final[Path] = Path(__file__).parent.absolute()
-ASSET_DIR: Final[Path] = SRC_DIR / 'assets'
+CORE_DIR: Final[Path] = Path(__file__).parent.absolute()
+SOURCE_DIR: Final[Path] = CORE_DIR.parent.absolute()
+ASSET_DIR: Final[Path] = SOURCE_DIR / 'assets'
+
 DEVICE_INFO: Final[Path] = ASSET_DIR / 'support.yml'
 SUPPORT_INFO: Final[Path] = ASSET_DIR / 'support.yml'
 
