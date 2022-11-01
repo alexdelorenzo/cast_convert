@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Final
 
 from .base import VideoProfile, VideoCodec, AudioProfile, AudioCodec, \
-  Container, Formats, Extension, first, VideoFormat
+  Container, Formats, Extension, first, VideoFormat, Level, Subtitle, Codecs
 from .exceptions import UnknownFormat
 from .parse import ENCODERS
 from .video import Video
@@ -28,6 +28,9 @@ class FfmpegArg(StrEnum):
   scodec: str = auto()
   fps: str = auto()
   r: str = auto()
+
+  vprofile: str = auto()
+  vlevel: str = auto()
 
   hwaccel: str = auto()
   hwaccel_output_format: str = auto()
@@ -58,12 +61,17 @@ HWACCEL_ARGS: Final[Args] = {
 DEFAULT_INPUT_ARGS: Final[Args] = {}
 
 
+def get_encoder(codec: Codecs) -> str:
+  encoders = ENCODERS[codec]
+  return first(encoders)
+
+
 def transcode_video(video: Video, formats: Formats) -> Video:
   # TODO: Finish this stub
   container, video_profile, audio_profile, subtitle = formats
 
   input_args = get_input_args(formats)
-  output_args = get_output_args(formats)
+  output_args = get_output_args(video, formats)
 
   new_path = get_new_path(video, container)
 
@@ -110,20 +118,18 @@ def get_new_path(
   return new_path
 
 
-def get_output_args(formats: Formats) -> Args:
+def get_output_args(video: Video, formats: Formats) -> Args:
   # TODO: Finish this stub
   args: Args = DEFAULT_OUTPUT_ARGS.copy()
 
   if (profile := formats.audio_profile) and (codec := profile.codec):
-    encoders = ENCODERS[codec]
-    args[FfmpegArg.acodec] = first(encoders)
+    args[FfmpegArg.acodec] = get_encoder(codec)
 
   if (profile := formats.video_profile) and (codec := profile.codec):
-    encoders = ENCODERS[codec]
-    args[FfmpegArg.vcodec] = first(encoders)
+    args[FfmpegArg.vcodec] = get_encoder(codec)
 
   if subtitle := formats.subtitle:
-    pass
+    args[FfmpegArg.scodec] = subtitle
 
   if not profile:
     return args
@@ -133,11 +139,12 @@ def get_output_args(formats: Formats) -> Args:
   if fps:
     args[FfmpegArg.r] = str(fps)
 
-  if resolution:
-    pass
-
   if level:
-    pass
+    args[FfmpegArg.vlevel] = str(level)
+
+    if not args.get(FfmpegArg.vcodec):
+      codec = video.formats.video_profile.codec
+      args[FfmpegArg.vcodec] = get_encoder(codec)
 
   return args
 
@@ -145,12 +152,6 @@ def get_output_args(formats: Formats) -> Args:
 def get_input_args(formats: Formats) -> Args:
   video_codec, resolution, fps, level = formats.video_profile
   args: Args = DEFAULT_INPUT_ARGS.copy()
-
-  if resolution:
-    pass
-
-  if level:
-    pass
 
   return args
 
