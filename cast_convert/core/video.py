@@ -78,7 +78,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
       break
 
   height, width = video.height, video.width
-  fps = video.original_frame_rate
+  fps = video.original_frame_rate or video.frame_rate
   profile = video.format_profile
 
   return VideoProfile(
@@ -89,10 +89,10 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
   )
 
 
-def is_compatible(video: Video, other: VideoFormat) -> bool:
+def is_compatible(video: Video, fmt: VideoFormat) -> bool:
   container, video_profile, audio_profile, subtitle = video.formats
 
-  match other:
+  match fmt:
     case VideoProfile(codec, resolution, fps, level):
       _codec, _resolution, _fps, _level = video_profile
 
@@ -121,7 +121,7 @@ def is_compatible(video: Video, other: VideoFormat) -> bool:
 
       return subtitle is _subtitle
 
-  raise TypeError(f'Cannot compare with {get_name(other)}')
+  raise TypeError(f'Cannot compare with {get_name(fmt)}')
 
 
 def profile_to_level(profile: str | None) -> Level:
