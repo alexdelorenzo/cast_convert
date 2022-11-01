@@ -44,8 +44,8 @@ class NormalizedFormat:
 
   @classmethod
   def _missing_(cls: Type[Self], value: str) -> Self:
-    name = get_name(cls)
     logging.info(f"Missing: {value}")
+    name = get_name(cls)
 
     if hasattr(cls, value):
       return getattr(cls, value)
