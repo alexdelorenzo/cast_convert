@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import Final, Self, Type, Iterable, TypeVar, NamedTuple, Any
+from typing import Final, Self, Type, Iterable, TypeVar, NamedTuple, Any, Callable
 from decimal import Decimal
 from abc import ABC
 import logging
@@ -26,8 +26,14 @@ U = TypeVar('U')
 
 Item = T | U | None
 
-Level = Decimal
+
+class Decimal(Decimal):  # type: ignore
+  def __repr__(self) -> str:
+    return str(self)
+
+
 Fps = Decimal
+Level = Decimal
 
 
 DEFAULT_VIDEO_FPS: Final[Fps] = Fps()
@@ -207,13 +213,19 @@ class Formats(NamedTuple):
   subtitle: Subtitle | None = None
 
 
-def normalize_info(info: str) -> str:
+def normalize_info(
+  info: str,
+  condition: Callable[[str], bool] = str.isalnum
+) -> str:
   info = info.casefold()
-  return ''.join(char for char in info if char.isalnum())
+
+  return ''.join(
+    char
+    for char in info
+    if condition(char)
+  )
 
 
 def first(iterable: Iterable[T], default: Item = None) -> Item:
   iterator = iter(iterable)
   return next(iterator, default)
-
-
