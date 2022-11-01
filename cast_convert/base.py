@@ -128,8 +128,8 @@ class Subtitle(NormalizedFormat, StrEnum):
   utf8: str = auto()
   srt: str = auto()
   ssa: str = auto()
-  vtt: str = auto()
-  webvtt: str = vtt  # alias
+  webvtt: str = auto()
+  vtt: str = webvtt  # alias
   ttml: str = auto()
   eia608: str = auto()
   eia708: str = auto()

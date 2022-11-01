@@ -28,7 +28,7 @@ audio:
   - WAV
 
 subtitles:
-  - VTT
+  - WebVTT
   - TTML
   - EIA-608
   - EIA-708
