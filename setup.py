@@ -25,5 +25,5 @@ setup(
   zip_safe=True,
   install_requires=REQUIREMENTS,
   keywords=REQUIREMENTS,
-  entry_points={"console_scripts": ["cast_convert = cast_convert:command"]}
+  entry_points={"console_scripts": ["cast_convert = cast_convert.old:cmd"]}
 )
