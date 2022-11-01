@@ -67,12 +67,10 @@ def get_encoder(codec: Codecs) -> str:
 
 
 def transcode_video(video: Video, formats: Formats) -> Video:
-  # TODO: Finish this stub
   container, video_profile, audio_profile, subtitle = formats
 
   input_args = get_input_args(formats)
   output_args = get_output_args(video, formats)
-
   new_path = get_new_path(video, container)
 
   stream = ffmpeg.input(
