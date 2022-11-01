@@ -15,7 +15,9 @@ from .parse import ALIAS_FMTS, EXTENSIONS, Extension
 logging.basicConfig(level=logging.INFO)
 
 
-PROFILE_SEP: Final[str] = '@L'
+AT: Final[str] = '@'
+LEVEL_SEP: Final[str] = 'L'
+PROFILE_SEP: Final[str] = AT + LEVEL_SEP
 SUBTITLE_SEP: Final[str] = '/'
 
 
@@ -202,3 +204,5 @@ def normalize_info(info: str) -> str:
 def first(iterable: Iterable[T], default: Item = None) -> Item:
   iterator = iter(iterable)
   return next(iterator, default)
+
+

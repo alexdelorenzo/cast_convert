@@ -7,8 +7,8 @@ from pymediainfo import MediaInfo
 
 from .base import VideoProfile, AudioProfile, Container, \
   AudioCodec, VideoCodec, normalize_info, DEFAULT_VIDEO_FPS, \
-  DEFAULT_VIDEO_LEVEL, PROFILE_SEP, Formats, Level, Fps, Subtitle, \
-  VideoFormat, get_name
+  DEFAULT_VIDEO_LEVEL, Formats, Level, Fps, Subtitle, \
+  VideoFormat, get_name, LEVEL_SEP, AT
 from .parse import Yaml
 
 
@@ -126,8 +126,12 @@ def profile_to_level(profile: str | None) -> Level:
   if not (level := profile):
     return DEFAULT_VIDEO_LEVEL
 
-  if PROFILE_SEP in level:
-    name, level = level.split(PROFILE_SEP)
+  match level.split(AT):
+    case (_, level) | (_, level, _) if LEVEL_SEP in level:
+      level = level.strip(LEVEL_SEP)
+
+    case (_, level) | (_, level, _):
+      level = level
 
   level = normalize_info(level)
 
