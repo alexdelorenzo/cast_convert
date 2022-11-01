@@ -24,6 +24,6 @@ setup(
   packages=['cast_convert'],
   zip_safe=True,
   install_requires=REQUIREMENTS,
-  keywords=REQUIREMENTS,
+  keywords='chromecast transcode convert video cli'.split(' '),
   entry_points={"console_scripts": ["cast_convert = cast_convert.old:cmd"]}
 )
