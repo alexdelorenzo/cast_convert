@@ -129,10 +129,10 @@ def profile_to_level(profile: str | None) -> Level:
     return DEFAULT_VIDEO_LEVEL
 
   match level.split(AT):
-    case (_, level) | (_, level, _) if LEVEL_SEP in level:
+    case (name, level) | (name, level, _) if LEVEL_SEP in level:
       level = level.strip(LEVEL_SEP)
 
-    case (_, level) | (_, level, _):
+    case (name, level) | (name, level, _):
       level = level
 
   if not (level := normalize_info(level, str.isnumeric)):
