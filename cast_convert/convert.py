@@ -8,7 +8,7 @@ from typing import Final
 from .base import VideoProfile, VideoCodec, AudioProfile, AudioCodec, \
   Container, Formats, Extension, first, VideoFormat, Level, Subtitle, Codecs
 from .exceptions import UnknownFormat
-from .parse import ENCODERS
+from .parse import ENCODERS, Alias
 from .video import Video
 from .device import Device
 
@@ -61,7 +61,7 @@ HWACCEL_ARGS: Final[Args] = {
 DEFAULT_INPUT_ARGS: Final[Args] = {}
 
 
-def get_encoder(codec: Codecs) -> str:
+def get_encoder(codec: Codecs) -> Alias:
   encoders = ENCODERS[codec]
   return first(encoders)
 
