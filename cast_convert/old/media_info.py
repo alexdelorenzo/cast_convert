@@ -14,7 +14,7 @@ except ImportError as e:
   except ImportError as e2:
     raise ImportError("Please install mypy via pip") from e2
 
-from ..exceptions import StreamNotFoundException
+from ..core.exceptions import StreamNotFoundException
 from .chromecast_compat import CAST_COMPAT
 from .preferences import CONVERT_TO_CODEC
 
