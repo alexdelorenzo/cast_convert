@@ -148,6 +148,11 @@ class Subtitle(NormalizedFormat, StrEnum):
     return super().from_info(info)
 
 
+class ProfileName(NormalizedFormat, StrEnum):
+  main: str = auto()
+  main10: str = auto()
+
+
 @dataclass(eq=True, frozen=True)
 class Profile(ABC):
   pass
@@ -176,6 +181,12 @@ class VideoProfile(Profile, Unpackable):
   resolution: int | None = DEFAULT_PROFILE_RESOLUTION
   fps: Fps | None = DEFAULT_PROFILE_FPS
   level: Level | None = DEFAULT_PROFILE_LEVEL
+
+
+@dataclass(eq=True, frozen=True)
+class EncoderProfile(Profile, Unpackable):
+  profile: ProfileName | None = None
+  level: Level | None = None
 
 
 VideoProfiles = list[VideoProfile]

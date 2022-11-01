@@ -5,10 +5,12 @@ from typing import Self, Iterable
 
 from pymediainfo import MediaInfo
 
-from .base import VideoProfile, AudioProfile, Container, \
-  AudioCodec, VideoCodec, normalize_info, DEFAULT_VIDEO_FPS, \
-  DEFAULT_VIDEO_LEVEL, Formats, Level, Fps, Subtitle, \
-  VideoFormat, get_name, LEVEL_SEP, AT
+from .base import (
+  VideoProfile, AudioProfile, Container,
+  AudioCodec, VideoCodec, normalize_info, DEFAULT_VIDEO_FPS,
+  DEFAULT_VIDEO_LEVEL, Formats, Level, Fps, Subtitle,
+  VideoFormat, get_name, LEVEL_SEP, AT,
+)
 from .parse import Yaml
 
 
@@ -151,6 +153,7 @@ def profile_to_level(profile: str | None) -> Level:
 
 def get_video_profiles(profiles: Yaml) -> Iterable[VideoProfile]:
   profile: Yaml
+  attrs: Yaml
 
   for profile in profiles:
     [name, attrs], *_ = profile.items()
