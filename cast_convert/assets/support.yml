@@ -91,6 +91,8 @@ encoders:
     - libopus
   flac:
     - flac
+  webvtt:
+    - webvtt
 
 # map of codecs to ffmpeg decoders
 decoders:

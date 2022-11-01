@@ -126,8 +126,8 @@ def get_output_args(video: Video, formats: Formats) -> Args:
   if (profile := formats.video_profile) and (codec := profile.codec):
     args[FfmpegArg.vcodec] = get_encoder(codec)
 
-  if subtitle := formats.subtitle:
-    args[FfmpegArg.scodec] = subtitle
+  if codec := formats.subtitle:
+    args[FfmpegArg.scodec] = get_encoder(codec)
 
   if not profile:
     return args
