@@ -17,12 +17,14 @@ Fmt = str
 Alias = str
 Extension = str
 
+Fmts = list[Fmt]
 Aliases = list[Alias]
 FmtAliases = dict[Fmt, Aliases]
 AliasFmts = dict[Alias, Fmt]
 
-FmtNames = list[Fmt]
 FmtExtensions = dict[Fmt, Extension]
+
+FfmpegCodecs = dict[str, FmtAliases]
 
 Yaml = dict[str, ...] | list['Yaml'] | dict[str, 'Yaml']
 
@@ -35,11 +37,16 @@ def get_yaml(path: Path = DEVICE_INFO) -> Yaml:
 DEVICE_DATA: Final[Yaml] = get_yaml()
 
 EXTENSIONS: Final[FmtExtensions] = DEVICE_DATA['extensions']
-ENCODERS: Final[FmtAliases] = DEVICE_DATA['encoders']
-DECODERS: Final[FmtAliases] = DEVICE_DATA['decoders']
-SUBTITLES: Final[FmtNames] = DEVICE_DATA['subtitles']
-CONTAINERS: Final[FmtNames] = DEVICE_DATA['containers']
-AUDIO: Final[FmtNames] = DEVICE_DATA['audio']
+
+ENCODERS: Final[FfmpegCodecs] = DEVICE_DATA['encoders']
+VIDEO_ENCODERS: Final[FmtAliases] = ENCODERS['video']
+AUDIO_ENCODERS: Final[FmtAliases] = ENCODERS['audio']
+SUBTITLE_ENCODERS: Final[FmtAliases] = ENCODERS['subtitles']
+
+DECODERS: Final[FfmpegCodecs] = DEVICE_DATA['decoders']
+SUBTITLES: Final[Fmts] = DEVICE_DATA['subtitles']
+CONTAINERS: Final[Fmts] = DEVICE_DATA['containers']
+AUDIO: Final[Fmts] = DEVICE_DATA['audio']
 DEVICES: Final[Yaml] = DEVICE_DATA['devices']
 
 FMT_ALIASES: Final[FmtAliases] = DEVICE_DATA['aliases']
