@@ -2,7 +2,7 @@ from setuptools import setup
 from sys import version_info
 from pathlib import Path
 
-from cast_convert import __version__
+from cast_convert.old import __version__
 
 
 MIN_PYTHON_VERSION = (3, 11)
