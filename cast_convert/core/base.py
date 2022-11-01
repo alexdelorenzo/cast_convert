@@ -1,7 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import Final, Self, Type, Iterable, TypeVar, NamedTuple, Any, Callable
+from typing import Final, Self, Type, Iterable, TypeVar, \
+  NamedTuple, Any, Callable
 from decimal import Decimal
 from abc import ABC
 import logging
@@ -52,8 +53,8 @@ class NormalizedFormat:
 
   @classmethod
   def _missing_(cls: Type[Self], value: str) -> Self:
-    logging.info(f"Missing: {value}")
     name = get_name(cls)
+    logging.info(f"[{name}] Missing: {value}")
 
     if hasattr(cls, value):
       return getattr(cls, value)
@@ -104,6 +105,7 @@ class VideoCodec(NormalizedFormat, StrEnum):
   h264: str = avc  # alias
   div3: str = auto()
   divx: str = div3  # alias
+  mpeg4visual: str = divx
   hevc: str = auto()
   h265: str = hevc  # alias
   hdr: str = auto()
@@ -211,6 +213,11 @@ class Formats(NamedTuple):
   video_profile: VideoProfile | None = None
   audio_profile: AudioProfile | None = None
   subtitle: Subtitle | None = None
+
+
+class OnTranscodeErr(NormalizedFormat, StrEnum):
+  cycle_video_encoders: str = auto()
+  cycle_audio_encoders: str = auto()
 
 
 def normalize_info(
