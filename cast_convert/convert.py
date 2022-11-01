@@ -1,18 +1,15 @@
 from __future__ import annotations
 
-import logging
 from enum import StrEnum, auto
 from pathlib import Path
 from typing import Final
-
-from .base import VideoProfile, VideoCodec, AudioProfile, AudioCodec, \
-  Container, Formats, Extension, first, VideoFormat, Level, Subtitle, Codecs
-from .exceptions import UnknownFormat
-from .parse import ENCODERS, Alias
-from .video import Video
-from .device import Device
+import logging
 
 import ffmpeg
+
+from .base import Container, Formats, Extension, first, Codecs
+from .parse import ENCODERS, Alias
+from .video import Video
 
 
 DOT: Final[str] = '.'
@@ -26,11 +23,10 @@ class FfmpegArg(StrEnum):
   acodec: str = auto()
   vcodec: str = auto()
   scodec: str = auto()
-  fps: str = auto()
-  r: str = auto()
-
   vprofile: str = auto()
   vlevel: str = auto()
+  fps: str = auto()
+  r: str = auto()
 
   hwaccel: str = auto()
   hwaccel_output_format: str = auto()
@@ -97,7 +93,7 @@ def transcode_video(video: Video, formats: Formats) -> Video:
 def get_new_path(
   video: Video,
   container: Container,
-  suffix: str = TRANSCODE_SUFFIX
+  suffix: str = TRANSCODE_SUFFIX,
 ) -> Path:
   ext: Extension = video.path.suffix
 
@@ -117,7 +113,6 @@ def get_new_path(
 
 
 def get_output_args(video: Video, formats: Formats) -> Args:
-  # TODO: Finish this stub
   args: Args = DEFAULT_OUTPUT_ARGS.copy()
 
   if (profile := formats.audio_profile) and (codec := profile.codec):
@@ -164,7 +159,7 @@ def get_filters(stream: ffmpeg.Stream, formats: Formats) -> ffmpeg.Stream | None
     filters = ffmpeg.filter(
       stream,
       FfmpegArg.scale,
-      scale
+      scale,
     )
 
   return filters
