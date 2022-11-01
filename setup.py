@@ -1,6 +1,7 @@
-from setuptools import setup
 from sys import version_info
 from pathlib import Path
+
+from setuptools import setup
 
 from cast_convert import __version__
 
