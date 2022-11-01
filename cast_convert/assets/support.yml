@@ -40,8 +40,11 @@ aliases:
     - mp4
   hevc:
     - h265
-  mkv:
-    - matroska
+  matroska:
+    - mkv
+    - mka
+    - mks
+    - mk3d
   div3:
     - divx
   mp4:
