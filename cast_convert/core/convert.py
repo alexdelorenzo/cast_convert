@@ -13,6 +13,7 @@ from .video import Video
 
 
 DOT: Final[str] = '.'
+SCALE_RESOLUTION: Final[int] = -1
 
 DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()  # type: ignore
 TRANSCODE_SUFFIX: Final[str] = '_transcoded'
@@ -154,12 +155,11 @@ def get_filters(stream: ffmpeg.Stream, formats: Formats) -> ffmpeg.Stream | None
   filters: ffmpeg.Stream | None = None
 
   if resolution:
-    scale = f'{resolution}:-1'
-
     filters = ffmpeg.filter(
       stream,
       FfmpegArg.scale,
-      scale,
+      resolution,
+      SCALE_RESOLUTION,
     )
 
   return filters
