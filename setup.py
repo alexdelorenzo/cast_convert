@@ -19,7 +19,7 @@ setup(
   version=__version__,
   description="Identify and convert videos to formats that are Chromecast supported.",
   url="https://github.com/alexdelorenzo/cast_convert",
-  author="alexdelorenzo.dev (Alex DeLorenzo)",
+  author="Alex DeLorenzo (alexdelorenzo.dev)",
   license="AGPL 3.0",
   packages=['cast_convert'],
   zip_safe=True,
