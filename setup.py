@@ -2,7 +2,7 @@ from setuptools import setup
 from sys import version_info
 from pathlib import Path
 
-from cast_convert.old import __version__
+from cast_convert import __version__
 
 
 MIN_PYTHON_VERSION = (3, 11)
@@ -17,7 +17,7 @@ if version_info < MIN_PYTHON_VERSION:
 setup(
   name="cast_convert",
   version=__version__,
-  description="Convert and inspect video for Chromecast playback",
+  description="Identify and convert videos to formats that are Chromecast supported.",
   url="https://github.com/alexdelorenzo/cast_convert",
   author="alexdelorenzo.dev (Alex DeLorenzo)",
   license="AGPL 3.0",
