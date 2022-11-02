@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from typing import (
   Final, Iterable, TypeVar,
-  Callable,
+  Callable, Protocol, TYPE_CHECKING
 )
 from decimal import Decimal
 import logging
+
+if TYPE_CHECKING:
+  from .media.formats import Metadata
 
 
 logging.basicConfig(level=logging.INFO)
@@ -38,6 +41,11 @@ DEFAULT_VIDEO_LEVEL: Final[Level] = Level()
 DEFAULT_PROFILE_FPS: Final[Fps] = Fps('24.0')
 DEFAULT_PROFILE_LEVEL: Final[Level] = Level('0.0')
 DEFAULT_PROFILE_RESOLUTION: Final[Resolution] = 720
+
+
+class IsCompatible(Protocol):
+  def is_compatible(self, other: Metadata) -> bool:
+    pass
 
 
 def normalize_info(

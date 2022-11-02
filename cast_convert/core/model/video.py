@@ -6,7 +6,7 @@ from typing import Self, Iterable
 from pymediainfo import MediaInfo
 
 from ..base import (
-  normalize_info, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL,
+  IsCompatible, normalize_info, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL,
   Level, Fps, LEVEL_SEP, AT, Resolution,
 )
 from ..media.profiles import AudioProfile, VideoProfile
@@ -17,7 +17,7 @@ from ..parse import Yaml
 
 
 @dataclass
-class Video:
+class Video(IsCompatible):
   name: str
   path: Path
 
