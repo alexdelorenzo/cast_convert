@@ -8,14 +8,14 @@ import logging
 import ffmpeg
 
 from .base import Container, Formats, Extension, first, \
-  Codecs, VideoCodec, AudioCodec, Subtitle
-from .parse import ENCODERS, Alias, Aliases, AUDIO_ENCODERS, \
+  Codecs, VideoCodec, AudioCodec, Subtitle, Resolution
+from .parse import Alias, Aliases, AUDIO_ENCODERS, \
   VIDEO_ENCODERS, SUBTITLE_ENCODERS
 from .video import Video
 
 
 DOT: Final[str] = '.'
-SCALE_RESOLUTION: Final[int] = -1
+SCALE_RESOLUTION: Final[Resolution] = -1
 
 DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()  # type: ignore
 TRANSCODE_SUFFIX: Final[str] = '_transcoded'
@@ -43,7 +43,6 @@ class FfmpegArg(StrEnum):
 
 Arg = FfmpegArg | str
 Args = dict[Arg, Arg]
-
 
 DEFAULT_OUTPUT_ARGS: Final[Args] = {
   FfmpegArg.acodec: FfmpegArg.copy,
@@ -152,7 +151,7 @@ def get_output_args(video: Video, formats: Formats) -> Args:
   if level:
     args[FfmpegArg.vlevel] = str(level)
 
-    if not args.get(FfmpegArg.vcodec):
+    if FfmpegArg.vcodec not in args:
       codec = video.formats.video_profile.codec
       args[FfmpegArg.vcodec] = get_encoder(codec)
 
@@ -179,4 +178,3 @@ def get_filters(stream: ffmpeg.Stream, formats: Formats) -> ffmpeg.Stream | None
     )
 
   return filters
-

@@ -9,7 +9,7 @@ from .base import (
   VideoProfile, AudioProfile, Container,
   AudioCodec, VideoCodec, normalize_info, DEFAULT_VIDEO_FPS,
   DEFAULT_VIDEO_LEVEL, Formats, Level, Fps, Subtitle,
-  VideoFormat, get_name, LEVEL_SEP, AT,
+  VideoFormat, get_name, LEVEL_SEP, AT, Resolution,
 )
 from .parse import Yaml
 
@@ -83,7 +83,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
 
   return VideoProfile(
     codec=codec,
-    resolution=int(height),
+    resolution=Resolution(height),
     fps=Fps(fps if fps else DEFAULT_VIDEO_FPS),
     level=profile_to_level(profile)
   )
@@ -159,7 +159,7 @@ def get_video_profiles(profiles: Yaml) -> Iterable[VideoProfile]:
 
     yield VideoProfile(
       codec=codec,
-      resolution=int(attrs.get('resolution')),
+      resolution=Resolution(attrs.get('resolution')),
       fps=Fps(attrs.get('fps')),
       level=Level(attrs.get('level')),
     )

@@ -35,6 +35,7 @@ class Decimal(Decimal):  # type: ignore
 
 Fps = Decimal
 Level = Decimal
+Resolution = int
 
 
 DEFAULT_VIDEO_FPS: Final[Fps] = Fps()
@@ -42,7 +43,7 @@ DEFAULT_VIDEO_LEVEL: Final[Level] = Level()
 
 DEFAULT_PROFILE_FPS: Final[Fps] = Fps('24.0')
 DEFAULT_PROFILE_LEVEL: Final[Level] = Level('0.0')
-DEFAULT_PROFILE_RESOLUTION: Final[int] = 720
+DEFAULT_PROFILE_RESOLUTION: Final[Resolution] = 720
 
 
 class NormalizedFormat:
@@ -186,7 +187,7 @@ class AudioProfile(Profile, Unpackable):
 @dataclass(eq=True, frozen=True)
 class VideoProfile(Profile, Unpackable):
   codec: VideoCodec | None = VideoCodec.unknown
-  resolution: int | None = DEFAULT_PROFILE_RESOLUTION
+  resolution: Resolution | None = DEFAULT_PROFILE_RESOLUTION
   fps: Fps | None = DEFAULT_PROFILE_FPS
   level: Level | None = DEFAULT_PROFILE_LEVEL
 
