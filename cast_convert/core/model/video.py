@@ -9,9 +9,9 @@ from ..base import (
   normalize_info, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL,
   Level, Fps, LEVEL_SEP, AT, Resolution,
 )
-from ..media.profiles import AudioProfile, VideoProfile, is_video_profile_compatible
+from ..media.profiles import AudioProfile, VideoProfile
 from ..media.base import get_name
-from ..media.formats import Formats, VideoFormat, is_compatible as is_fmt_compatible
+from ..media.formats import Formats, VideoFormat, is_compatible
 from ..media.codecs import AudioCodec, Container, Subtitle, VideoCodec
 from ..parse import Yaml
 
@@ -52,7 +52,7 @@ class Video:
     )
 
   def is_compatible(self, other: VideoFormat) -> bool:
-    return is_compatible(self, other)
+    return is_compatible(self.formats, other)
 
 
 def get_audio_profile(data: MediaInfo) -> AudioProfile | None:
@@ -89,34 +89,6 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
     fps=Fps(fps if fps else DEFAULT_VIDEO_FPS),
     level=profile_to_level(profile)
   )
-
-
-def is_compatible(video: Video, fmt: VideoFormat) -> bool:
-  container, video_profile, audio_profile, subtitle = video.formats
-
-  match fmt:
-    case VideoProfile(codec, resolution, fps, level):
-      return is_fmt_compatible(video_profile, fmt)
-
-    case AudioProfile(codec):
-      return is_fmt_compatible(audio_profile.codec, codec)
-
-    case VideoCodec() as codec:
-      return is_fmt_compatible(video_profile.codec, codec)
-
-    case AudioCodec() as codec:
-      return is_fmt_compatible(audio_profile.codec, codec)
-
-    case Container() as _container:
-      return is_fmt_compatible(container, _container)
-
-    case Subtitle() as _subtitle:
-      if not _subtitle:
-        return True
-
-      return is_fmt_compatible(subtitle, _subtitle)
-
-  raise TypeError(f'Cannot compare with {get_name(fmt)}')
 
 
 def profile_to_level(profile: str | None) -> Level:

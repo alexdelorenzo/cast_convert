@@ -17,12 +17,15 @@ class Formats(NamedTuple):
   audio_profile: AudioProfile | None = None
   subtitle: Subtitle | None = None
 
-  def is_compatible(self, other: VideoFormat) -> bool:
+  def is_compatible(self, other: Metadata) -> bool:
     return is_compatible(self, other)
 
 
-def is_compatible(fmt: VideoFormat, other: VideoFormat) -> bool:
-  match (fmt, other):
+Metadata = VideoFormat | Formats
+
+
+def are_compatible(metadata: Metadata, other: Metadata) -> bool:
+  match (metadata, other):
     case VideoProfile() as video_profile, VideoProfile() as other:
       return is_video_profile_compatible(video_profile, other)
 
@@ -44,4 +47,47 @@ def is_compatible(fmt: VideoFormat, other: VideoFormat) -> bool:
 
       return other is subtitle
 
-  raise TypeError(f'Cannot compare {get_name(fmt)} with {get_name(other)}')
+    case Formats() as formats, Formats() as other:
+      return are_fmts_compatible(formats, other)
+
+  raise TypeError(f'Cannot compare {get_name(metadata)} with {get_name(other)}')
+
+
+FormatPairs = Iterable[tuple[VideoFormat, VideoFormat]]
+
+
+def are_fmts_compatible(formats: Formats, other: Formats) -> bool:
+  both: FormatPairs = zip(formats, other)
+
+  return all(are_compatible(fmt, _fmt) for fmt, _fmt in both)
+
+
+def is_compatible(formats: Formats, other: Metadata) -> bool:
+  container, video_profile, audio_profile, subtitle = formats
+
+  match other:
+    case VideoProfile():
+      return are_compatible(video_profile, other)
+
+    case AudioProfile(codec):
+      return are_compatible(audio_profile.codec, codec)
+
+    case VideoCodec() as codec:
+      return are_compatible(video_profile.codec, codec)
+
+    case AudioCodec() as codec:
+      return are_compatible(audio_profile.codec, codec)
+
+    case Container() as _container:
+      return are_compatible(container, _container)
+
+    case Subtitle() as _subtitle:
+      if not _subtitle:
+        return True
+
+      return are_compatible(subtitle, _subtitle)
+
+    case Formats() as formats:
+      return are_fmts_compatible(formats, other)
+
+  raise TypeError(f'Cannot compare formats with {get_name(other)}')
