@@ -51,7 +51,7 @@ def is_video_profile_compatible(video_profile: VideoProfile, other: VideoProfile
 
   return (
     codec is _codec and
-    resolution <= _resolution and
-    fps <= _fps and
-    level <= _level
+    (resolution is _resolution or resolution <= _resolution) and
+    (fps is _fps or fps <= fps) and
+    (level is level or level <= level)
   )
