@@ -146,9 +146,9 @@ def transcode_formats(formats: Formats, to_formats: Formats) -> Formats | None:
   container, video_profile, audio_profile, subtitle = formats
   to_container, to_video, to_audio, to_subtitle = to_formats
 
+  new_container = transcode_containers(container, to_container)
   new_video = transcode_video_profile(video_profile, to_video)
   new_audio = transcode_audio_profile(audio_profile, to_audio)
-  new_container = transcode_containers(container, to_container)
   new_subtitle = transcode_subtitle(subtitle, to_subtitle)
 
   return Formats(

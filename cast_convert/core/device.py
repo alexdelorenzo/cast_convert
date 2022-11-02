@@ -132,5 +132,3 @@ def get_devices(data: Yaml) -> Iterable[Device]:
   for name, device_info in data['devices'].items():
     profiles: Yaml = device_info['profiles']
     yield get_device(name, profiles, containers, audio, subtitles)
-
-
