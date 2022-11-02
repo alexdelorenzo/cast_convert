@@ -1,24 +1,24 @@
 from __future__ import annotations
+
 from dataclasses import dataclass, field
 from itertools import chain
 from pathlib import Path
 from typing import Iterable, Self, Type
 import logging
-from unittest import case
 
-from ..media.base import get_name
-from ..media.profiles import AudioProfile, AudioProfiles, VideoProfile, VideoProfiles, is_video_profile_compatible
-from ..media.formats import Formats, Metadata, VideoFormat, VideoFormats, are_compatible, \
-  is_compatible as is_fmt_compatible
-from ..media.codecs import AudioCodec, Container, Containers, Subtitle, Subtitles, VideoCodec
-from ..parse import Yaml, get_yaml, DEVICE_INFO, Fmts
+from ..base import IsCompatible
 from ..convert.transcode import transcode_to
 from ..exceptions import UnknownFormat
+from ..media.base import get_name
+from ..media.codecs import AudioCodec, Container, Containers, Subtitle, Subtitles, VideoCodec
+from ..media.formats import Formats, Metadata, VideoFormat, VideoFormats, are_compatible
+from ..media.profiles import AudioProfile, AudioProfiles, VideoProfile, VideoProfiles
+from ..parse import DEVICE_INFO, Fmts, Yaml, get_yaml
 from .video import Video, get_video_profiles
 
 
 @dataclass(eq=True, frozen=True)
-class Device:
+class Device(IsCompatible):
   name: str
 
   video_profiles: VideoProfiles = field(default_factory=VideoProfiles)

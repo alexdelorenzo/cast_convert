@@ -5,6 +5,7 @@ from typing import Iterable, NamedTuple
 from .base import get_name
 from .codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
 from .profiles import AudioProfile, Profiles, VideoProfile, is_video_profile_compatible
+from ..base import IsCompatible
 
 
 VideoFormat = Codecs | Profiles | Container | Subtitle
@@ -50,6 +51,12 @@ def are_compatible(metadata: Metadata, other: Metadata) -> bool:
     case Formats() as formats, Formats() as other:
       return are_fmts_compatible(formats, other)
 
+    case None, None:
+      return True
+
+    case _, None | None, _:
+      return False
+
   raise TypeError(f'Cannot compare {get_name(metadata)} with {get_name(other)}')
 
 
@@ -66,8 +73,8 @@ def is_compatible(formats: Formats, other: Metadata) -> bool:
   container, video_profile, audio_profile, subtitle = formats
 
   match other:
-    case VideoProfile():
-      return are_compatible(video_profile, other)
+    case VideoProfile() as profile:
+      return are_compatible(video_profile, profile)
 
     case AudioProfile(codec):
       return are_compatible(audio_profile.codec, codec)
@@ -87,7 +94,7 @@ def is_compatible(formats: Formats, other: Metadata) -> bool:
 
       return are_compatible(subtitle, _subtitle)
 
-    case Formats() as formats:
-      return are_fmts_compatible(formats, other)
+    case Formats() as _formats:
+      return are_compatible(formats, _formats)
 
   raise TypeError(f'Cannot compare formats with {get_name(other)}')
