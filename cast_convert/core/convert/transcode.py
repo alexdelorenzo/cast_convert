@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 from ..media.profiles import AudioProfile, VideoProfile
 from ..media.formats import Formats
@@ -8,6 +8,10 @@ from ..model.video import Video
 
 if TYPE_CHECKING:
   from ..model.device import Device
+
+
+def exists(*items: Any) -> bool:
+  return all(item is not None for item in items)
 
 
 def transcode_video(
@@ -105,11 +109,20 @@ def transcode_video_profile(
   codec, resolution, fps, level = video_profile
   default_codec, default_resolution, default_fps, default_level = default_video
 
-  new_codec = None if codec is default_codec else default_codec
-  new_resolution = None if resolution <= default_resolution else default_resolution
-  new_fps = None if fps <= default_fps else default_fps
+  new_codec = new_resolution = new_fps = new_level = None
 
-  new_level = None if level <= default_level else default_level
+  if exists(codec, default_codec):
+    new_codec = None if codec is default_codec else default_codec
+
+  if exists(resolution, default_resolution):
+    new_resolution = None if resolution <= default_resolution else default_resolution
+
+  if exists(fps, default_fps):
+    new_fps = None if fps <= default_fps else default_fps
+
+  if exists(level, default_level):
+    new_level = None if level <= default_level else default_level
+
   new_level = new_level if new_codec is None else None
 
   return VideoProfile(
@@ -121,9 +134,12 @@ def transcode_video_profile(
 
 
 def transcode_audio_profile(
-  audio_profile: AudioProfile,
-  default_audio: AudioProfile,
-) -> AudioProfile:
+  audio_profile: AudioProfile | None,
+  default_audio: AudioProfile | None,
+) -> AudioProfile | None:
+  if not exists(audio_profile, default_audio):
+    return None
+
   [codec] = audio_profile
   new_codec = None if codec is default_audio.codec else default_audio.codec
 
@@ -154,7 +170,7 @@ def transcode_formats(formats: Formats, to_formats: Formats) -> Formats | None:
   new_container = transcode_containers(container, to_container)
   new_video = transcode_video_profile(video_profile, to_video)
   new_audio = transcode_audio_profile(audio_profile, to_audio)
-  new_subtitle = transcode_subtitle(subtitle, to_subtitle)
+  new_subtitle = transcode_subtitles(subtitle, to_subtitle)
 
   return Formats(
     container=new_container,
