@@ -94,15 +94,17 @@ def transcode_to(
 
 
 def transcode_video_profile(
-  video_profile: Formats,
+  video_profile: VideoProfile,
   default_video: VideoProfile,
 ) -> VideoProfile:
   codec, resolution, fps, level = video_profile
+  default_codec, default_resolution, default_fps, default_level = default_video
 
-  new_codec = None if codec is default_video.codec else default_video.codec
-  new_resolution = None if resolution <= default_video.resolution else default_video.resolution
-  new_fps = None if fps <= default_video.fps else default_video.fps
-  new_level = None if level <= default_video.level else default_video.level
+  new_codec = None if codec is default_codec else default_codec
+  new_resolution = None if resolution <= default_resolution else default_resolution
+  new_fps = None if fps <= default_fps else default_fps
+
+  new_level = None if level <= default_level else default_level
   new_level = new_level if new_codec is None else None
 
   return VideoProfile(
