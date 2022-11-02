@@ -36,7 +36,7 @@ class VideoCodec(NormalizedFormat, StrEnum):
   h264: str = avc  # alias
   div3: str = auto()
   divx: str = div3  # alias
-  mpeg4visual: str = divx
+  mpeg4visual: str = divx  # alias
   hevc: str = auto()
   h265: str = hevc  # alias
   hdr: str = auto()

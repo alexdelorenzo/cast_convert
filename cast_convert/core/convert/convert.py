@@ -44,6 +44,7 @@ class FfmpegArg(StrEnum):
 Arg = FfmpegArg | str
 Args = dict[Arg, Arg]
 
+
 DEFAULT_OUTPUT_ARGS: Final[Args] = {
   FfmpegArg.acodec: FfmpegArg.copy,
   FfmpegArg.vcodec: FfmpegArg.copy,

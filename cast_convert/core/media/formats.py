@@ -5,7 +5,6 @@ from typing import Iterable, NamedTuple
 from .base import get_name
 from .codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
 from .profiles import AudioProfile, Profiles, VideoProfile, is_video_profile_compatible
-from ..model.video import Video
 
 
 VideoFormat = Codecs | Profiles | Container | Subtitle
@@ -17,6 +16,9 @@ class Formats(NamedTuple):
   video_profile: VideoProfile | None = None
   audio_profile: AudioProfile | None = None
   subtitle: Subtitle | None = None
+
+  def is_compatible(self, other: VideoFormat) -> bool:
+    return is_compatible(self, other)
 
 
 def is_compatible(fmt: VideoFormat, other: VideoFormat) -> bool:
