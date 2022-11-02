@@ -136,8 +136,7 @@ def transcode_subtitles(
   subtitle: Subtitle,
   default_subtitle: Subtitle,
 ) -> Subtitle | None:
-  # TODO: Finish this stub
-  return None
+  return None if subtitle is default_subtitle else default_subtitle
 
 
 def transcode_formats(formats: Formats, default_formats: Formats) -> Formats | None:
