@@ -2,12 +2,15 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from itertools import chain
 from pathlib import Path
-from typing import Iterable, Self
+from typing import Iterable, Self, Type
 import logging
 
-from .base import VideoProfile, AudioProfile, Container, \
-  AudioCodec, VideoCodec, Formats, VideoFormat, VideoProfiles, \
-  AudioProfiles, Containers, VideoFormats, Subtitles, Subtitle
+from .models.profiles import AudioProfile, VideoProfile
+from .models.formats import (
+  AudioProfiles, Containers,
+  Formats, Subtitles, VideoFormat, VideoFormats, VideoProfiles,
+)
+from .models.codecs import AudioCodec, Container, Subtitle, VideoCodec
 from .parse import Yaml, get_yaml, DEVICE_INFO, Fmts
 from .transcode import transcode_to
 from .video import Video, get_video_profiles
@@ -25,9 +28,26 @@ class Device:
   subtitles: Subtitles = field(default_factory=Subtitles)
 
   @classmethod
-  def from_yaml(cls, path: Path = DEVICE_INFO) -> Iterable[Self]:
+  def from_yaml(cls: Type[Self], path: Path = DEVICE_INFO) -> Iterable[Self]:
     yaml = get_yaml(path)
     yield from get_devices(yaml)
+
+  @classmethod
+  def from_attrs(
+    cls: Type[Self],
+    name: str,
+    profiles: Yaml,
+    container_names: Fmts,
+    audio_names: Fmts,
+    subtitle_names: Fmts,
+  ) -> Self:
+    return get_device(
+      name,
+      profiles,
+      container_names,
+      audio_names,
+      subtitle_names,
+    )
 
   def add_format(self, fmt: VideoFormat):
     match fmt:
@@ -110,14 +130,13 @@ def get_device(
   audio_names: Fmts,
   subtitle_names: Fmts,
 ) -> Device:
-  device = Device(name)
-
   video = get_video_profiles(profiles)
   containers = map(Container.from_info, container_names)
   codecs = map(AudioCodec.from_info, audio_names)
   audio = map(AudioProfile, codecs)
   subtitles = map(Subtitle.from_info, subtitle_names)
 
+  device = Device(name)
   formats = chain(audio, video, containers, subtitles)
   device.add_formats(formats)
 

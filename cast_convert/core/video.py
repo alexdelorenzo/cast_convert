@@ -6,11 +6,13 @@ from typing import Self, Iterable
 from pymediainfo import MediaInfo
 
 from .base import (
-  VideoProfile, AudioProfile, Container,
-  AudioCodec, VideoCodec, normalize_info, DEFAULT_VIDEO_FPS,
-  DEFAULT_VIDEO_LEVEL, Formats, Level, Fps, Subtitle,
-  VideoFormat, get_name, LEVEL_SEP, AT, Resolution,
+  normalize_info, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL,
+  Level, Fps, LEVEL_SEP, AT, Resolution,
 )
+from .models.profiles import AudioProfile, VideoProfile
+from .models.base import get_name
+from .models.formats import Formats, VideoFormat
+from .models.codecs import AudioCodec, Container, Subtitle, VideoCodec
 from .parse import Yaml
 
 
