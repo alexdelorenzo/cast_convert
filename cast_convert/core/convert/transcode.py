@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from .models.profiles import AudioProfile, VideoProfile
-from .models.formats import Formats
-from .models.codecs import Container, Subtitle
-from .video import Video
+from ..media.profiles import AudioProfile, VideoProfile
+from ..media.formats import Formats
+from ..media.codecs import Container, Subtitle
+from ..model.video import Video
 
 if TYPE_CHECKING:
-  from .device import Device
+  from ..model.device import Device
 
 
 def transcode_video(

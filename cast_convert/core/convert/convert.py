@@ -7,16 +7,11 @@ import logging
 
 import ffmpeg
 
-from .models.formats import Formats
-from .models.codecs import (
-  AudioCodec, Codecs, Container, Subtitle, VideoCodec,
-)
-from .base import first, Resolution
-from .parse import (
-  Alias, Aliases, AUDIO_ENCODERS, SUBTITLE_ENCODERS,
-  VIDEO_ENCODERS, Extension,
-)
-from .video import Video
+from ..media.formats import Formats
+from ..media.codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
+from ..base import first, Resolution
+from ..parse import Alias, Aliases, AUDIO_ENCODERS, SUBTITLE_ENCODERS, VIDEO_ENCODERS, Extension
+from ..model.video import Video
 
 
 DOT: Final[str] = '.'

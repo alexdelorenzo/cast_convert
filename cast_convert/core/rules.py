@@ -1,5 +1,5 @@
-from .models.base import OnTranscodeErr
-from .models.codecs import Codecs
+from .media.base import OnTranscodeErr
+from .media.codecs import Codecs
 from .parse import ENCODERS, Aliases
 
 
