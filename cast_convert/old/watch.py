@@ -118,7 +118,7 @@ def watch_directory(
     while True:
       sleep(1)
 
-  except KeyboardInterrupt:
+  except BaseException:
     observer.stop()
     observer.join()
     queue.join()

@@ -158,7 +158,7 @@ _profile: &profile
 
 # Device record shape
 _device: &device
-  model: 1st Gen
+#  model: 1st Gen
   profiles:
     - avc:
         <<: *profile
