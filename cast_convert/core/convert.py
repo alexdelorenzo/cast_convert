@@ -7,8 +7,10 @@ import logging
 
 import ffmpeg
 
-from .base import Container, Formats, Extension, first, Codecs, VideoCodec, AudioCodec, Subtitle
-from .parse import ENCODERS, Alias, Aliases, AUDIO_ENCODERS, VIDEO_ENCODERS, SUBTITLE_ENCODERS
+from .base import Container, Formats, Extension, first, \
+  Codecs, VideoCodec, AudioCodec, Subtitle
+from .parse import ENCODERS, Alias, Aliases, AUDIO_ENCODERS, \
+  VIDEO_ENCODERS, SUBTITLE_ENCODERS
 from .video import Video
 
 

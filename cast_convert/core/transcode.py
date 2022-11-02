@@ -58,7 +58,9 @@ def transcode_subtitle(
   video: Video,
   default_subtitle: Subtitle | None = None,
 ) -> Subtitle | None:
-  # TODO: Finish this stub
+  if device.can_play_subtitle(video):
+    return None
+
   *_, subtitle = video.formats
 
   if not default_subtitle:
