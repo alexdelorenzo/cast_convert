@@ -38,3 +38,8 @@ class VideoProfile(Profile, Unpackable):
 class EncoderProfile(Profile, Unpackable):
   profile: ProfileName | None = None
   level: Level | None = None
+
+
+Profiles = AudioProfile | VideoProfile
+VideoProfiles = list[VideoProfile]
+AudioProfiles = list[AudioProfile]

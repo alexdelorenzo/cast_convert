@@ -7,10 +7,10 @@ import logging
 
 import ffmpeg
 
-from .models.formats import (
-  Codecs, Formats,
+from .models.formats import Formats
+from .models.codecs import (
+  AudioCodec, Codecs, Container, Subtitle, VideoCodec,
 )
-from .models.codecs import AudioCodec, Container, Subtitle, VideoCodec
 from .base import first, Resolution
 from .parse import (
   Alias, Aliases, AUDIO_ENCODERS, SUBTITLE_ENCODERS,

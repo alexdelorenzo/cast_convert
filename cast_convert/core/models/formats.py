@@ -2,16 +2,10 @@ from __future__ import annotations
 
 from typing import Iterable, NamedTuple
 
-from .codecs import AudioCodec, Container, Subtitle, VideoCodec
-from .profiles import AudioProfile, VideoProfile
+from .codecs import Codecs, Container, Subtitle
+from .profiles import AudioProfile, Profiles, VideoProfile
 
 
-VideoProfiles = list[VideoProfile]
-AudioProfiles = list[AudioProfile]
-Containers = list[Container]
-Subtitles = list[Subtitle]
-Codecs = AudioCodec | VideoCodec
-Profiles = AudioProfile | VideoProfile
 VideoFormat = Codecs | Profiles | Container | Subtitle
 VideoFormats = Iterable[VideoFormat]
 

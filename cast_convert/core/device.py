@@ -5,12 +5,11 @@ from pathlib import Path
 from typing import Iterable, Self, Type
 import logging
 
-from .models.profiles import AudioProfile, VideoProfile
-from .models.formats import (
-  AudioProfiles, Containers,
-  Formats, Subtitles, VideoFormat, VideoFormats, VideoProfiles,
+from .models.profiles import AudioProfile, AudioProfiles, VideoProfile, VideoProfiles
+from .models.formats import Formats, VideoFormat, VideoFormats
+from .models.codecs import (
+  AudioCodec, Container, Containers, Subtitle, Subtitles, VideoCodec,
 )
-from .models.codecs import AudioCodec, Container, Subtitle, VideoCodec
 from .parse import Yaml, get_yaml, DEVICE_INFO, Fmts
 from .transcode import transcode_to
 from .video import Video, get_video_profiles

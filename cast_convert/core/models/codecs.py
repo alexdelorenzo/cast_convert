@@ -90,3 +90,8 @@ class Subtitle(NormalizedFormat, StrEnum):
 class ProfileName(NormalizedFormat, StrEnum):
   main: str = auto()
   main10: str = auto()
+
+
+Containers = list[Container]
+Subtitles = list[Subtitle]
+Codecs = AudioCodec | VideoCodec
