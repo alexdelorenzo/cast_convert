@@ -127,9 +127,7 @@ def transcode_containers(
   container: Container,
   default_container: Container,
 ) -> Container | None:
-  new_container = None if container is default_container else default_container
-
-  return new_container
+  return None if container is default_container else default_container
 
 
 def transcode_subtitles(
@@ -139,17 +137,17 @@ def transcode_subtitles(
   return None if subtitle is default_subtitle else default_subtitle
 
 
-def transcode_formats(formats: Formats, default_formats: Formats) -> Formats | None:
-  if formats == default_formats:
+def transcode_formats(formats: Formats, to_formats: Formats) -> Formats | None:
+  if formats == to_formats:
     return None
 
   container, video_profile, audio_profile, subtitle = formats
-  default_container, default_video, default_audio, default_subtitle = default_formats
+  to_container, to_video, to_audio, to_subtitle = to_formats
 
-  new_video = transcode_video_profile(video_profile, default_video)
-  new_audio = transcode_audio_profile(audio_profile, default_audio)
-  new_container = transcode_containers(container, default_container)
-  new_subtitle = transcode_subtitle(subtitle, default_subtitle)
+  new_video = transcode_video_profile(video_profile, to_video)
+  new_audio = transcode_audio_profile(audio_profile, to_audio)
+  new_container = transcode_containers(container, to_container)
+  new_subtitle = transcode_subtitle(subtitle, to_subtitle)
 
   return Formats(
     container=new_container,
