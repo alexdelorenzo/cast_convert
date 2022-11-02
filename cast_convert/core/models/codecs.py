@@ -4,9 +4,9 @@ import logging
 from enum import StrEnum, auto
 from typing import Self, Type
 
-from cast_convert.core.base import SUBTITLE_SEP
-from cast_convert.core.models.base import NormalizedFormat
-from cast_convert.core.parse import EXTENSIONS, Extension
+from ..base import SUBTITLE_SEP
+from ..parse import EXTENSIONS, Extension
+from .base import NormalizedFormat
 
 
 class Container(NormalizedFormat, StrEnum):

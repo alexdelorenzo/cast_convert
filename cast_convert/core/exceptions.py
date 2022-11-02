@@ -2,11 +2,11 @@ from __future__ import annotations
 
 
 class CastConvertException(Exception):
-    pass
+  pass
 
 
 class StreamNotFoundException(CastConvertException):
-    pass
+  pass
 
 
 class VideoError(CastConvertException):
