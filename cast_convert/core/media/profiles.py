@@ -43,3 +43,15 @@ class EncoderProfile(Profile, Unpackable):
 Profiles = AudioProfile | VideoProfile
 VideoProfiles = list[VideoProfile]
 AudioProfiles = list[AudioProfile]
+
+
+def is_video_profile_compatible(video_profile: VideoProfile, other: VideoProfile) -> bool:
+  codec, resolution, fps, level = video_profile
+  _codec, _resolution, _fps, _level = other
+
+  return (
+    _codec is codec and
+    _resolution <= resolution and
+    _fps <= fps and
+    _level <= level
+  )

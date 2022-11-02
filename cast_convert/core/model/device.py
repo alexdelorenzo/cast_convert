@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import Iterable, Self, Type
 import logging
 
-from ..media.profiles import AudioProfile, AudioProfiles, VideoProfile, VideoProfiles
-from ..media.formats import Formats, VideoFormat, VideoFormats
+from ..media.base import get_name
+from ..media.profiles import AudioProfile, AudioProfiles, VideoProfile, VideoProfiles, is_video_profile_compatible
+from ..media.formats import Formats, VideoFormat, VideoFormats, is_compatible as is_fmt_compatible
 from ..media.codecs import AudioCodec, Container, Containers, Subtitle, Subtitles, VideoCodec
 from ..parse import Yaml, get_yaml, DEVICE_INFO, Fmts
 from ..convert.transcode import transcode_to
@@ -119,6 +120,9 @@ class Device:
   def transcode_to(self, video: Video) -> Formats | None:
     return transcode_to(self, video)
 
+  def is_compatible(self, fmt: VideoFormat) -> bool:
+    return is_compatible(self, fmt)
+
 
 def get_device(
   name: str,
@@ -148,3 +152,39 @@ def get_devices(data: Yaml) -> Iterable[Device]:
   for name, device_info in data['devices'].items():
     profiles: Yaml = device_info['profiles']
     yield get_device(name, profiles, containers, audio, subtitles)
+
+
+def is_compatible(device: Device, fmt: VideoFormat) -> bool:
+  match fmt:
+    case VideoProfile():
+      for video_profile in device.video_profiles:
+        if is_fmt_compatible(video_profile, fmt):
+          return True
+
+    case AudioProfile(codec):
+      for audio_profile in device.audio_profiles:
+        return is_fmt_compatible(audio_profile.codec, codec)
+
+    case VideoCodec() as codec:
+      for video_profile in device.video_profiles:
+        return is_fmt_compatible(video_profile.codec, codec)
+
+    case AudioCodec() as codec:
+      for audio_profile in device.audio_profiles:
+        return is_fmt_compatible(audio_profile.codec, codec)
+
+    case Container() as _container:
+      for container in device.containers:
+        return is_fmt_compatible(container, _container)
+
+    case Subtitle() as _subtitle:
+      if not _subtitle:
+        return True
+
+      for subtitle in device.subtitles:
+        return is_fmt_compatible(subtitle, _subtitle)
+
+    case _:
+      raise TypeError(f'Cannot compare with {get_name(fmt)}')
+
+  return False

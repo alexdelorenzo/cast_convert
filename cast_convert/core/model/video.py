@@ -9,9 +9,9 @@ from ..base import (
   normalize_info, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL,
   Level, Fps, LEVEL_SEP, AT, Resolution,
 )
-from ..media.profiles import AudioProfile, VideoProfile
+from ..media.profiles import AudioProfile, VideoProfile, is_video_profile_compatible
 from ..media.base import get_name
-from ..media.formats import Formats, VideoFormat
+from ..media.formats import Formats, VideoFormat, is_compatible as is_fmt_compatible
 from ..media.codecs import AudioCodec, Container, Subtitle, VideoCodec
 from ..parse import Yaml
 
@@ -96,32 +96,25 @@ def is_compatible(video: Video, fmt: VideoFormat) -> bool:
 
   match fmt:
     case VideoProfile(codec, resolution, fps, level):
-      _codec, _resolution, _fps, _level = video_profile
-
-      return (
-        _codec is codec and
-        _resolution <= resolution and
-        _fps <= fps and
-        _level <= level
-      )
+      return is_fmt_compatible(video_profile, fmt)
 
     case AudioProfile(codec):
-      return audio_profile.codec is codec
+      return is_fmt_compatible(audio_profile.codec, codec)
 
     case VideoCodec() as codec:
-      return video_profile.codec is codec
+      return is_fmt_compatible(video_profile.codec, codec)
 
     case AudioCodec() as codec:
-      return audio_profile.codec is codec
+      return is_fmt_compatible(audio_profile.codec, codec)
 
     case Container() as _container:
-      return container is _container
+      return is_fmt_compatible(container, _container)
 
     case Subtitle() as _subtitle:
       if not _subtitle:
         return True
 
-      return subtitle is _subtitle
+      return is_fmt_compatible(subtitle, _subtitle)
 
   raise TypeError(f'Cannot compare with {get_name(fmt)}')
 
