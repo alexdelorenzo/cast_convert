@@ -13,5 +13,5 @@ def remove_encoder(codec: Codecs):
     case None:
       pass
 
-    case aliases:
+    case list() as aliases:
       aliases.pop()
