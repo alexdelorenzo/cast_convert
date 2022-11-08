@@ -6,6 +6,7 @@ from typing import Final
 import logging
 
 import ffmpeg
+from ffmpeg.nodes import FilterableStream, OutputStream
 
 from ..media.formats import Formats
 from ..media.codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
@@ -82,6 +83,25 @@ def get_encoder(codec: Codecs) -> Alias:
 def transcode_video(video: Video, formats: Formats) -> Video:
   container, video_profile, audio_profile, subtitle = formats
 
+  new_path, stream = get_stream(video, formats, container)
+  cmd = get_ffmpeg_cmd(stream)
+
+  logging.info(f'Running command: {cmd}')
+  stream.run()  # type: ignore
+
+  return Video.from_path(new_path)
+
+
+def get_ffmpeg_cmd(stream: OutputStream) -> str:
+  args = stream.compile()  # type: ignore
+  return ' '.join(args)
+
+
+def get_stream(
+  video: Video,
+  formats: Formats,
+  container: Container,
+) -> tuple[Path, OutputStream]:
   input_args = get_input_args(formats)
   output_args = get_output_args(video, formats)
   new_path = get_new_path(video, container)
@@ -99,12 +119,7 @@ def transcode_video(video: Video, formats: Formats) -> Video:
     **output_args
   )
 
-  cmd: str = ' '.join(stream.compile())
-  logging.info(f'Running command: {cmd}')
-
-  stream.run()
-
-  return Video.from_path(new_path)
+  return new_path, stream
 
 
 def get_new_path(
@@ -160,15 +175,25 @@ def get_output_args(video: Video, formats: Formats) -> Args:
 
 
 def get_input_args(formats: Formats) -> Args:
-  video_codec, resolution, fps, level = formats.video_profile
   args: Args = DEFAULT_INPUT_ARGS.copy()
+
+  if not formats.video_profile:
+    return args
+
+  video_codec, resolution, fps, level = formats.video_profile
 
   return args
 
 
-def get_filters(stream: ffmpeg.Stream, formats: Formats) -> ffmpeg.Stream | None:
+def get_filters(
+  stream: FilterableStream,
+  formats: Formats
+) -> FilterableStream | None:
+  if not formats.video_profile:
+    return stream
+
   video_codec, resolution, fps, level = formats.video_profile
-  filters: ffmpeg.Stream | None = None
+  filters: FilterableStream | None = None
 
   if resolution:
     filters = ffmpeg.filter(
