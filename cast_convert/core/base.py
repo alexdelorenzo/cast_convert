@@ -26,7 +26,7 @@ U = TypeVar('U')
 Item = T | U | None
 
 
-class Decimal(Decimal):  # type: ignore
+class Decimal(Decimal):
   def __repr__(self) -> str:
     return str(self)
 
