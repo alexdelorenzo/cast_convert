@@ -83,7 +83,7 @@ def get_encoder(codec: Codecs) -> Alias:
 def transcode_video(video: Video, formats: Formats) -> Video:
   container, video_profile, audio_profile, subtitle = formats
 
-  new_path, stream = get_stream(video, formats, container)
+  new_path, stream = get_stream(video, formats)
   cmd = get_ffmpeg_cmd(stream)
 
   logging.info(f'Running command: {cmd}')
@@ -100,11 +100,10 @@ def get_ffmpeg_cmd(stream: OutputStream) -> str:
 def get_stream(
   video: Video,
   formats: Formats,
-  container: Container,
 ) -> tuple[Path, OutputStream]:
   input_args = get_input_args(formats)
   output_args = get_output_args(video, formats)
-  new_path = get_new_path(video, container)
+  new_path = get_new_path(video, formats.container)
 
   stream = ffmpeg.input(
     str(video.path),

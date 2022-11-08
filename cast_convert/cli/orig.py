@@ -3,40 +3,18 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Final
 
-import typer
+from typer import Typer, Option, Argument
 
-from ..core.base import first
-from ..core.convert.run import get_ffmpeg_cmd, get_stream
-from ..core.model.video import Video
-from ..core.model.device import Device
+from .helpers import _get_command
 
 
-app: Final[typer.Typer] = typer.Typer()
+app: Final[Typer] = Typer()
 
 
-@app.command()
+@app.command(help='Get FFMPEG transcoding command.')
 def get_command(
-  path: Path,
-  name: str,
+  name: str = Option('Chromecast 1st Gen', help='Chromecast model name'),
+  paths: list[Path] = Argument(None, help='Path to video', resolve_path=True),
 ):
-  video = Video.from_path(path)
-  devices: tuple[Device] = tuple(Device.from_yaml())  # type: ignore
-  device: Device
-
-  if not (device := first(dev for dev in devices if dev.name == name)):
-    print(f'Device name "{name}" not found, please use one of these: ')
-
-    for device in devices:
-      print(f'\t - {device.name}')
-
-    return
-
-  if device.can_play(video):
-    print(f'No need to transcode {video.name} for {device.name}.')
-    return
-
-  formats = device.transcode_to(video)
-  _, stream = get_stream(video, formats, formats.container)
-
-  cmd = get_ffmpeg_cmd(stream)
-  print(cmd)
+  for path in paths:
+    _get_command(name, path)
