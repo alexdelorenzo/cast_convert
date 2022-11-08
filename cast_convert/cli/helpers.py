@@ -1,6 +1,7 @@
 from __future__ import annotations
-
 from pathlib import Path
+
+from rich import print
 
 from ..core.base import first
 from ..core.convert.run import get_ffmpeg_cmd, get_stream
