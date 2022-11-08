@@ -8,7 +8,10 @@ from rich import print
 
 from ..core.base import DESCRIPTION
 from ..core.model.device import Device
-from .helpers import DEFAULT_MODEL, _convert, _get_command, _inspect, show_devices
+from .helpers import (
+  DEFAULT_MODEL, _convert, _get_command, _inspect,
+  get_devices, show_devices
+)
 
 
 RC_MISSING_ARGS: Final[int] = 1
@@ -18,14 +21,12 @@ DEFAULT_NAME_OPT: Final[Option] = Option(
   help='Chromecast model name',
 )
 
-
 DEFAULT_PATHS_ARG: Final[Argument] = Argument(
   default=...,
   help='Path, or paths, to video(s)',
   resolve_path=True,
 
 )
-
 
 app: Final[Typer] = Typer()
 
@@ -83,11 +84,10 @@ def devices():
   """
   List all supported device names.
   """
+  _devices = get_devices()
 
-  devices: tuple[Device] = tuple(Device.from_yaml())  # type: ignore
-
-  print('You can use these device names with the [b]--name[/b] flag: ')
-  show_devices(devices)
+  print('You can use these device names with the [b]--name[/b] flag:')
+  show_devices(_devices)
 
 
 @app.callback(help=DESCRIPTION)
