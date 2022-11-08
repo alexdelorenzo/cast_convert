@@ -16,9 +16,9 @@ DEFAULT_MODEL: Final[str] = 'Chromecast 1st Gen'
 
 def get_device(
   name: str,
-  devices: Path = DEVICE_INFO,
+  device_file: Path = DEVICE_INFO,
 ) -> Device | None:
-  devices: tuple[Device] = tuple(Device.from_yaml())  # type: ignore
+  devices: tuple[Device] = tuple(Device.from_yaml(device_file))  # type: ignore
 
   if not (device := first(dev for dev in devices if dev.name == name)):
     print(f'[b red]Device name "{name}" not found[/b red], please use one of these:')
@@ -33,17 +33,28 @@ def show_devices(devices: tuple[Device]):
     print(f'\t - [b]{device.name}')
 
 
+def should_transcode(
+  device: Device,
+  video: Video,
+) -> bool:
+  if not device:
+    return False
+
+  if device.can_play(video):
+    print(f'No need to transcode {video.name} for {device.name}.')
+    return False
+
+  return True
+
+
 def _get_command(
   name: str,
   path: Path,
 ):
   video = Video.from_path(path)
+  device = get_device(name, path)
 
-  if not (device := get_device(name)):
-    return
-
-  if device.can_play(video):
-    print(f'No need to transcode {video.name} for {device.name}.')
+  if not should_transcode(device, video):
     return
 
   formats = device.transcode_to(video)
@@ -58,12 +69,9 @@ def _convert(
   path: Path,
 ):
   video = Video.from_path(path)
+  device = get_device(name, path)
 
-  if not (device := get_device(name)):
-    return
-
-  if device.can_play(video):
-    print(f'No need to transcode {video.name} for {device.name}.')
+  if not should_transcode(device, video):
     return
 
   formats = device.transcode_to(video)
@@ -75,12 +83,9 @@ def _inspect(
   path: Path,
 ):
   video = Video.from_path(path)
+  device = get_device(name, path)
 
-  if not (device := get_device(name)):
-    return
-
-  if device.can_play(video):
-    print(f'No need to transcode {video.name} for {device.name}.')
+  if not should_transcode(device, video):
     return
 
   print(f'These attributes will be converted from  {video.path}:\n\t', end='')
