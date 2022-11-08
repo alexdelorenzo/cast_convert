@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cast_convert.core.base import first
-from cast_convert.core.convert.run import get_ffmpeg_cmd, get_stream
-from cast_convert.core.model.device import Device
-from cast_convert.core.model.video import Video
+from ..core.base import first
+from ..core.convert.run import get_ffmpeg_cmd, get_stream
+from ..core.model.device import Device
+from ..core.model.video import Video
 
 
 def _get_command(
