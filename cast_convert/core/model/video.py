@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Self, Iterable
+from typing import Self, Iterable, cast
 
 from pymediainfo import MediaInfo
 
@@ -73,7 +73,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
 
   [video] = data.video_tracks
   fmts = video.format, video.codec_id, video.codec_id_hint
-  codec: VideoCodec = VideoCodec.unknown  # type: ignore
+  codec: VideoCodec = cast(VideoCodec.unknown, VideoCodec)
 
   for fmt in fmts:
     if (codec := VideoCodec.from_info(fmt)) is not VideoCodec.unknown:
