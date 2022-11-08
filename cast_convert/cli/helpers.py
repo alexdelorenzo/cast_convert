@@ -52,7 +52,7 @@ def _get_command(
   path: Path,
 ):
   video = Video.from_path(path)
-  device = get_device(name, path)
+  device = get_device(name)
 
   if not should_transcode(device, video):
     return
@@ -69,7 +69,7 @@ def _convert(
   path: Path,
 ):
   video = Video.from_path(path)
-  device = get_device(name, path)
+  device = get_device(name)
 
   if not should_transcode(device, video):
     return
@@ -83,7 +83,7 @@ def _inspect(
   path: Path,
 ):
   video = Video.from_path(path)
-  device = get_device(name, path)
+  device = get_device(name)
 
   if not should_transcode(device, video):
     return

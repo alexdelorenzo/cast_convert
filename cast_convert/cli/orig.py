@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Final
+from typing import Final, NoReturn
 
-from typer import Typer, Option, Argument
+from typer import Typer, Option, Argument, Exit
 from rich import print
 
 from ..core.model.device import Device
 from .helpers import DEFAULT_MODEL, _convert, _get_command, _inspect, show_devices
 
+
+RC_MISSING_ARGS: Final[int] = 1
 
 DEFAULT_NAME_OPT: Final[Option] = Option(
   default=DEFAULT_MODEL,
@@ -26,6 +28,12 @@ DEFAULT_PATHS_ARG: Final[Argument] = Argument(
 app: Final[Typer] = Typer()
 
 
+def check_paths(paths: list[Path]) -> NoReturn | None:
+  if not paths:
+    print('[b red]No paths supplied.')
+    raise Exit(code=RC_MISSING_ARGS)
+
+
 @app.command()
 def get_command(
   name: str = DEFAULT_NAME_OPT,
@@ -34,6 +42,7 @@ def get_command(
   """
   Get FFMPEG transcoding command.
   """
+  check_paths(paths)
 
   for path in paths:
     _get_command(name, path)
@@ -47,6 +56,7 @@ def convert(
   """
   Convert video for Chromecast compatibility.
   """
+  check_paths(paths)
 
   for path in paths:
     _convert(name, path)
@@ -60,6 +70,7 @@ def inspect(
   """
   Inspect a video to see what attributes should be decoded.
   """
+  check_paths(paths)
 
   for path in paths:
     _inspect(name, path)

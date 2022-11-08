@@ -11,7 +11,7 @@ if TYPE_CHECKING:
   from .media.formats import Metadata
 
 
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 
 AT: Final[str] = '@'
