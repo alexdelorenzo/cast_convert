@@ -6,8 +6,8 @@ from typing import Final
 from typer import Typer, Option, Argument
 from rich import print
 
-from .helpers import DEFAULT_MODEL, _convert, _get_command, _inspect, show_devices
 from ..core.model.device import Device
+from .helpers import DEFAULT_MODEL, _convert, _get_command, _inspect, show_devices
 
 
 DEFAULT_NAME_OPT: Final[Option] = Option(
@@ -70,7 +70,9 @@ def devices():
   """
   List all supported device names.
   """
+
   devices: tuple[Device] = tuple(Device.from_yaml())  # type: ignore
+
   print('You can use these device names with the [b]--name[/b] flag: ')
   show_devices(devices)
 
