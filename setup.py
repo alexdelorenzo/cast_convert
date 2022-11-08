@@ -6,6 +6,7 @@ from typing import Final
 from setuptools import setup, find_packages
 
 from cast_convert import __version__
+from cast_convert.core.base import DESCRIPTION
 
 
 NAME: Final[str] = 'cast_convert'
@@ -34,7 +35,7 @@ if version_info < MIN_PYTHON_VERSION:
 setup(
   name="cast_convert",
   version=__version__,
-  description="📽️ Identify and convert videos to formats that are Chromecast supported.",
+  description=DESCRIPTION,
   url="https://github.com/alexdelorenzo/cast_convert",
   author="Alex DeLorenzo (alexdelorenzo.dev)",
   license="AGPL 3.0",

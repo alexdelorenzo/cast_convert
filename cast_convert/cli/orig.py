@@ -3,9 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Final, NoReturn
 
-from typer import Typer, Option, Argument, Exit
+from typer import Typer, Option, Argument, Exit, Context
 from rich import print
 
+from ..core.base import DESCRIPTION
 from ..core.model.device import Device
 from .helpers import DEFAULT_MODEL, _convert, _get_command, _inspect, show_devices
 
@@ -19,9 +20,10 @@ DEFAULT_NAME_OPT: Final[Option] = Option(
 
 
 DEFAULT_PATHS_ARG: Final[Argument] = Argument(
-  default=None,
+  default=...,
   help='Path, or paths, to video(s)',
   resolve_path=True,
+
 )
 
 
@@ -88,5 +90,6 @@ def devices():
   show_devices(devices)
 
 
-
-
+@app.callback(help=DESCRIPTION)
+def main(ctx: Context):
+  pass

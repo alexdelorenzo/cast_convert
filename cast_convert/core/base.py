@@ -42,6 +42,9 @@ DEFAULT_PROFILE_FPS: Final[Fps] = Fps('24.0')
 DEFAULT_PROFILE_LEVEL: Final[Level] = Level('0.0')
 DEFAULT_PROFILE_RESOLUTION: Final[Resolution] = 720
 
+DESCRIPTION: Final[str] = \
+  "📽️ Identify and convert videos to formats that are Chromecast supported."
+
 
 class IsCompatible(Protocol):
   def is_compatible(self, other: Metadata) -> bool:
