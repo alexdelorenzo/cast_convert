@@ -54,7 +54,7 @@ def are_compatible(metadata: Metadata, other: Metadata) -> bool:
     case None, None:
       return True
 
-    case _, None | None, _:
+    case (_, None) | (None, _):
       return False
 
   raise TypeError(f'Cannot compare {get_name(metadata)} with {get_name(other)}')
