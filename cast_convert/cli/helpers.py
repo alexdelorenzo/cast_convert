@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
-from typing import Final
+from typing import Final, cast
 
 from rich import print
 
@@ -14,11 +14,21 @@ from ..core.parse import DEVICE_INFO
 DEFAULT_MODEL: Final[str] = 'Chromecast 1st Gen'
 
 
+Devices = tuple[Device]
+
+
+def get_devices(
+  device_file: Path = DEVICE_INFO,
+) -> Devices:
+  devices = tuple(Device.from_yaml(device_file))
+  return cast(devices, Devices)
+
+
 def get_device(
   name: str,
   device_file: Path = DEVICE_INFO,
 ) -> Device | None:
-  devices: tuple[Device] = tuple(Device.from_yaml(device_file))  # type: ignore
+  devices = get_devices(device_file)
 
   if not (device := first(dev for dev in devices if dev.name == name)):
     print(f'[b red]Device name "{name}" not found[/b red], please use one of these:')
