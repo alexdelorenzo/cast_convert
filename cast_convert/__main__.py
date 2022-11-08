@@ -2,7 +2,7 @@ import logging
 
 import typer
 
-from .cli.orig import app
+from .cli.commands import app
 
 
 logging.basicConfig(level=logging.WARN)

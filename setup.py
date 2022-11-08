@@ -47,7 +47,7 @@ setup(
   entry_points={
     "console_scripts": [
       "cast_convert = cast_convert.old:cmd",
-      "cast-convert = cast_convert.cli.orig:app",
+      "cast-convert = cast_convert.cli:app",
     ]
   }
 )
