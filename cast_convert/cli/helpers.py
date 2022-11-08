@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
+from typing import Final
 
 from rich import print
 
@@ -7,6 +8,9 @@ from ..core.base import first
 from ..core.convert.run import get_ffmpeg_cmd, get_stream
 from ..core.model.device import Device
 from ..core.model.video import Video
+
+
+DEFAULT_MODEL: Final[str] = 'Chromecast 1st Gen'
 
 
 def _get_command(
@@ -18,10 +22,10 @@ def _get_command(
   device: Device
 
   if not (device := first(dev for dev in devices if dev.name == name)):
-    print(f'Device name "{name}" not found, please use one of these: ')
+    print(f'[b red]Device name "{name}" not found[/b red], please use one of these: ')
 
     for device in devices:
-      print(f'\t - {device.name}')
+      print(f'\t - [b]{device.name}')
 
     return
 
@@ -33,4 +37,4 @@ def _get_command(
   _, stream = get_stream(video, formats)
 
   cmd = get_ffmpeg_cmd(stream)
-  print(cmd)
+  print(f'[b]{cmd}')
