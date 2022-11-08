@@ -8,3 +8,7 @@ unpackable>=0.0.4, <0.1.0
 watchdog>=2.1.9, <2.2.0
 
 # setuptools~=65.5.1
+
+setuptools~=65.5.1
+aiopath~=0.6.11
+hachiko~=0.4.0
