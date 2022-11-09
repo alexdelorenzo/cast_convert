@@ -73,7 +73,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
 
   [video] = data.video_tracks
   fmts = video.format, video.codec_id, video.codec_id_hint
-  codec: VideoCodec = cast(VideoCodec.unknown, VideoCodec)
+  codec: VideoCodec = cast(VideoCodec, VideoCodec.unknown)
 
   for fmt in fmts:
     if (codec := VideoCodec.from_info(fmt)) is not VideoCodec.unknown:
