@@ -48,7 +48,7 @@ async def wait_for_stable_size(
 
 async def is_video(path: Path) -> bool:
   try:
-    await asyncio.to_thread(Video.from_path, path)
+    await to_thread(Video.from_path, path)
 
   except Exception as e:
     logging.exception(e)
