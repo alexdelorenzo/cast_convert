@@ -23,22 +23,22 @@ DEFAULT_THREADS: Final[int] = 2
 
 
 async def wait_for_stable_size(
-  filename: str,
+  file: str | Path,
   wait: float = FILESIZE_CHECK_WAIT,
   previous: int = None,
 ) -> int:
-  path = AsyncPath(filename)
+  path = AsyncPath(file)
   previous: int | None
 
   while True:
     try:
       result = await path.stat()
-      filesize = result.st_size
+      size: int = result.st_size
 
-      if filesize == previous:
-        return filesize
+      if size == previous:
+        return size
 
-      previous = filesize
+      previous = size
       await sleep(wait)
 
     except Exception as e:
@@ -88,7 +88,7 @@ async def convert(
   path = path.absolute()
 
   async with sem:
-    await wait_for_stable_size(str(path))
+    await wait_for_stable_size(path)
     await to_thread(_convert, device, path)
 
 
