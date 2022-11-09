@@ -77,7 +77,7 @@ async def gen_videos(
       match change:
         case Change.added | Change.modified:
           if await is_video(path):
-            yield path  # type: ignore
+            yield path
 
 
 async def convert(
