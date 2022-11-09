@@ -13,13 +13,14 @@ from hachiko.hachiko import AIOEventHandler
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.utils.patterns import match_any_paths
 
-from cast_convert.cli.helpers import DEFAULT_MODEL, _convert
-from cast_convert.core.model.device import Device
-from cast_convert.core.model.video import Video
+from ...cli.helpers import DEFAULT_MODEL, _convert
+from ..model.device import Device
+from ..model.video import Video
 
 
 FILESIZE_CHECK_WAIT: Final[float] = 2.0
 DEFAULT_THREADS: Final[int] = 2
+NO_SIZE: Final[int] = -1
 
 
 async def wait_for_stable_size(
@@ -28,7 +29,7 @@ async def wait_for_stable_size(
   previous: int = None,
 ) -> int:
   path = AsyncPath(file)
-  previous: int | None
+  previous: int = NO_SIZE
 
   while True:
     try:
@@ -43,7 +44,7 @@ async def wait_for_stable_size(
 
     except Exception as e:
       exception(e)
-      previous = None
+      previous = NO_SIZE
 
 
 async def is_video(path: Path) -> bool:
