@@ -133,14 +133,15 @@ def get_device(
   audio_names: Fmts,
   subtitle_names: Fmts,
 ) -> Device:
-  video = get_video_profiles(profiles)
   containers = map(Container.from_info, container_names)
   codecs = map(AudioCodec.from_info, audio_names)
   audio = map(AudioProfile, codecs)
   subtitles = map(Subtitle.from_info, subtitle_names)
 
+  video = get_video_profiles(profiles)
+  formats = chain(containers, audio, subtitles, video)
+
   device = Device(name)
-  formats = chain(audio, video, containers, subtitles)
   device.add_formats(formats)
 
   return device
