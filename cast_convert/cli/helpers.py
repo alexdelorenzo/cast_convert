@@ -28,14 +28,15 @@ def get_device(
   name: str,
   device_file: Path = DEVICE_INFO,
 ) -> Device | None:
+  name = name.casefold()
   devices = get_devices(device_file)
 
-  if not (device := first(dev for dev in devices if dev.name == name)):
+  if not (dev := first(d for d in devices if d.name.casefold() == name)):
     print(f'[b red]Device name "{name}" not found[/b red], please use one of these:')
     show_devices(devices)
-    return
+    return None
 
-  return device
+  return dev
 
 
 def show_devices(devices: tuple[Device]):
