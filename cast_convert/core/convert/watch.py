@@ -104,7 +104,7 @@ async def convert_videos(
   sem = BoundedSemaphore(threads)
 
   async with TaskGroup() as tg:
-    async for path in gen_videos(*paths, seen=seen):  # type: ignore
+    async for path in gen_videos(*paths, seen=seen):
       coro = convert(device, path, sem)
       tg.create_task(coro)
 
