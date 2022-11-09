@@ -1,21 +1,25 @@
 import logging
 import os
 import asyncio
-from asyncio import sleep, Queue, to_thread
+from asyncio import sleep, Queue, to_thread, BoundedSemaphore, TaskGroup
 from dataclasses import dataclass, field
 from logging import exception
 from pathlib import Path
-from typing import Final
+from typing import AsyncGenerator, AsyncIterable, Final
 
 from aiopath import AsyncPath
+from watchfiles import awatch, Change
 from hachiko.hachiko import AIOEventHandler
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.utils.patterns import match_any_paths
 
+from cast_convert.cli.helpers import DEFAULT_MODEL, _convert
+from cast_convert.core.model.device import Device
 from cast_convert.core.model.video import Video
 
 
 FILESIZE_CHECK_WAIT: Final[float] = 2.0
+DEFAULT_THREADS: Final[int] = 2
 
 
 async def wait_for_stable_size(
@@ -24,6 +28,7 @@ async def wait_for_stable_size(
   previous: int = None,
 ) -> int:
   path = AsyncPath(filename)
+  previous: int | None
 
   while True:
     try:
@@ -40,6 +45,71 @@ async def wait_for_stable_size(
       exception(e)
       previous = None
 
+
+async def is_video(path: Path) -> bool:
+  try:
+    await asyncio.to_thread(Video.from_path, path)
+
+  except Exception as e:
+    logging.exception(e)
+    logging.error(f'Not a video: {path}')
+    return False
+
+  return True
+
+
+async def gen_videos(
+  *paths: Path,
+  seen: set[Path] | None = None
+) -> AsyncIterable[Path]:
+  if seen is None:
+    seen = set[Path]()
+
+  async for changes in awatch(*paths):
+    for change, file in changes:
+      path = Path(file)
+
+      if path in seen:
+        continue
+
+      seen.add(path)
+
+      match change:
+        case Change.added | Change.modified:
+          if await is_video(path):
+            yield path  # type: ignore
+
+
+async def convert(
+  device: str,
+  path: Path,
+  sem: BoundedSemaphore,
+):
+  path = path.absolute()
+
+  async with sem:
+    await wait_for_stable_size(str(path))
+    await to_thread(_convert, device, path)
+
+
+async def convert_videos(
+  *paths: Path,
+  device: str = DEFAULT_MODEL,
+  seen: set[Path] | None = None,
+  threads: int = DEFAULT_THREADS,
+):
+  if seen is None:
+    seen = set[Path]()
+
+  sem = BoundedSemaphore(threads)
+
+  async with TaskGroup() as tg:
+    async for path in gen_videos(*paths, seen=seen):  # type: ignore
+      coro = convert(device, path, sem)
+      tg.create_task(coro)
+
+
+### watchdog ###
 
 @dataclass
 class AddedFileHandler(
@@ -88,23 +158,9 @@ class AddedFileHandler(
     return await self.on_moved(event)
 
 
-async def is_video(path: Path) -> bool:
-  try:
-    await asyncio.to_thread(Video.from_path, path)
-
-  except Exception as e:
-    logging.exception(e)
-    logging.error(f'Not a video: {path}')
-    return False
-
-  return True
-
-THREADS = 1
-
-
 async def consume_video_queue(
   queue: Queue,
-  threads: int = THREADS,
+  threads: int = DEFAULT_THREADS,
   show_debug: bool = False
 ):
   while True:

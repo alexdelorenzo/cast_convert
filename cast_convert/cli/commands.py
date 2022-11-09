@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from asyncio import run
 from pathlib import Path
 from typing import Final, NoReturn
 
@@ -7,6 +8,7 @@ from typer import Typer, Option, Argument, Exit, Context
 from rich import print
 
 from ..core.base import DESCRIPTION
+from ..core.convert.watch import DEFAULT_THREADS, convert_videos
 from ..core.model.device import Device
 from .helpers import (
   DEFAULT_MODEL, _convert, _get_command, _inspect,
@@ -88,6 +90,21 @@ def devices():
 
   print('You can use these device names with the [b]--name[/b] flag:')
   show_devices(_devices)
+
+
+@app.command()
+def watch(
+  name: str = DEFAULT_NAME_OPT,
+  paths: list[Path] = DEFAULT_PATHS_ARG,
+  threads: int = DEFAULT_THREADS,
+):
+  """
+  Watch directories for added videos and convert them.
+  """
+  check_paths(paths)
+
+  coro = convert_videos(*paths, device=name, threads=threads)
+  run(coro)
 
 
 @app.callback(help=DESCRIPTION)

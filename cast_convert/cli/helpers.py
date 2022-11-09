@@ -21,7 +21,7 @@ def get_devices(
   device_file: Path = DEVICE_INFO,
 ) -> Devices:
   devices = tuple(Device.from_yaml(device_file))
-  return cast(devices, Devices)
+  return cast(Devices, devices)
 
 
 def get_device(
