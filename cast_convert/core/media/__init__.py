@@ -1,1 +1,1 @@
-from . import base, formats, profiles, codecs
+from . import base as media_base, formats, profiles, codecs
