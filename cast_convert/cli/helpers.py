@@ -4,11 +4,11 @@ from typing import Final, cast
 
 from rich import print
 
-from ..core.base import first
 from ..core.convert.run import get_ffmpeg_cmd, get_stream, transcode_video
 from ..core.model.device import Device
 from ..core.model.video import Video
 from ..core.parse import DEVICE_INFO
+from ..core.base import first
 
 
 DEFAULT_MODEL: Final[str] = 'Chromecast 1st Gen'
@@ -32,7 +32,7 @@ def get_device(
   devices = get_devices(device_file)
 
   if not (dev := first(d for d in devices if d.name.casefold() == name)):
-    print(f'[b red]Device name "{name}" not found[/b red], please use one of these:')
+    print(f'[b red]Device name "{name}" not found[/], please use one of these:')
     show_devices(devices)
     return None
 
