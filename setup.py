@@ -5,19 +5,16 @@ from typing import Final
 
 from setuptools import setup, find_packages
 
-from cast_convert import __version__
+from cast_convert import NAME, __version__
 from cast_convert.core.base import DESCRIPTION
 
 
-NAME: Final[str] = 'cast_convert'
-MIN_PYTHON_VERSION: Final[tuple[int, ...]] = (3, 11)
-OLD_PYTHON_REQUIREMENTS: Final[list[str]] = ['mypy-lang']
-
-REQUIREMENTS: Final[list[str]] = (
+REQUIREMENTS: list[str] = (
   Path('requirements.txt')
   .read_text()
   .split('\n')
 )
+REQUIREMENTS = [req for req in REQUIREMENTS if req]
 
 ASSET_DIRS: Final[list[str]] = [
   'assets/*.yml',
@@ -27,13 +24,8 @@ PKG_DATA: Final[dict[str, list[str]]] = {
   NAME: ASSET_DIRS
 }
 
-
-if version_info < MIN_PYTHON_VERSION:
-  REQUIREMENTS.extend(OLD_PYTHON_REQUIREMENTS)
-
-
 setup(
-  name="cast_convert",
+  name=NAME,
   version=__version__,
   description=DESCRIPTION,
   url="https://github.com/alexdelorenzo/cast_convert",
@@ -46,7 +38,6 @@ setup(
   keywords='chromecast transcode convert video cli'.split(' '),
   entry_points={
     "console_scripts": [
-      # "cast_convert = cast_convert.old:cmd",
       "cast-convert = cast_convert.cli:app",
     ]
   }
