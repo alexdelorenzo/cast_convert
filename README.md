@@ -118,6 +118,10 @@ You can specify one or more file or directory paths as `PATHS` arguments.
 
 You must specify at least one path. Paths are supplied after commands, and they are the *last* arguments to `cast-convert`.
 
+```bash
+$ cast-convert get-command vid1.mkv vid2.mkv vid3.mkv
+```
+
 ### Commands
 #### `convert`
 ```bash
