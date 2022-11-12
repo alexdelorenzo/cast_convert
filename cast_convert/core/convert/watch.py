@@ -52,6 +52,7 @@ async def is_video(path: Path) -> bool:
   if video.formats.video_profile:
     return True
 
+  logging.error(f'Not a video: {path}')
   return False
 
 
