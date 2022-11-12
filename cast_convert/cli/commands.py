@@ -43,7 +43,7 @@ def get_command(
   paths: list[Path] = DEFAULT_PATHS_ARG,
 ):
   """
-  Get FFMPEG transcoding command.
+  📜 Get FFMPEG transcoding command.
   """
   check_paths(paths)
 
@@ -57,7 +57,7 @@ def convert(
   paths: list[Path] = DEFAULT_PATHS_ARG,
 ):
   """
-  Convert video for Chromecast compatibility.
+  📼 Convert video for Chromecast compatibility.
   """
   check_paths(paths)
 
@@ -71,7 +71,7 @@ def inspect(
   paths: list[Path] = DEFAULT_PATHS_ARG,
 ):
   """
-  Inspect a video to see what attributes should be decoded.
+  🔎 Inspect a video to see what attributes should be decoded.
   """
   check_paths(paths)
 
@@ -82,7 +82,7 @@ def inspect(
 @app.command()
 def devices():
   """
-  List all supported device names.
+  📺 List all supported device names.
   """
   _devices = get_devices_from_file()
 
@@ -97,7 +97,7 @@ def watch(
   threads: int = DEFAULT_PROCS,
 ):
   """
-  Watch directories for added videos and convert them.
+  👀 Watch directories for added videos and convert them.
   """
   check_paths(paths)
 
@@ -108,6 +108,7 @@ def watch(
 @app.callback(help=DESCRIPTION)
 def main(
   ctx: Context,
-  log_level: int = Option(logging.WARN, help="Choose level of debug logging, 0 to 50"),
+  log_level: str = Option('warn', help="Choose level of debug logging."),
 ):
+  log_level = log_level.upper()
   logging.basicConfig(level=log_level)

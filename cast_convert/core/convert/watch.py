@@ -69,9 +69,8 @@ async def gen_videos(
       seen.add(path)
 
       match change:
-        case Change.added | Change.modified:
-          if await is_video(path):
-            yield path
+        case Change.added | Change.modified if await is_video(path):
+          yield path
 
 
 async def convert(
@@ -115,4 +114,4 @@ async def convert_videos(
 #   sem = BoundedSemaphore(threads)
 #
 #   async for path in gen_videos(*paths, seen=seen):
-#     await convert(device, path, sem)
+#     await convert(device, path
