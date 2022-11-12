@@ -34,98 +34,162 @@ Individual casting devices like the Chromecast have unique video encoding, audio
 
 ## Requirements
 ### Minimum
- - Python 3.11
- - `mediainfo`
- - `ffmpeg`
+  - Python 3.11
+  - `mediainfo`
+  - `ffmpeg`
 
 ### Encoders
  - `libmp3lame`
  - `x264`
 
 ## Installation
-```bashe
+```bash
 $ python3 -m pip install cast_convert
 ```
 
-[//]: # ()
-[//]: # (## Usage)
+## Usage
+```bash
+ Usage: cast_convert [OPTIONS] COMMAND [ARGS]...  
 
-[//]: # (### General)
+ 📽️ Identify and convert videos to formats that are
+ Chromecast supported.
 
-[//]: # (```)
+╭─ Options ────────────────────────────────────────────────╮
+│ --log-level                 TEXT  Choose level of debug  │
+│                                   logging.               │
+│                                   [default: warn]        │
+│ --install-completion              Install completion for │
+│                                   the current shell.     │
+│ --show-completion                 Show completion for    │
+│                                   the current shell, to  │
+│                                   copy it or customize   │
+│                                   the installation.      │
+│ --help                            Show this message and  │
+│                                   exit.                  │
+╰──────────────────────────────────────────────────────────╯
+╭─ Commands ───────────────────────────────────────────────╮
+│ convert      Convert video for Chromecast compatibility. │
+│ devices      List all supported device names.            │
+│ get-command  Get FFMPEG transcoding command.             │
+│ inspect      Inspect a video to see what attributes      │
+│              should be decoded.                          │
+│ watch        Watch directories for added videos and      │
+│              convert them.                               │
+╰──────────────────────────────────────────────────────────╯
 
-[//]: # (alex@mbp12,1:~$ cast_convert --help)
+```
 
-[//]: # (Usage: cast_convert [OPTIONS] COMMAND [ARGS]...)
+### Parameters
+#### `--log-level`
+You can set the log level using the `--log-level` flag:
 
-[//]: # ()
-[//]: # (  Convert and inspect video for Chromecast compatibility)
+```bash
+$ cast_convert --log-level debug devices
+```
 
-[//]: # ()
-[//]: # (Options:)
+Default log level is `warn`.
 
-[//]: # (  --help  Show this message and exit.)
+#### `--name`
+You can specify the model of your device with the `--name` flag.
 
-[//]: # ()
-[//]: # (Commands:)
+The `--name` flag comes *after* [`cast_control` commands](#commands).
 
-[//]: # (  convert  Convert video to Chromecast compatible...)
+```bash
+$ cast_convert inspect --name 'Chromecast Ultra' ~/video.mkv
+```
 
-[//]: # (  get_cmd  Generate ffmpeg conversion command)
+Default device name is `Chromecast 1st Gen`.
 
-[//]: # (  inspect  Inspect video for transcoding options)
 
-[//]: # ()
-[//]: # (```)
+#### `PATHS`
+You can specify one or more file or directory paths as `PATHS` arguments.
 
-[//]: # ()
-[//]: # (### Inspection)
+You must specify at least one path. Paths are supplied after commands, and they are the *last* arguments to `cast_convert`.
 
-[//]: # (```)
+### Commands
+#### `convert`
+```bash
+Usage: cast_convert convert [OPTIONS] PATHS...
 
-[//]: # (alex@mbp12,1:~$ cast_convert inspect Vids/Zoolander\ 2001\ \&#40;1080p\ x265\ 10bit\ Joy\&#41;.mkv)
+📼 Convert video for Chromecast compatibility. 
 
-[//]: # (Transcode video to {'container': '', 'audio': '', 'video': 'h264'})
+╭─ Arguments ──────────────────────────────────────────────╮
+│ *    paths      PATHS...  Path, or paths, to video(s)    │
+│                           [default: None]                │
+│                           [required]                     │
+╰──────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────╮
+│ --name        TEXT  Chromecast model name                │
+│                     [default: Chromecast 1st Gen]        │
+│ --help              Show this message and exit.          │
+╰──────────────────────────────────────────────────────────╯
+```
 
-[//]: # ()
-[//]: # (```)
+#### `devices`
+```bash
+Usage: cast_convert convert [OPTIONS] PATHS...
 
-[//]: # ()
-[//]: # (### Conversion)
+📺 List the names of supported devices.
 
-[//]: # (```)
+╭─ Options ────────────────────────────────────────────────╮
+│ --help              Show this message and exit.          │
+╰──────────────────────────────────────────────────────────╯
+```
 
-[//]: # (alex@mbp12,1:~$ cast_convert convert --help)
+#### `get-command`
+```bash
 
-[//]: # (Usage: cast_convert convert [OPTIONS] FILENAME)
+Usage: cast_convert get-command [OPTIONS] PATHS...
 
-[//]: # ()
-[//]: # (  Convert video to Chromecast compatible encodings and container)
+📜 Get FFMPEG transcoding commands.
 
-[//]: # ()
-[//]: # (Options:)
+╭─ Arguments ──────────────────────────────────────────────╮
+│ *    paths      PATHS...  Path, or paths, to video(s)    │
+│                           [default: None]                │
+│                           [required]                     │
+╰──────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────╮
+│ --name        TEXT  Chromecast model name                │
+│                     [default: Chromecast 1st Gen]        │
+│ --help              Show this message and exit.          │
+╰──────────────────────────────────────────────────────────╯
+```
 
-[//]: # (  -t, --threads INTEGER  Count of threads for ffmpeg to use. Default: 4)
+#### `inspect`
+```bash
+Usage: cast_convert inspect [OPTIONS] PATHS...
 
-[//]: # (  --help                 Show this message and exit.)
+🔎 Inspect a video to see what attributes should be transcoded.
 
-[//]: # (```)
+╭─ Arguments ──────────────────────────────────────────────╮
+│ *    paths      PATHS...  Path, or paths, to video(s)    │
+│                           [default: None]                │
+│                           [required]                     │
+╰──────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────╮
+│ --name        TEXT  Chromecast model name                │
+│                     [default: Chromecast 1st Gen]        │
+│ --help              Show this message and exit.          │
+╰──────────────────────────────────────────────────────────╯
+```
 
-[//]: # ()
-[//]: # (### Print ffmpeg call)
 
-[//]: # (The conversion command calls ffmpeg to transcode video. The `get_cmd` command will print the ffmpeg call.)
+#### `watch`
+```bash
+Usage: cast_convert watch [OPTIONS] PATHS...
 
-[//]: # (```)
+👀 Watch directories for added videos and convert them. 
 
-[//]: # (alex@mbp12,1:~$ cast_convert get_cmd Vids/Zoolander\ 2001\ \&#40;1080p\ x265\ 10bit\ Joy\&#41;.mkv)
+╭─ Arguments ──────────────────────────────────────────────╮
+│ *    paths      PATHS...  Path, or paths, to video(s)    │
+│                           [default: None]                │
+│                           [required]                     │
+╰──────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────╮
+│ --name           TEXT     Chromecast model name          │
+│                           [default: Chromecast 1st Gen]  │
+│ --threads        INTEGER  [default: 2]                   │
+│ --help                    Show this message and exit.    │
+╰──────────────────────────────────────────────────────────╯
+```
 
-[//]: # (ffmpeg -fflags +genpts -i "Vids/Zoolander 2001 &#40;1080p x265 10bit Joy&#41;.mkv" -c:v libx264 -preset ultrafast -crf 21 -c:a copy  -threads 4 "Vids/Zoolander 2001 &#40;1080p x265 10bit Joy&#41;_transcode.mp4")
-
-[//]: # ()
-[//]: # (```)
-
-[//]: # ()
-[//]: # (## License)
-
-[//]: # (See `LICENSE`)
