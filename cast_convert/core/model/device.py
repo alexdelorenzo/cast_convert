@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from itertools import chain
 from pathlib import Path
-from typing import Iterable, Self, Type, cast
+from typing import Iterable, Self, Type
 import logging
 
 from ..convert.transcode import transcode_to
@@ -11,7 +11,7 @@ from ..media.base import get_name
 from ..media.codecs import AudioCodec, Container, Containers, Subtitle, Subtitles, VideoCodec
 from ..media.formats import Formats, Metadata, VideoFormat, VideoFormats, are_compatible
 from ..media.profiles import AudioProfile, AudioProfiles, VideoProfile, VideoProfiles
-from ..base import IsCompatible
+from ..base import IsCompatible, first
 from ..exceptions import UnknownFormat
 from ..parse import DEVICE_INFO, Fmts, Yaml, get_yaml
 from .video import Video, get_video_profiles
@@ -191,6 +191,28 @@ def is_compatible(device: Device, other: Metadata) -> bool:
 
 
 Devices = tuple[Device, ...]
+
+
+def load_device_with_name(
+  name: str,
+  device_file: Path = DEVICE_INFO,
+) -> Device | None:
+  name = name.casefold()
+  devices = get_devices_from_file(device_file)
+
+  return get_device_with_name(name, devices)
+
+
+def get_device_with_name(
+  name: str,
+  devices: Devices,
+) -> Device | None:
+  name = name.casefold()
+
+  if not (dev := first(d for d in devices if d.name.casefold() == name)):
+    return None
+
+  return dev
 
 
 def get_devices_from_file(

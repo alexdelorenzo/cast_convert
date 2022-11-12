@@ -1,10 +1,6 @@
-import logging
-
-import typer
+from __future__ import annotations
 
 from .cli.commands import app
 
-
-logging.basicConfig(level=logging.WARN)
 
 app()

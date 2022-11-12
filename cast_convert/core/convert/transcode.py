@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any, TYPE_CHECKING
 
 from rich import print
@@ -9,12 +8,12 @@ from .run import transcode_video
 
 from ..media.formats import Formats
 from ..media.profiles import AudioProfile, VideoProfile
+from ..model.video import Video
+
 
 if TYPE_CHECKING:
-  from ..model.device import Device
-  from .helpers import get_device_with_name
   from ..media.codecs import Container, Subtitle
-  from ..model.video import Video
+  from ..model.device import Device
 
 
 def exists(*items: Any) -> bool:
@@ -187,20 +186,6 @@ def transcode_formats(formats: Formats, to_formats: Formats) -> Formats | None:
   )
 
 
-def _convert(
-  name: str,
-  path: Path,
-):
-  video = Video.from_path(path)
-  device = get_device_with_name(name)
-
-  if not should_transcode(device, video):
-    return
-
-  formats = device.transcode_to(video)
-  transcode_video(video, formats)
-
-
 def should_transcode(
   device: Device,
   video: Video,
@@ -213,3 +198,5 @@ def should_transcode(
     return False
 
   return True
+
+

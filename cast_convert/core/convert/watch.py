@@ -9,7 +9,7 @@ from watchfiles import awatch, Change
 
 from ..model.video import Video
 from ..base import DEFAULT_MODEL
-from .transcode import _convert
+from .helpers import _convert
 
 
 FILESIZE_CHECK_WAIT: Final[float] = 2.0

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from asyncio import run
 from pathlib import Path
 from typing import Final, NoReturn
@@ -9,9 +10,9 @@ from rich import print
 
 from ..core.base import DEFAULT_MODEL, DESCRIPTION
 from ..core.convert.watch import DEFAULT_THREADS, convert_videos
-from ..core.convert.helpers import _get_command, _inspect, show_devices
+from ..core.convert.helpers import _convert, _get_command, _inspect, show_devices
 from ..core.model.device import get_devices_from_file
-from ..core.convert.transcode import _convert
+from ..core.model.video import Video
 
 
 RC_MISSING_ARGS: Final[int] = 1
@@ -106,5 +107,8 @@ def watch(
 
 
 @app.callback(help=DESCRIPTION)
-def main(ctx: Context):
-  pass
+def main(
+  ctx: Context,
+  log_level: int = Option(logging.WARN, help="Choose level of debug logging, 0 to 50"),
+):
+  logging.basicConfig(level=log_level)

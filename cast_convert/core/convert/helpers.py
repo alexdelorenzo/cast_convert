@@ -3,9 +3,9 @@ from pathlib import Path
 
 from rich import print
 
-from .transcode import should_transcode
+from .transcode import should_transcode, transcode_video
 from ..base import first
-from ..model.device import Device, get_devices_from_file
+from ..model.device import Device, get_device_with_name, load_device_with_name, get_devices_from_file
 from ..model.video import Video
 from .run import get_ffmpeg_cmd, get_stream
 from ..parse import DEVICE_INFO
@@ -21,7 +21,7 @@ def _get_command(
   path: Path,
 ):
   video = Video.from_path(path)
-  device = get_device_with_name(name)
+  device = _get_device_from_name(name)
 
   if not should_transcode(device, video):
     return
@@ -38,7 +38,7 @@ def _inspect(
   path: Path,
 ):
   video = Video.from_path(path)
-  device = get_device_with_name(name)
+  device = _get_device_from_name(name)
 
   if not should_transcode(device, video):
     return
@@ -48,16 +48,30 @@ def _inspect(
   print(formats)
 
 
-def get_device_with_name(
+def _get_device_from_name(
   name: str,
   device_file: Path = DEVICE_INFO,
 ) -> Device | None:
-  name = name.casefold()
   devices = get_devices_from_file(device_file)
 
-  if not (dev := first(d for d in devices if d.name.casefold() == name)):
+  if not (dev := get_device_with_name(name, devices)):
     print(f'[b red]Device name "{name}" not found[/], please use one of these:')
     show_devices(devices)
+
     return None
 
   return dev
+
+
+def _convert(
+  name: str,
+  path: Path,
+):
+  video = Video.from_path(path)
+  device = load_device_with_name(name)
+
+  if not should_transcode(device, video):
+    return
+
+  formats = device.transcode_to(video)
+  transcode_video(video, formats)
