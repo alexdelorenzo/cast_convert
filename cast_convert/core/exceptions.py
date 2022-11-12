@@ -17,5 +17,9 @@ class UnknownFormat(VideoError):
   pass
 
 
+class FileNotVideo(VideoError):
+  pass
+
+
 class DeviceError(CastConvertException):
   pass

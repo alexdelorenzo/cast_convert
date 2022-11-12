@@ -21,7 +21,7 @@ async def wait_for_stable_size(
   wait: float = FILESIZE_CHECK_WAIT,
   previous: int = None,
 ) -> int:
-  path = AsyncPath(file)
+  path: AsyncPath = AsyncPath(file)
   previous: int = NO_SIZE
 
   while True:
@@ -42,14 +42,17 @@ async def wait_for_stable_size(
 
 async def is_video(path: Path) -> bool:
   try:
-    await to_thread(Video.from_path, path)
+    video = await to_thread(Video.from_path, path)
 
   except Exception as e:
     logging.exception(e)
     logging.error(f'Not a video: {path}')
     return False
 
-  return True
+  if video.formats.video_profile:
+    return True
+
+  return False
 
 
 async def gen_videos(
