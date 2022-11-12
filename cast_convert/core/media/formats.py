@@ -5,7 +5,6 @@ from typing import Iterable, NamedTuple
 from .base import get_name
 from .codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
 from .profiles import AudioProfile, Profiles, VideoProfile, is_video_profile_compatible
-from ..base import IsCompatible
 
 
 VideoFormat = Codecs | Profiles | Container | Subtitle
@@ -26,7 +25,7 @@ Metadata = VideoFormat | Formats
 
 
 def are_compatible(metadata: Metadata, other: Metadata) -> bool:
-  match (metadata, other):
+  match metadata, other:
     case VideoProfile() as video_profile, VideoProfile() as other:
       return is_video_profile_compatible(video_profile, other)
 
@@ -43,7 +42,7 @@ def are_compatible(metadata: Metadata, other: Metadata) -> bool:
       return other is container
 
     case Subtitle() as subtitle, Subtitle() as other:
-      if not subtitle:
+      if not subtitle or not other:
         return True
 
       return other is subtitle
@@ -89,7 +88,7 @@ def is_compatible(formats: Formats, other: Metadata) -> bool:
       return are_compatible(container, _container)
 
     case Subtitle() as _subtitle:
-      if not _subtitle:
+      if not _subtitle or not subtitle:
         return True
 
       return are_compatible(subtitle, _subtitle)

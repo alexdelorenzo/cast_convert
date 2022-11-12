@@ -3,16 +3,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from itertools import chain
 from pathlib import Path
-from typing import Iterable, Self, Type
+from typing import Iterable, Self, Type, cast
 import logging
 
-from ..base import IsCompatible
 from ..convert.transcode import transcode_to
-from ..exceptions import UnknownFormat
 from ..media.base import get_name
 from ..media.codecs import AudioCodec, Container, Containers, Subtitle, Subtitles, VideoCodec
 from ..media.formats import Formats, Metadata, VideoFormat, VideoFormats, are_compatible
 from ..media.profiles import AudioProfile, AudioProfiles, VideoProfile, VideoProfiles
+from ..base import IsCompatible
+from ..exceptions import UnknownFormat
 from ..parse import DEVICE_INFO, Fmts, Yaml, get_yaml
 from .video import Video, get_video_profiles
 
@@ -28,7 +28,10 @@ class Device(IsCompatible):
   subtitles: Subtitles = field(default_factory=Subtitles)
 
   @classmethod
-  def from_yaml(cls: Type[Self], path: Path = DEVICE_INFO) -> Iterable[Self]:
+  def from_yaml(
+    cls: Type[Self],
+    path: Path = DEVICE_INFO
+  ) -> Iterable[Self]:
     yaml = get_yaml(path)
     yield from get_devices(yaml)
 
@@ -160,32 +163,25 @@ def get_devices(data: Yaml) -> Iterable[Device]:
 def is_compatible(device: Device, other: Metadata) -> bool:
   match other:
     case VideoProfile():
-      for video_profile in device.video_profiles:
-        if are_compatible(video_profile, other):
-          return True
+      return any(are_compatible(profile, other) for profile in device.video_profiles)
 
     case AudioProfile(codec):
-      for audio_profile in device.audio_profiles:
-        return are_compatible(audio_profile.codec, codec)
+      return any(are_compatible(profile.codec, codec) for profile in device.audio_profiles)
 
     case VideoCodec() as codec:
-      for video_profile in device.video_profiles:
-        return are_compatible(video_profile.codec, codec)
+      return any(are_compatible(profile.codec, codec) for profile in device.video_profiles)
 
     case AudioCodec() as codec:
-      for audio_profile in device.audio_profiles:
-        return are_compatible(audio_profile.codec, codec)
+      return any(are_compatible(profile.codec, codec) for profile in device.audio_profiles)
 
     case Container() as _container:
-      for container in device.containers:
-        return are_compatible(container, _container)
+      return any(are_compatible(container, _container) for container in device.containers)
 
-    case Subtitle() as _subtitle:
-      if not _subtitle:
+    case Subtitle() as _sub:
+      if not _sub:
         return True
 
-      for subtitle in device.subtitles:
-        return are_compatible(subtitle, _subtitle)
+      return any(are_compatible(sub, _sub) for sub in device.subtitles)
 
     case Formats() as formats:
       return all(device.is_compatible(fmt) for fmt in formats)
@@ -194,3 +190,13 @@ def is_compatible(device: Device, other: Metadata) -> bool:
       raise TypeError(f'Cannot compare device with {get_name(other)}')
 
   return False
+
+
+Devices = tuple[Device, ...]
+
+
+def get_devices_from_file(
+  device_file: Path = DEVICE_INFO,
+) -> Devices:
+  devices: Devices = tuple(Device.from_yaml(device_file))
+  return devices

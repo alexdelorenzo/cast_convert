@@ -1,13 +1,20 @@
 from __future__ import annotations
+
+from pathlib import Path
 from typing import Any, TYPE_CHECKING
 
-from ..media.profiles import AudioProfile, VideoProfile
+from rich import print
+
+from .run import transcode_video
+
 from ..media.formats import Formats
-from ..media.codecs import Container, Subtitle
-from ..model.video import Video
+from ..media.profiles import AudioProfile, VideoProfile
 
 if TYPE_CHECKING:
   from ..model.device import Device
+  from .helpers import get_device_with_name
+  from ..media.codecs import Container, Subtitle
+  from ..model.video import Video
 
 
 def exists(*items: Any) -> bool:
@@ -178,3 +185,31 @@ def transcode_formats(formats: Formats, to_formats: Formats) -> Formats | None:
     audio_profile=new_audio,
     subtitle=new_subtitle,
   )
+
+
+def _convert(
+  name: str,
+  path: Path,
+):
+  video = Video.from_path(path)
+  device = get_device_with_name(name)
+
+  if not should_transcode(device, video):
+    return
+
+  formats = device.transcode_to(video)
+  transcode_video(video, formats)
+
+
+def should_transcode(
+  device: Device,
+  video: Video,
+) -> bool:
+  if not device:
+    return False
+
+  if device.can_play(video):
+    print(f'No need to transcode {video.name} for {device.name}.')
+    return False
+
+  return True

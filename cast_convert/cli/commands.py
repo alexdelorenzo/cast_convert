@@ -7,13 +7,11 @@ from typing import Final, NoReturn
 from typer import Typer, Option, Argument, Exit, Context
 from rich import print
 
-from ..core.base import DESCRIPTION
+from ..core.base import DEFAULT_MODEL, DESCRIPTION
 from ..core.convert.watch import DEFAULT_THREADS, convert_videos
-from ..core.model.device import Device
-from .helpers import (
-  DEFAULT_MODEL, _convert, _get_command, _inspect,
-  get_devices, show_devices
-)
+from ..core.convert.helpers import _get_command, _inspect, show_devices
+from ..core.model.device import get_devices_from_file
+from ..core.convert.transcode import _convert
 
 
 RC_MISSING_ARGS: Final[int] = 1
@@ -86,7 +84,7 @@ def devices():
   """
   List all supported device names.
   """
-  _devices = get_devices()
+  _devices = get_devices_from_file()
 
   print('You can use these device names with the [b]--name[/b] flag:')
   show_devices(_devices)

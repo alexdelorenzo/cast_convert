@@ -1,18 +1,15 @@
 import logging
-import os
-import asyncio
-from asyncio import sleep, Queue, to_thread, BoundedSemaphore, TaskGroup
-from dataclasses import dataclass, field
+from asyncio import sleep, to_thread, BoundedSemaphore, TaskGroup
 from logging import exception
 from pathlib import Path
-from typing import AsyncGenerator, AsyncIterable, Final
+from typing import AsyncIterable, Final
 
 from aiopath import AsyncPath
 from watchfiles import awatch, Change
 
-from ...cli.helpers import DEFAULT_MODEL, _convert
-from ..model.device import Device
 from ..model.video import Video
+from ..base import DEFAULT_MODEL
+from .transcode import _convert
 
 
 FILESIZE_CHECK_WAIT: Final[float] = 2.0

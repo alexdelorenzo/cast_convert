@@ -11,8 +11,7 @@ if TYPE_CHECKING:
   from .media.formats import Metadata
 
 
-# logging.basicConfig(level=logging.INFO)
-
+DEFAULT_MODEL: Final[str] = 'Chromecast 1st Gen'
 
 AT: Final[str] = '@'
 LEVEL_SEP: Final[str] = 'L'
