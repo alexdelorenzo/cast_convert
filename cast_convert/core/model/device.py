@@ -189,8 +189,6 @@ def is_compatible(device: Device, other: Metadata) -> bool:
     case _:
       raise TypeError(f'Cannot compare device with {get_name(other)}')
 
-  return False
-
 
 Devices = tuple[Device, ...]
 
