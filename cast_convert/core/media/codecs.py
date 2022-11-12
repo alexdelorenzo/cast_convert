@@ -44,8 +44,8 @@ class VideoCodec(NormalizedFormat, StrEnum):
   mp4: str = avc  # alias
   vp8: str = auto()
   vp9: str = auto()
+  vp09: str = vp9  # alias
   xvid: str = auto()
-  vp09: str = vp9
 
 
 class AudioCodec(NormalizedFormat, StrEnum):
