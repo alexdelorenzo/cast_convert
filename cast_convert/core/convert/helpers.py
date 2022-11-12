@@ -3,11 +3,11 @@ from pathlib import Path
 
 from rich import print
 
-from .transcode import should_transcode, transcode_video
+from .transcode import should_transcode
 from ..base import first
 from ..model.device import Device, get_device_with_name, load_device_with_name, get_devices_from_file
 from ..model.video import Video
-from .run import get_ffmpeg_cmd, get_stream
+from .run import get_ffmpeg_cmd, get_stream, transcode_video
 from ..parse import DEVICE_INFO
 
 
@@ -43,7 +43,7 @@ def _inspect(
   if not should_transcode(device, video):
     return
 
-  print(f'These attributes will be converted from  {video.path}:\n\t', end='')
+  print(f'These attributes will be converted from {video.path}:')
   formats = device.transcode_to(video)
   print(formats)
 
