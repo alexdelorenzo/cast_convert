@@ -3,12 +3,12 @@ from pathlib import Path
 
 from rich import print
 
-from .transcode import should_transcode
 from ..base import first
 from ..model.device import Device, get_device_with_name, load_device_with_name, get_devices_from_file
 from ..model.video import Video
-from .run import get_ffmpeg_cmd, get_stream, transcode_video
 from ..parse import DEVICE_INFO
+from .run import get_ffmpeg_cmd, get_stream, transcode_video
+from .transcode import should_transcode
 
 
 def show_devices(devices: tuple[Device]):

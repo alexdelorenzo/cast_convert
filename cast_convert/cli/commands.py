@@ -12,7 +12,6 @@ from ..core.base import DEFAULT_MODEL, DESCRIPTION
 from ..core.convert.watch import DEFAULT_PROCS, convert_videos
 from ..core.convert.helpers import _convert, _get_command, _inspect, show_devices
 from ..core.model.device import get_devices_from_file
-from ..core.model.video import Video
 
 
 RC_MISSING_ARGS: Final[int] = 1
