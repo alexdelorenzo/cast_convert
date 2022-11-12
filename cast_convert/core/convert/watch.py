@@ -1,6 +1,5 @@
 import logging
 from asyncio import sleep, to_thread, BoundedSemaphore, TaskGroup
-from logging import exception
 from pathlib import Path
 from typing import AsyncIterable, Final
 
@@ -13,7 +12,7 @@ from .helpers import _convert
 
 
 FILESIZE_CHECK_WAIT: Final[float] = 2.0
-DEFAULT_THREADS: Final[int] = 2
+DEFAULT_PROCS: Final[int] = 2
 NO_SIZE: Final[int] = -1
 
 
@@ -37,7 +36,7 @@ async def wait_for_stable_size(
       await sleep(wait)
 
     except Exception as e:
-      exception(e)
+      logging.exception(e)
       previous = NO_SIZE
 
 
@@ -91,14 +90,29 @@ async def convert_videos(
   *paths: Path,
   device: str = DEFAULT_MODEL,
   seen: set[Path] | None = None,
-  threads: int = DEFAULT_THREADS,
+  procs: int = DEFAULT_PROCS,
 ):
   if seen is None:
     seen = set[Path]()
 
-  sem = BoundedSemaphore(threads)
+  sem = BoundedSemaphore(procs)
 
   async with TaskGroup() as tg:
     async for path in gen_videos(*paths, seen=seen):
       coro = convert(device, path, sem)
       tg.create_task(coro)
+
+
+# async def convert_videos(
+#   *paths: Path,
+#   device: str = DEFAULT_MODEL,
+#   seen: set[Path] | None = None,
+#   threads: int = DEFAULT_THREADS,
+# ):
+#   if seen is None:
+#     seen = set[Path]()
+#
+#   sem = BoundedSemaphore(threads)
+#
+#   async for path in gen_videos(*paths, seen=seen):
+#     await convert(device, path, sem)

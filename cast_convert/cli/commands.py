@@ -9,7 +9,7 @@ from typer import Typer, Option, Argument, Exit, Context
 from rich import print
 
 from ..core.base import DEFAULT_MODEL, DESCRIPTION
-from ..core.convert.watch import DEFAULT_THREADS, convert_videos
+from ..core.convert.watch import DEFAULT_PROCS, convert_videos
 from ..core.convert.helpers import _convert, _get_command, _inspect, show_devices
 from ..core.model.device import get_devices_from_file
 from ..core.model.video import Video
@@ -95,14 +95,14 @@ def devices():
 def watch(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
-  threads: int = DEFAULT_THREADS,
+  threads: int = DEFAULT_PROCS,
 ):
   """
   Watch directories for added videos and convert them.
   """
   check_paths(paths)
 
-  coro = convert_videos(*paths, device=name, threads=threads)
+  coro = convert_videos(*paths, device=name, procs=threads)
   run(coro)
 
 
