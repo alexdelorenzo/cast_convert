@@ -19,11 +19,9 @@ class NormalizedFormat:
     name = get_name(cls)
     logging.info(f"[{name}] Missing: {value}")
 
-    if hasattr(cls, value):
-      found = getattr(cls, value)
-      logging.info(f"[{name}] Using {found} as an alias for {value}")
-
-      return found
+    if alias := getattr(cls, value, None):
+      logging.info(f"[{name}] Using {alias} as an alias for {value}")
+      return alias
 
     if alias := ALIAS_FMTS.get(value):
       logging.info(f"[{name}] Using {alias} as an alias for {value}")
