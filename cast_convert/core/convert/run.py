@@ -108,7 +108,8 @@ def get_stream(
     **input_args
   )
 
-  if filters := get_filters(stream, formats):
+  if filters := get_video_filters(stream, formats):
+    output_args.pop(FfmpegArg.vcodec)
     stream = filters
 
   stream = stream.output(
@@ -182,9 +183,9 @@ def get_input_args(formats: Formats) -> Args:
   return args
 
 
-def get_filters(
+def get_video_filters(
   stream: FilterableStream,
-  formats: Formats
+  formats: Formats,
 ) -> FilterableStream | None:
   if not formats.video_profile:
     return stream
