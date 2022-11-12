@@ -81,8 +81,6 @@ def get_encoder(codec: Codecs) -> Alias:
 
 
 def transcode_video(video: Video, formats: Formats) -> Video:
-  container, video_profile, audio_profile, subtitle = formats
-
   new_path, stream = get_stream(video, formats)
   cmd = get_ffmpeg_cmd(stream)
 
