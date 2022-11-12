@@ -48,6 +48,18 @@ $ python3 -m pip install cast_convert
 ```
 
 ## Usage
+### Launch
+You can run the Python module directly:
+```bash
+$ python3 -m cast_convert --help
+```
+
+Or you can use launcher that gets added to your `$PATH`:
+```bash
+$ cast-convert --help
+```
+
+### Options and commands
 ```bash
  Usage: cast_convert [OPTIONS] COMMAND [ARGS]...  
 
