@@ -45,6 +45,7 @@ class VideoCodec(NormalizedFormat, StrEnum):
   vp8: str = auto()
   vp9: str = auto()
   xvid: str = auto()
+  vp09: str = vp9
 
 
 class AudioCodec(NormalizedFormat, StrEnum):
