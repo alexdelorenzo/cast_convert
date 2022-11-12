@@ -61,7 +61,7 @@ $ cast-convert --help
 
 ### Options and commands
 ```bash
- Usage: cast_convert [OPTIONS] COMMAND [ARGS]...  
+ Usage: cast-convert [OPTIONS] COMMAND [ARGS]...  
 
  📽️ Identify and convert videos to formats that are
  Chromecast supported.
@@ -96,7 +96,7 @@ $ cast-convert --help
 You can set the log level using the `--log-level` flag:
 
 ```bash
-$ cast_convert --log-level debug devices
+$ cast-convert --log-level debug devices
 ```
 
 Default log level is `warn`.
@@ -104,10 +104,10 @@ Default log level is `warn`.
 #### `--name`
 You can specify the model of your device with the `--name` flag.
 
-The `--name` flag comes *after* [`cast_control` commands](#commands).
+The `--name` flag comes *after* [`cast-convert` commands](#commands).
 
 ```bash
-$ cast_convert inspect --name 'Chromecast Ultra' ~/video.mkv
+$ cast-convert inspect --name 'Chromecast Ultra' ~/video.mkv
 ```
 
 Default device name is `Chromecast 1st Gen`.
@@ -116,12 +116,12 @@ Default device name is `Chromecast 1st Gen`.
 #### `PATHS`
 You can specify one or more file or directory paths as `PATHS` arguments.
 
-You must specify at least one path. Paths are supplied after commands, and they are the *last* arguments to `cast_convert`.
+You must specify at least one path. Paths are supplied after commands, and they are the *last* arguments to `cast-convert`.
 
 ### Commands
 #### `convert`
 ```bash
-Usage: cast_convert convert [OPTIONS] PATHS...
+Usage: cast-convert convert [OPTIONS] PATHS...
 
 📼 Convert video for Chromecast compatibility. 
 
@@ -139,7 +139,7 @@ Usage: cast_convert convert [OPTIONS] PATHS...
 
 #### `devices`
 ```bash
-Usage: cast_convert convert [OPTIONS] PATHS...
+Usage: cast-convert convert [OPTIONS] PATHS...
 
 📺 List the names of supported devices.
 
@@ -151,7 +151,7 @@ Usage: cast_convert convert [OPTIONS] PATHS...
 #### `get-command`
 ```bash
 
-Usage: cast_convert get-command [OPTIONS] PATHS...
+Usage: cast-convert get-command [OPTIONS] PATHS...
 
 📜 Get FFMPEG transcoding commands.
 
@@ -169,7 +169,7 @@ Usage: cast_convert get-command [OPTIONS] PATHS...
 
 #### `inspect`
 ```bash
-Usage: cast_convert inspect [OPTIONS] PATHS...
+Usage: cast-convert inspect [OPTIONS] PATHS...
 
 🔎 Inspect a video to see what attributes should be transcoded.
 
@@ -188,7 +188,7 @@ Usage: cast_convert inspect [OPTIONS] PATHS...
 
 #### `watch`
 ```bash
-Usage: cast_convert watch [OPTIONS] PATHS...
+Usage: cast-convert watch [OPTIONS] PATHS...
 
 👀 Watch directories for added videos and convert them. 
 
