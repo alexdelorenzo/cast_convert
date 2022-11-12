@@ -193,9 +193,7 @@ def should_transcode(
     return False
 
   if device.can_play(video):
-    print(f'No need to transcode {video.name} for {device.name}.')
+    print(f'✅ File [b blue]{video.path}[/] is compatible with [b]{device.name}[/].')
     return False
 
   return True
-
-

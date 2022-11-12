@@ -1,17 +1,19 @@
 from __future__ import annotations
 from pathlib import Path
+from typing import Any
 
 from rich import print
 
 from ..base import first
-from ..model.device import Device, get_device_with_name, load_device_with_name, get_devices_from_file
+from ..model.device import Device, Devices, get_device_with_name, \
+  load_device_with_name, get_devices_from_file
 from ..model.video import Video
 from ..parse import DEVICE_INFO
 from .run import get_ffmpeg_cmd, get_stream, transcode_video
 from .transcode import should_transcode
 
 
-def show_devices(devices: tuple[Device]):
+def show_devices(devices: Devices):
   for device in devices:
     print(f'\t - [b]{device.name}')
 
@@ -43,7 +45,7 @@ def _inspect(
   if not should_transcode(device, video):
     return
 
-  print(f'These attributes will be converted from {video.path}:')
+  print(f'🔄️ [green]These attributes will be converted from[/] [b]{video.path}[/]:')
   formats = device.transcode_to(video)
   print(formats)
 
@@ -75,3 +77,12 @@ def _convert(
 
   formats = device.transcode_to(video)
   transcode_video(video, formats)
+
+
+def indent(text: str | Any) -> str:
+  if not isinstance(text, str):
+    text: str = str(text)
+
+  lines = text.split('\n')
+
+  return '\n'.join(f'\t{line}' for line in lines)
