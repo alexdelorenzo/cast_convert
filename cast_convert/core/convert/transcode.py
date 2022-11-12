@@ -4,11 +4,10 @@ from typing import Any, TYPE_CHECKING
 
 from rich import print
 
-from .run import transcode_video
-
 from ..media.formats import Formats
 from ..media.profiles import AudioProfile, VideoProfile
 from ..model.video import Video
+from .run import transcode_video
 
 
 if TYPE_CHECKING:
