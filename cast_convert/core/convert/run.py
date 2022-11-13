@@ -188,7 +188,7 @@ def get_video_filters(
   formats: Formats,
 ) -> FilterableStream | None:
   if not formats.video_profile:
-    return stream
+    return None
 
   video_codec, resolution, fps, level = formats.video_profile
   filters: FilterableStream | None = None
