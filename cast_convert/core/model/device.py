@@ -76,6 +76,9 @@ class Device(IsCompatible):
   def can_play_audio(self, video: Video) -> bool:
     *_, audio_profile, _ = video.formats
 
+    if not audio_profile:
+      return True
+
     if audio_profile.codec is AudioCodec.unknown:
       raise UnknownFormat(f"Missing codec for {video}")
 
@@ -88,6 +91,9 @@ class Device(IsCompatible):
 
   def can_play_video(self, video: Video) -> bool:
     _, video_profile, *_ = video.formats
+
+    if not video_profile:
+      return True
 
     if video_profile.codec is VideoCodec.unknown:
       raise UnknownFormat(f"Missing codec for {video}")
