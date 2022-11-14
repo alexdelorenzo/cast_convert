@@ -1,10 +1,11 @@
 from __future__ import annotations
 from pathlib import Path
-from typing import Any
+from typing import Any, NoReturn
 
+from click.exceptions import Exit
 from rich import print
 
-from ..base import first
+from ..base import RC_MISSING_ARGS, first
 from ..model.device import Device, Devices, get_device_with_name, \
   load_device_with_name, get_devices_from_file
 from ..model.video import Video
@@ -86,3 +87,9 @@ def indent(text: str | Any) -> str:
   lines = text.split('\n')
 
   return '\n'.join(f'\t{line}' for line in lines)
+
+
+def check_paths(paths: list[Path]) -> NoReturn | None:
+  if not paths:
+    print('[b red]No paths supplied.')
+    raise Exit(code=RC_MISSING_ARGS)

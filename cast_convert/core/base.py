@@ -44,6 +44,8 @@ DEFAULT_PROFILE_RESOLUTION: Final[Resolution] = 720
 DESCRIPTION: Final[str] = \
   "📽️ Identify and convert videos to formats that are Chromecast supported."
 
+RC_MISSING_ARGS: Final[int] = 1
+
 
 class IsCompatible(Protocol):
   def is_compatible(self, other: Metadata) -> bool:
