@@ -46,15 +46,15 @@ AudioProfiles = list[AudioProfile]
 
 
 def is_video_profile_compatible(
-  video_profile: VideoProfile,
-  other: VideoProfile
+  profile: VideoProfile,
+  supported: VideoProfile
 ) -> bool:
-  codec, resolution, fps, level = video_profile
-  _codec, _resolution, _fps, _level = other
+  codec, resolution, fps, level = profile
+  _codec, _resolution, _fps, _level = supported
 
   return (
     codec is _codec and
     (resolution is _resolution or resolution <= _resolution) and
-    (fps is _fps or fps <= fps) and
+    (fps is _fps or fps <= _fps) and
     (level is _level or level <= _level)
   )
