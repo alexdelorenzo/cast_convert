@@ -19,10 +19,9 @@ NO_SIZE: Final[int] = -1
 async def wait_for_stable_size(
   file: str | Path,
   wait: float = FILESIZE_CHECK_WAIT,
-  previous: int = None,
+  previous: int = NO_SIZE,
 ) -> int:
   path: AsyncPath = AsyncPath(file)
-  previous: int = NO_SIZE
 
   while True:
     try:
