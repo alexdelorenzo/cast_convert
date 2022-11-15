@@ -45,7 +45,10 @@ VideoProfiles = list[VideoProfile]
 AudioProfiles = list[AudioProfile]
 
 
-def is_video_profile_compatible(video_profile: VideoProfile, other: VideoProfile) -> bool:
+def is_video_profile_compatible(
+  video_profile: VideoProfile,
+  other: VideoProfile
+) -> bool:
   codec, resolution, fps, level = video_profile
   _codec, _resolution, _fps, _level = other
 
@@ -53,5 +56,5 @@ def is_video_profile_compatible(video_profile: VideoProfile, other: VideoProfile
     codec is _codec and
     (resolution is _resolution or resolution <= _resolution) and
     (fps is _fps or fps <= fps) and
-    (level is level or level <= level)
+    (level is _level or level <= _level)
   )
