@@ -2,6 +2,7 @@ import logging
 from asyncio import sleep, to_thread, BoundedSemaphore, TaskGroup
 from pathlib import Path
 from typing import AsyncIterable, Final
+from multiprocessing import cpu_count
 
 from aiopath import AsyncPath
 from watchfiles import awatch, Change
@@ -12,7 +13,8 @@ from .helpers import _convert
 
 
 FILESIZE_CHECK_WAIT: Final[float] = 2.0
-DEFAULT_PROCS: Final[int] = 2
+DEFAULT_JOBS: Final[int] = 2
+DEFAULT_THREADS: Final[int] = cpu_count()
 NO_SIZE: Final[int] = -1
 
 
@@ -80,28 +82,30 @@ async def convert(
   device: str,
   path: Path,
   sem: BoundedSemaphore,
+  threads: int,
 ):
   path = path.absolute()
 
   async with sem:
     await wait_for_stable_size(path)
-    await to_thread(_convert, device, path)
+    await to_thread(_convert, device, path, threads)
 
 
 async def convert_videos(
   *paths: Path,
   device: str = DEFAULT_MODEL,
   seen: set[Path] | None = None,
-  procs: int = DEFAULT_PROCS,
+  jobs: int = DEFAULT_JOBS,
+  threads: int = DEFAULT_THREADS,
 ):
   if seen is None:
     seen = set[Path]()
 
-  sem = BoundedSemaphore(procs)
+  sem = BoundedSemaphore(jobs)
 
   async with TaskGroup() as tg:
     async for path in gen_videos(*paths, seen=seen):
-      coro = convert(device, path, sem)
+      coro = convert(device, path, sem, threads)
       tg.create_task(coro)
 
 

@@ -40,9 +40,10 @@ class FfmpegArg(StrEnum):
   vaapi: str = auto()
 
   scale: str = auto()
+  threads: str = auto()
 
 
-Arg = FfmpegArg | str
+Arg = FfmpegArg | str | float | int
 Args = dict[Arg, Arg]
 
 
@@ -80,8 +81,8 @@ def get_encoder(codec: Codecs) -> Alias:
   return first(encoders)
 
 
-def transcode_video(video: Video, formats: Formats) -> Video:
-  new_path, stream = get_stream(video, formats)
+def transcode_video(video: Video, formats: Formats, threads: int) -> Video:
+  new_path, stream = get_stream(video, formats, threads)
   cmd = get_ffmpeg_cmd(stream)
 
   logging.info(f'Running command: {cmd}')
@@ -98,10 +99,11 @@ def get_ffmpeg_cmd(stream: OutputStream) -> str:
 def get_stream(
   video: Video,
   formats: Formats,
+  threads: int,
 ) -> tuple[Path, OutputStream]:
   input_args = get_input_args(formats)
-  output_args = get_output_args(video, formats)
-  new_path = get_new_path(video, formats.container)
+  output_args = get_output_args(video, formats, threads)
+  new_path = get_new_path(video, formats)
 
   stream = ffmpeg.input(
     str(video.path),
@@ -122,9 +124,12 @@ def get_stream(
 
 def get_new_path(
   video: Video,
-  container: Container,
+  formats: Formats,
   suffix: str = TRANSCODE_SUFFIX,
 ) -> Path:
+  container, video_profile, audio, subtitle = formats
+  codec, *_ = video_profile
+
   ext: Extension = video.path.suffix
 
   if container and not (ext := container.to_extension()):
@@ -142,7 +147,7 @@ def get_new_path(
   return new_path
 
 
-def get_output_args(video: Video, formats: Formats) -> Args:
+def get_output_args(video: Video, formats: Formats, threads: int) -> Args:
   args: Args = DEFAULT_OUTPUT_ARGS.copy()
 
   if (profile := formats.audio_profile) and (codec := profile.codec):
@@ -160,14 +165,16 @@ def get_output_args(video: Video, formats: Formats) -> Args:
   *_, fps, level = profile
 
   if fps:
-    args[FfmpegArg.r] = str(fps)
+    args[FfmpegArg.r] = fps
 
   if level:
-    args[FfmpegArg.vlevel] = str(level)
+    args[FfmpegArg.vlevel] = level
 
     if FfmpegArg.vcodec not in args:
       codec = video.formats.video_profile.codec
       args[FfmpegArg.vcodec] = get_encoder(codec)
+
+  args[FfmpegArg.threads] = threads
 
   return args
 

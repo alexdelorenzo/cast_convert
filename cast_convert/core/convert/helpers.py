@@ -22,6 +22,7 @@ def show_devices(devices: Devices):
 def _get_command(
   name: str,
   path: Path,
+  threads: int,
 ):
   video = Video.from_path(path)
   device = _get_device_from_name(name)
@@ -30,7 +31,7 @@ def _get_command(
     return
 
   formats = device.transcode_to(video)
-  _, stream = get_stream(video, formats)
+  _, stream = get_stream(video, formats, threads)
 
   cmd = get_ffmpeg_cmd(stream)
   print(f'[b]{cmd}')
@@ -69,6 +70,7 @@ def _get_device_from_name(
 def _convert(
   name: str,
   path: Path,
+  threads: int,
 ):
   video = Video.from_path(path)
   device = load_device_with_name(name)
@@ -77,7 +79,7 @@ def _convert(
     return
 
   formats = device.transcode_to(video)
-  transcode_video(video, formats)
+  transcode_video(video, formats, threads)
 
 
 def indent(text: str | Any) -> str:

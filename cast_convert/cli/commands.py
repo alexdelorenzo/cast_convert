@@ -9,7 +9,8 @@ from typer import Typer, Option, Argument, Context
 from rich import print
 
 from ..core.base import DEFAULT_MODEL, DESCRIPTION
-from ..core.convert.watch import DEFAULT_PROCS, convert_videos
+from ..core.convert.watch import DEFAULT_JOBS, DEFAULT_THREADS, convert_videos
+
 from ..core.convert.helpers import _convert, _get_command, _inspect, show_devices
 from ..core.model.device import get_devices_from_file
 
@@ -23,8 +24,13 @@ DEFAULT_PATHS_ARG: Final[Argument] = Argument(
   default=...,
   help='Path(s) to video(s)',
   resolve_path=True,
-
 )
+
+DEFAULT_THREADS_OPT: Final[Option] = Option(
+  default=DEFAULT_THREADS,
+  help="Number of threads to tell FFMPEG to use per job"
+)
+
 
 app: Final[Typer] = Typer()
 
@@ -33,24 +39,26 @@ app: Final[Typer] = Typer()
 def get_command(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
+  threads: int = DEFAULT_THREADS_OPT,
 ):
   """
   📜 Get FFMPEG transcoding command.
   """
   for path in paths:
-    _get_command(name, path)
+    _get_command(name, path, threads)
 
 
 @app.command()
 def convert(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
+  threads: int = DEFAULT_THREADS_OPT,
 ):
   """
   📼 Convert video for Chromecast compatibility.
   """
   for path in paths:
-    _convert(name, path)
+    _convert(name, path, threads)
 
 
 @app.command()
@@ -80,19 +88,20 @@ def devices():
 def watch(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
-  threads: int = DEFAULT_PROCS,
+  jobs: int = Option(DEFAULT_JOBS, help="Number of simultaneous transcoding jobs"),
+  threads: int = DEFAULT_THREADS_OPT,
 ):
   """
   👀 Watch directories for added videos and convert them.
   """
-  coro = convert_videos(*paths, device=name, procs=threads)
+  coro = convert_videos(*paths, device=name, jobs=jobs, threads=threads)
   run(coro)
 
 
 @app.callback(help=DESCRIPTION)
 def main(
   ctx: Context,
-  log_level: str = Option('warn', help="Choose level of debug logging."),
+  log_level: str = Option('warn', help="Set the logging level"),
 ):
   log_level = log_level.upper()
   logging.basicConfig(level=log_level)
