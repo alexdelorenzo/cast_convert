@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from functools import lru_cache
+from functools import cache, lru_cache
 from itertools import chain
 from pathlib import Path
 from typing import Iterable, Self, Type
@@ -216,7 +216,7 @@ def is_compatible(device: Device, other: Metadata) -> bool:
 Devices = tuple[Device, ...]
 
 
-@lru_cache
+@cache
 def load_device_with_name(
   name: str,
   device_file: Path = DEVICE_INFO,
@@ -239,7 +239,7 @@ def get_device_with_name(
   return dev
 
 
-@lru_cache
+@cache
 def get_devices_from_file(
   device_file: Path = DEVICE_INFO,
 ) -> Devices:
