@@ -107,18 +107,3 @@ async def convert_videos(
     async for path in gen_videos(*paths, seen=seen):
       coro = convert(device, path, sem, threads)
       tg.create_task(coro)
-
-
-# async def convert_videos(
-#   *paths: Path,
-#   device: str = DEFAULT_MODEL,
-#   seen: set[Path] | None = None,
-#   threads: int = DEFAULT_THREADS,
-# ):
-#   if seen is None:
-#     seen = set[Path]()
-#
-#   sem = BoundedSemaphore(threads)
-#
-#   async for path in gen_videos(*paths, seen=seen):
-#     await convert(device, path
