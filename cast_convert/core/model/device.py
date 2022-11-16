@@ -1,20 +1,26 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import lru_cache
 from itertools import chain
 from pathlib import Path
 from typing import Iterable, Self, Type
 import logging
 
+from thefuzz import process
+
+from .video import Video, get_video_profiles
+from ..base import IsCompatible, first
 from ..convert.transcode import transcode_to
+from ..exceptions import UnknownFormat
 from ..media.base import get_name
 from ..media.codecs import AudioCodec, Container, Containers, Subtitle, Subtitles, VideoCodec
 from ..media.formats import Formats, Metadata, VideoFormat, VideoFormats, are_compatible
 from ..media.profiles import AudioProfile, AudioProfiles, VideoProfile, VideoProfiles
-from ..base import IsCompatible, first
-from ..exceptions import UnknownFormat
 from ..parse import DEVICE_INFO, Fmts, Yaml, get_yaml
-from .video import Video, get_video_profiles
+
+
+MIN_SCORE = 30
 
 
 @dataclass(eq=True, frozen=True)
@@ -128,8 +134,22 @@ class Device(IsCompatible):
       self.can_play_subtitle(video)
     )
 
-  def transcode_to(self, video: Video) -> Formats | None:
-    return transcode_to(self, video)
+  def transcode_to(
+    self,
+    video: Video,
+    default_video: VideoProfile | None = None,
+    default_audio: AudioProfile | None = None,
+    default_container: Container | None = None,
+    default_subtitle: Subtitle | None = None,
+  ) -> Formats | None:
+    return transcode_to(
+      self,
+      video,
+      default_video,
+      default_audio,
+      default_container,
+      default_subtitle
+    )
 
   def is_compatible(self, other: Metadata) -> bool:
     return is_compatible(self, other)
@@ -199,6 +219,7 @@ def is_compatible(device: Device, other: Metadata) -> bool:
 Devices = tuple[Device, ...]
 
 
+@lru_cache
 def load_device_with_name(
   name: str,
   device_file: Path = DEVICE_INFO,
@@ -206,7 +227,7 @@ def load_device_with_name(
   name = name.casefold()
   devices = get_devices_from_file(device_file)
 
-  return get_device_with_name(name, devices)
+  return get_device_fuzzy(name, devices)
 
 
 def get_device_with_name(
@@ -221,8 +242,22 @@ def get_device_with_name(
   return dev
 
 
+@lru_cache
 def get_devices_from_file(
   device_file: Path = DEVICE_INFO,
 ) -> Devices:
   devices: Devices = tuple(Device.from_yaml(device_file))
   return devices
+
+
+def get_device_fuzzy(
+  name: str,
+  devices: Devices,
+) -> Device | None:
+  devices = {dev.name: dev for dev in devices}
+  closest_name, score = process.extractOne(name, devices.keys())
+
+  if score < MIN_SCORE:
+    return None
+
+  return devices.get(closest_name)
