@@ -45,6 +45,7 @@ DESCRIPTION: Final[str] = \
   "📽️ Identify and convert videos to formats that are Chromecast supported."
 
 RC_MISSING_ARGS: Final[int] = 1
+RC_NO_MATCHING_DEVICE: Final[int] = 2
 
 
 class IsCompatible(Protocol):

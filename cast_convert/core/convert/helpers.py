@@ -3,9 +3,10 @@ from pathlib import Path
 from typing import Any, NoReturn
 
 from click.exceptions import Exit
+from rich.pretty import pprint
 from rich import print
 
-from ..base import RC_MISSING_ARGS
+from ..base import RC_MISSING_ARGS, RC_NO_MATCHING_DEVICE
 from ..model.device import Device, Devices, get_device_with_name, \
   load_device_with_name, get_devices_from_file
 from ..model.video import Video
@@ -25,7 +26,9 @@ def _get_command(
   threads: int,
 ):
   video = Video.from_path(path)
-  device = _get_device_from_name(name)
+
+  if not (device := _get_device_from_name(name)):
+    raise Exit(code=RC_NO_MATCHING_DEVICE)
 
   if not should_transcode(device, video):
     return
@@ -42,14 +45,16 @@ def _inspect(
   path: Path,
 ):
   video = Video.from_path(path)
-  device = _get_device_from_name(name)
+
+  if not (device := _get_device_from_name(name)):
+    raise Exit(code=RC_NO_MATCHING_DEVICE)
 
   if not should_transcode(device, video):
     return
 
-  print(f'🔄️ [green]These attributes will be converted from[/] [b]{video.path}[/]:')
+  print(f'🔄️ [green]These attributes will be converted from[/] [b]"{video.path}"[/]:')
   formats = device.transcode_to(video)
-  print(formats)
+  pprint(formats, expand_all=True)
 
 
 def _get_device_from_name(
@@ -59,7 +64,7 @@ def _get_device_from_name(
   devices = get_devices_from_file(device_file)
 
   if not (dev := get_device_with_name(name, devices)):
-    print(f'[b red]Device name "{name}" not found[/], please use one of these:')
+    print(f'[b red]Device name [yellow]"{name}"[/] not found[/], please use one of these:')
     show_devices(devices)
 
     return None
