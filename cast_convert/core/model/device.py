@@ -10,7 +10,7 @@ import logging
 from thefuzz import process
 
 from .video import Video, get_video_profiles
-from ..base import IsCompatible, first
+from ..base import IsCompatible, MIN_FUZZY_MATCH_SCORE, first
 from ..convert.transcode import transcode_to
 from ..exceptions import UnknownFormat
 from ..media.base import get_name
@@ -18,9 +18,6 @@ from ..media.codecs import AudioCodec, Container, Containers, Subtitle, Subtitle
 from ..media.formats import Formats, Metadata, VideoFormat, VideoFormats, are_compatible
 from ..media.profiles import AudioProfile, AudioProfiles, VideoProfile, VideoProfiles
 from ..parse import DEVICE_INFO, Fmts, Yaml, get_yaml
-
-
-MIN_SCORE = 30
 
 
 @dataclass(eq=True, frozen=True)
@@ -257,7 +254,7 @@ def get_device_fuzzy(
   devices = {dev.name: dev for dev in devices}
   closest_name, score = process.extractOne(name, devices.keys())
 
-  if score < MIN_SCORE:
+  if score < MIN_FUZZY_MATCH_SCORE:
     return None
 
   return devices.get(closest_name)

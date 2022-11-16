@@ -18,6 +18,8 @@ LEVEL_SEP: Final[str] = 'L'
 PROFILE_SEP: Final[str] = AT + LEVEL_SEP
 SUBTITLE_SEP: Final[str] = '/'
 
+MIN_FUZZY_MATCH_SCORE: Final[int] = 30
+
 
 T = TypeVar('T')
 U = TypeVar('U')
@@ -89,5 +91,3 @@ def normalize_info(
 def first(iterable: Iterable[T], default: Item = None) -> Item:
   iterator = iter(iterable)
   return next(iterator, default)
-
-

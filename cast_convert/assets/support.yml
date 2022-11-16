@@ -56,6 +56,11 @@ extensions:
   mp4: mp4
   webm: webm
 
+
+codec_container_compat:
+  #
+
+
 # map of codecs to ffmpeg encoders
 encoders:
   video:
