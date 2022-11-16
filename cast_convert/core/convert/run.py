@@ -16,14 +16,14 @@ from ..model.video import Video
 
 
 DOT: Final[str] = '.'
-SCALE_RESOLUTION: Final[Resolution] = -1
+SCALE_RESOLUTION: Final[Resolution] = -2  # see: https://stackoverflow.com/a/29582287
 
 DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()  # type: ignore
 TRANSCODE_SUFFIX: Final[str] = '_transcoded'
 HWACCEL_DEVICE: Final[Path] = Path('/dev/dri/renderD128')
 
 
-class FfmpegArg(StrEnum):
+class FfmpegOpt(StrEnum):
   acodec: str = auto()
   vcodec: str = auto()
   scodec: str = auto()
@@ -32,34 +32,60 @@ class FfmpegArg(StrEnum):
   fps: str = auto()
   r: str = auto()
 
+  fflags: str = auto()
+  movflags: str = auto()
+
   hwaccel: str = auto()
   hwaccel_output_format: str = auto()
   vaapi_device: str = auto()
-
-  copy: str = auto()
-  vaapi: str = auto()
 
   scale: str = auto()
   threads: str = auto()
 
 
-Arg = FfmpegArg | str | float | int
-Args = dict[Arg, Arg]
+class FfmpegArg(StrEnum):
+  y: str = '-y'
 
 
-DEFAULT_OUTPUT_ARGS: Final[Args] = {
-  FfmpegArg.acodec: FfmpegArg.copy,
-  FfmpegArg.vcodec: FfmpegArg.copy,
-  FfmpegArg.scodec: FfmpegArg.copy,
+class FfmpegVal(StrEnum):
+  copy: str = auto()
+  vaapi: str = auto()
+  faststart: str = auto()
+
+  genpts: str = '+genpts'
+  scale_resolution: str = str(SCALE_RESOLUTION)
+
+
+Option = FfmpegOpt | str
+Arg = FfmpegArg | str
+Val = FfmpegVal | str | float | int
+
+Args = list[Arg]
+Options = dict[Option, Val]
+
+
+DEFAULT_OUTPUT_OPTS: Final[Options] = {
+  FfmpegOpt.acodec: FfmpegVal.copy,
+  FfmpegOpt.vcodec: FfmpegVal.copy,
+  FfmpegOpt.scodec: FfmpegVal.copy,
+  FfmpegOpt.movflags: FfmpegVal.faststart,
 }
 
-HWACCEL_ARGS: Final[Args] = {
-  FfmpegArg.hwaccel: FfmpegArg.vaapi,
-  FfmpegArg.hwaccel_output_format: FfmpegArg.vaapi,
-  FfmpegArg.vaapi_device: str(HWACCEL_DEVICE),
+HWACCEL_OPTS: Final[Options] = {
+  FfmpegOpt.hwaccel: FfmpegVal.vaapi,
+  FfmpegOpt.hwaccel_output_format: FfmpegVal.vaapi,
+  FfmpegOpt.vaapi_device: str(HWACCEL_DEVICE),
 }
 
-DEFAULT_INPUT_ARGS: Final[Args] = {}
+DEFAULT_INPUT_OPTS: Final[Options] = {
+  FfmpegOpt.fflags: FfmpegVal.genpts,
+}
+
+GLOBAL_ARGS: Final[Args] = [
+  FfmpegArg.y,
+]
+
+GLOBAL_OPTS: Final[Options] = {}
 
 
 def get_encoder(codec: Codecs) -> Alias:
@@ -82,13 +108,13 @@ def get_encoder(codec: Codecs) -> Alias:
 
 
 def transcode_video(video: Video, formats: Formats, threads: int) -> Video:
-  new_path, stream = get_stream(video, formats, threads)
+  stream, path = get_stream(video, formats, threads)
   cmd = get_ffmpeg_cmd(stream)
 
   logging.info(f'Running command: {cmd}')
   stream.run()  # type: ignore
 
-  return Video.from_path(new_path)
+  return Video.from_path(path)
 
 
 def get_ffmpeg_cmd(stream: OutputStream) -> str:
@@ -100,26 +126,31 @@ def get_stream(
   video: Video,
   formats: Formats,
   threads: int,
-) -> tuple[Path, OutputStream]:
-  input_args = get_input_args(formats)
-  output_args = get_output_args(video, formats, threads)
+) -> tuple[OutputStream, Path]:
+  input_opts = get_input_opts(formats)
+  output_opts = get_output_opts(video, formats, threads)
   new_path = get_new_path(video, formats)
 
   stream = ffmpeg.input(
     str(video.path),
-    **input_args
+    **input_opts,
   )
 
   if filters := get_video_filters(stream, formats):
-    output_args.pop(FfmpegArg.vcodec)
+    output_opts.pop(FfmpegOpt.vcodec)
     stream = filters
 
   stream = stream.output(
     str(new_path),
-    **output_args
+    **output_opts,
   )
 
-  return new_path, stream
+  stream = stream.global_args(
+    *GLOBAL_ARGS,
+    **GLOBAL_OPTS,
+  )
+
+  return stream, new_path
 
 
 def get_new_path(
@@ -147,47 +178,47 @@ def get_new_path(
   return new_path
 
 
-def get_output_args(video: Video, formats: Formats, threads: int) -> Args:
-  args: Args = DEFAULT_OUTPUT_ARGS.copy()
+def get_output_opts(video: Video, formats: Formats, threads: int) -> Options:
+  opts: Options = DEFAULT_OUTPUT_OPTS.copy()
 
   if (profile := formats.audio_profile) and (codec := profile.codec):
-    args[FfmpegArg.acodec] = get_encoder(codec)
+    opts[FfmpegOpt.acodec] = get_encoder(codec)
 
   if (profile := formats.video_profile) and (codec := profile.codec):
-    args[FfmpegArg.vcodec] = get_encoder(codec)
+    opts[FfmpegOpt.vcodec] = get_encoder(codec)
 
   if codec := formats.subtitle:
-    args[FfmpegArg.scodec] = get_encoder(codec)
+    opts[FfmpegOpt.scodec] = get_encoder(codec)
 
   if not profile:
-    return args
+    return opts
 
   *_, fps, level = profile
 
   if fps:
-    args[FfmpegArg.r] = fps
+    opts[FfmpegOpt.r] = fps
 
   if level:
-    args[FfmpegArg.vlevel] = level
+    opts[FfmpegOpt.vlevel] = level
 
-    if FfmpegArg.vcodec not in args:
+    if FfmpegOpt.vcodec not in opts:
       codec = video.formats.video_profile.codec
-      args[FfmpegArg.vcodec] = get_encoder(codec)
+      opts[FfmpegOpt.vcodec] = get_encoder(codec)
 
-  args[FfmpegArg.threads] = threads
+  opts[FfmpegOpt.threads] = threads
 
-  return args
+  return opts
 
 
-def get_input_args(formats: Formats) -> Args:
-  args: Args = DEFAULT_INPUT_ARGS.copy()
+def get_input_opts(formats: Formats) -> Options:
+  opts: Options = DEFAULT_INPUT_OPTS.copy()
 
   if not formats.video_profile:
-    return args
+    return opts
 
   video_codec, resolution, fps, level = formats.video_profile
 
-  return args
+  return opts
 
 
 def get_video_filters(
@@ -203,9 +234,9 @@ def get_video_filters(
   if resolution:
     filters = ffmpeg.filter(
       stream,
-      FfmpegArg.scale,
+      FfmpegOpt.scale,
       resolution,
-      SCALE_RESOLUTION,
+      FfmpegVal.scale_resolution,
     )
 
   return filters

@@ -5,7 +5,7 @@ from typing import Any, NoReturn
 from click.exceptions import Exit
 from rich import print
 
-from ..base import RC_MISSING_ARGS, first
+from ..base import RC_MISSING_ARGS
 from ..model.device import Device, Devices, get_device_with_name, \
   load_device_with_name, get_devices_from_file
 from ..model.video import Video
@@ -31,7 +31,7 @@ def _get_command(
     return
 
   formats = device.transcode_to(video)
-  _, stream = get_stream(video, formats, threads)
+  stream, _ = get_stream(video, formats, threads)
 
   cmd = get_ffmpeg_cmd(stream)
   print(f'[b]{cmd}')
