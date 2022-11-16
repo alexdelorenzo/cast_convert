@@ -137,7 +137,9 @@ def get_stream(
   )
 
   if filters := get_video_filters(stream, formats):
-    output_opts.pop(FfmpegOpt.vcodec)
+    if output_opts.get(FfmpegOpt.vcodec) is FfmpegVal.copy:
+      output_opts.pop(FfmpegOpt.vcodec)
+
     stream = filters
 
   stream = stream.output(
@@ -180,6 +182,7 @@ def get_new_path(
 
 def get_output_opts(video: Video, formats: Formats, threads: int) -> Options:
   opts: Options = DEFAULT_OUTPUT_OPTS.copy()
+  opts[FfmpegOpt.threads] = threads
 
   if (profile := formats.audio_profile) and (codec := profile.codec):
     opts[FfmpegOpt.acodec] = get_encoder(codec)
@@ -204,8 +207,6 @@ def get_output_opts(video: Video, formats: Formats, threads: int) -> Options:
     if FfmpegOpt.vcodec not in opts:
       codec = video.formats.video_profile.codec
       opts[FfmpegOpt.vcodec] = get_encoder(codec)
-
-  opts[FfmpegOpt.threads] = threads
 
   return opts
 
