@@ -4,7 +4,7 @@ from typing import Iterable, NamedTuple
 
 from .base import get_name
 from .codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
-from .profiles import AudioProfile, Profiles, VideoProfile, is_video_profile_compatible
+from .profiles import AudioProfile, Profile, Profiles, VideoProfile, is_video_profile_compatible
 
 
 VideoFormat = Codecs | Profiles | Container | Subtitle
@@ -19,6 +19,23 @@ class Formats(NamedTuple):
 
   def is_compatible(self, other: Metadata) -> bool:
     return is_compatible(self, other)
+
+  @property
+  def text(self) -> str:
+    lines = list[str]()
+
+    for key, val in self._asdict().items():
+      match val:
+        case None:
+          pass
+
+        case Profile() as profile:
+          lines.append(profile.text)
+
+        case _:
+          lines.append(f'[b]{key.title()}[/]: [b blue]{val}[/]')
+
+    return '\n'.join(lines)
 
 
 Metadata = VideoFormat | Formats

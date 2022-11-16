@@ -5,10 +5,11 @@ from asyncio import run
 from pathlib import Path
 from typing import Final
 
+from click.exceptions import Exit
 from typer import Typer, Option, Argument, Context
 from rich import print
 
-from ..core.base import DEFAULT_MODEL, DESCRIPTION
+from ..core.base import DEFAULT_MODEL, DESCRIPTION, Rc
 from ..core.convert.watch import DEFAULT_JOBS, DEFAULT_THREADS, convert_videos
 
 from ..core.convert.helpers import _convert, _get_command, _inspect, show_devices
@@ -44,8 +45,13 @@ def get_command(
   """
   📜 Get FFMPEG transcoding command.
   """
+  rc: int = Rc.ok
+
   for path in paths:
-    _get_command(name, path, threads)
+    if _get_command(name, path, threads):
+      rc = Rc.must_convert
+
+  raise Exit(code=rc)
 
 
 @app.command()
@@ -69,8 +75,13 @@ def inspect(
   """
   🔎 Inspect a video to see what attributes should be decoded.
   """
+  rc: int = Rc.ok
+
   for path in paths:
-    _inspect(name, path)
+    if _inspect(name, path):
+      rc = Rc.must_convert
+
+  raise Exit(code=rc)
 
 
 @app.command()

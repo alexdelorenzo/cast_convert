@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import (
-  Final, Iterable, TypeVar,
-  Callable, Protocol, TYPE_CHECKING
-)
 from decimal import Decimal
-import logging
+from enum import IntEnum
+from typing import (
+  Callable, Final, Iterable, Protocol, TYPE_CHECKING, TypeVar
+)
+
 
 if TYPE_CHECKING:
   from .media.formats import Metadata
@@ -44,12 +44,32 @@ DEFAULT_PROFILE_RESOLUTION: Final[Resolution] = 720
 DESCRIPTION: Final[str] = \
   "📽️ Identify and convert videos to formats that are Chromecast supported."
 
-RC_MISSING_ARGS: Final[int] = 1
-RC_NO_MATCHING_DEVICE: Final[int] = 2
+
+class Rc(IntEnum):
+  """Return codes"""
+  ok: int = 0
+  err: int = 1
+
+  missing_args: int = 2
+  no_matching_device: int = 3
+
+  must_convert: int = 4
 
 
 class IsCompatible(Protocol):
   def is_compatible(self, other: Metadata) -> bool:
+    pass
+
+
+class AsDict(Protocol):
+  @property
+  def as_dict(self) -> dict[str, Metadata]:
+    pass
+
+
+class AsText(Protocol):
+  @property
+  def text(self) -> str:
     pass
 
 
@@ -69,3 +89,5 @@ def normalize_info(
 def first(iterable: Iterable[T], default: Item = None) -> Item:
   iterator = iter(iterable)
   return next(iterator, default)
+
+

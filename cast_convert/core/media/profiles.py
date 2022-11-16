@@ -1,21 +1,37 @@
 from __future__ import annotations
 
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
+from typing import TYPE_CHECKING
 
 from unpackable import Unpackable
 
 from ..base import (
-  DEFAULT_PROFILE_FPS, DEFAULT_PROFILE_LEVEL,
+  AsDict, AsText, DEFAULT_PROFILE_FPS, DEFAULT_PROFILE_LEVEL,
   DEFAULT_PROFILE_RESOLUTION, Fps, Level, Resolution,
 )
 from .base import get_name
 from .codecs import AudioCodec, Codecs, ProfileName, VideoCodec
 
+if TYPE_CHECKING:
+  from .formats import Metadata
+
 
 @dataclass(eq=True, frozen=True)
-class Profile(ABC):
+class Profile(ABC, AsDict, AsText):
   pass
+
+  @property
+  def as_dict(self) -> dict[str, Metadata]:
+    return asdict(self)
+
+  @property
+  def text(self):
+    return '\n'.join(
+      f'[b]{key.title()}[/]: [b blue]{val}[/]'
+      for key, val in self.as_dict.items()
+      if val is not None
+    )
 
 
 @dataclass(eq=True, frozen=True)
@@ -46,8 +62,8 @@ AudioProfiles = list[AudioProfile]
 
 
 def is_video_profile_compatible(
-  profile: VideoProfile,
-  supported: VideoProfile
+  profile: VideoProfile | None,
+  supported: VideoProfile | None,
 ) -> bool:
   codec, resolution, fps, level = profile
   supported_codec, max_resolution, max_fps, max_level = supported
@@ -60,17 +76,23 @@ def is_video_profile_compatible(
   )
 
 
-def is_level_compatible(level: Level, max_level: Level) -> bool:
+def is_level_compatible(
+  level: Level | None,
+  max_level: Level | None,
+) -> bool:
   return level is max_level or level <= max_level
 
 
-def is_fps_compatible(fps: Fps, max_fps: Fps) -> bool:
+def is_fps_compatible(
+  fps: Fps | None,
+  max_fps: Fps | None
+) -> bool:
   return fps is max_fps or fps <= max_fps
 
 
 def is_resolution_compatible(
-  resolution: Resolution,
-  max_resolution: Resolution
+  resolution: Resolution | None,
+  max_resolution: Resolution | None
 ) -> bool:
   return resolution is max_resolution or resolution <= max_resolution
 
