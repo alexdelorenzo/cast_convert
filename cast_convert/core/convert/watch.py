@@ -13,9 +13,13 @@ from .helpers import _convert
 
 
 FILESIZE_CHECK_WAIT: Final[float] = 2.0
+NO_SIZE: Final[int] = -1
+
 DEFAULT_JOBS: Final[int] = 2
 DEFAULT_THREADS: Final[int] = cpu_count()
-NO_SIZE: Final[int] = -1
+
+
+Paths = set[Path]
 
 
 async def wait_for_stable_size(
@@ -57,25 +61,30 @@ async def is_video(path: Path) -> bool:
   return False
 
 
-async def gen_videos(
+def get_new_file(file: str, change: Change, seen: Paths) -> Path | None:
+  path = Path(file)
+
+  if path in seen:
+    return
+
+  seen.add(path)
+
+  match change:
+    case Change.added | Change.modified:
+      return path
+
+
+async def gen_new_files(
   *paths: Path,
-  seen: set[Path] | None = None
+  seen: Paths | None = None
 ) -> AsyncIterable[Path]:
   if seen is None:
-    seen = set[Path]()
+    seen = Paths()
 
   async for changes in awatch(*paths):
     for change, file in changes:
-      path = Path(file)
-
-      if path in seen:
-        continue
-
-      seen.add(path)
-
-      match change:
-        case Change.added | Change.modified if await is_video(path):
-          yield path
+      if path := get_new_file(file, change, seen):
+        yield path
 
 
 async def convert(
@@ -88,22 +97,24 @@ async def convert(
 
   async with sem:
     await wait_for_stable_size(path)
-    await to_thread(_convert, device, path, threads)
+
+    if await is_video(path):
+      await to_thread(_convert, device, path, threads)
 
 
 async def convert_videos(
   *paths: Path,
   device: str = DEFAULT_MODEL,
-  seen: set[Path] | None = None,
+  seen: Paths | None = None,
   jobs: int = DEFAULT_JOBS,
   threads: int = DEFAULT_THREADS,
 ):
   if seen is None:
-    seen = set[Path]()
+    seen = Paths()
 
   sem = BoundedSemaphore(jobs)
 
   async with TaskGroup() as tg:
-    async for path in gen_videos(*paths, seen=seen):
+    async for path in gen_new_files(*paths, seen=seen):
       coro = convert(device, path, sem, threads)
       tg.create_task(coro)
