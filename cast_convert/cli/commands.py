@@ -101,7 +101,7 @@ def watch(
 @app.callback(help=DESCRIPTION)
 def main(
   ctx: Context,
-  log_level: str = Option('warn', help="Set the logging level"),
+  log_level: str = Option('warn', help="Set the minimum logging level"),
 ):
   log_level = log_level.upper()
   logging.basicConfig(level=log_level)
