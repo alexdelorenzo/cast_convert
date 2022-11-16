@@ -5,7 +5,8 @@ from typing import Any, TYPE_CHECKING
 from rich import print
 
 from ..media.formats import Formats
-from ..media.profiles import AudioProfile, VideoProfile
+from ..media.profiles import AudioProfile, VideoProfile, is_codec_compatible, is_fps_compatible, is_level_compatible, \
+  is_resolution_compatible
 from ..model.video import Video
 from .run import transcode_video
 
@@ -117,18 +118,19 @@ def transcode_video_profile(
   new_codec = new_resolution = new_fps = new_level = None
 
   if exists(codec, default_codec):
-    new_codec = None if codec is default_codec else default_codec
+    new_codec = None if is_codec_compatible(codec, default_codec) else default_codec
 
   if exists(resolution, default_resolution):
-    new_resolution = None if resolution <= default_resolution else default_resolution
+    new_resolution = None if is_resolution_compatible(resolution, default_resolution) else default_resolution
 
   if exists(fps, default_fps):
-    new_fps = None if fps <= default_fps else default_fps
+    new_fps = None if is_fps_compatible(fps, default_fps) else default_fps
 
-  if exists(level, default_level):
-    new_level = None if level <= default_level else default_level
+  if new_codec:
+    new_level = default_level
 
-  new_level = new_level if new_codec is None else None
+  elif exists(level, default_level):
+    new_level = None if is_level_compatible(level, default_level) else default_level
 
   return VideoProfile(
     codec=new_codec,
@@ -193,7 +195,7 @@ def should_transcode(
     return False
 
   if device.can_play(video):
-    print(f'✅ File [b blue]{video.path}[/] is compatible with [b]{device.name}[/].')
+    print(f'✅ File [b blue]"{video.path}"[/] is compatible with [b]{device.name}[/].')
     return False
 
   return True

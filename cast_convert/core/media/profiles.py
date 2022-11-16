@@ -10,7 +10,7 @@ from ..base import (
   DEFAULT_PROFILE_RESOLUTION, Fps, Level, Resolution,
 )
 from .base import get_name
-from .codecs import AudioCodec, ProfileName, VideoCodec
+from .codecs import AudioCodec, Codecs, ProfileName, VideoCodec
 
 
 @dataclass(eq=True, frozen=True)
@@ -50,11 +50,33 @@ def is_video_profile_compatible(
   supported: VideoProfile
 ) -> bool:
   codec, resolution, fps, level = profile
-  _codec, _resolution, _fps, _level = supported
+  supported_codec, max_resolution, max_fps, max_level = supported
 
   return (
-    codec is _codec and
-    (resolution is _resolution or resolution <= _resolution) and
-    (fps is _fps or fps <= _fps) and
-    (level is _level or level <= _level)
+    is_codec_compatible(codec, supported_codec) and
+    is_resolution_compatible(resolution, max_resolution) and
+    is_fps_compatible(fps, max_fps) and
+    is_level_compatible(level, max_level)
   )
+
+
+def is_level_compatible(level: Level, max_level: Level) -> bool:
+  return level is max_level or level <= max_level
+
+
+def is_fps_compatible(fps: Fps, max_fps: Fps) -> bool:
+  return fps is max_fps or fps <= max_fps
+
+
+def is_resolution_compatible(
+  resolution: Resolution,
+  max_resolution: Resolution
+) -> bool:
+  return resolution is max_resolution or resolution <= max_resolution
+
+
+def is_codec_compatible(
+  codec: Codecs | None,
+  other: Codecs | None,
+) -> bool:
+  return codec is other
