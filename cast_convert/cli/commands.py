@@ -1,49 +1,90 @@
 from __future__ import annotations
 
-import logging
 from asyncio import run
 from pathlib import Path
 from typing import Final
+from enum import StrEnum
 
 from click.exceptions import Exit
 from typer import Typer, Option, Argument, Context
 from rich import print
 
-from ..core.base import DEFAULT_MODEL, DESCRIPTION, Rc
-from ..core.convert.watch import DEFAULT_JOBS, DEFAULT_THREADS, convert_videos
-
-from ..core.convert.helpers import _convert, _get_command, _inspect, show_devices
+from .. import COPYRIGHT_NOTICE, PROJECT_HOME, __version__
+from ..core.base import DEFAULT_JOBS, DEFAULT_LOG_LEVEL, DEFAULT_MODEL, DEFAULT_THREADS, DESCRIPTION, Level, Levels, Rc, \
+  setup_logging
+from ..core.convert.watch import convert_videos
+from ..core.convert.run import convert_from_name_path
 from ..core.model.device import get_devices_from_file
+from .helpers import _get_command, _inspect, show_devices
+
+
+class Panels(StrEnum):
+  about: str = "❓ About"
+  analyze: str = '📊 Analyze'
+  convert: str = '📽️ Convert'
+  device: str = '📺 Device'
+  encoder_options: str = '🖥 Encoder Options'
+  supported: str = "🛠️ Hardware Support"
 
 
 DEFAULT_NAME_OPT: Final[Option] = Option(
-  default=DEFAULT_MODEL,
-  help='Device model name',
+  DEFAULT_MODEL,
+  '--name', '-n',
+  help='📛 Device model name',
+  rich_help_panel=Panels.device,
 )
 
 DEFAULT_PATHS_ARG: Final[Argument] = Argument(
   default=...,
-  help='Path(s) to video(s)',
+  help='Path(s) to video(s).',
   resolve_path=True,
+  metavar='📂PATHS',
+  show_default=False,
+)
+
+DEFAULT_REPLACE_OPT: Final[Option] = Option(
+  False,
+  '--replace', '-r',
+  help='💾 Replace original file with transcoded video.',
+  rich_help_panel=Panels.encoder_options,
+  show_default=True,
 )
 
 DEFAULT_THREADS_OPT: Final[Option] = Option(
-  default=DEFAULT_THREADS,
-  help="Number of threads to tell FFMPEG to use per job"
+  DEFAULT_THREADS,
+  '--threads', '-t',
+  help="🧵 Number of threads to tell FFMPEG to use per job.",
+  rich_help_panel=Panels.encoder_options,
+)
+
+LONG_DESCRIPTION: Final[str] = f"""
+{DESCRIPTION}
+
+\n\t
+  See [b]{PROJECT_HOME}[/b] for more information.
+  {COPYRIGHT_NOTICE}.
+"""
+
+
+cli: Final[Typer] = Typer(
+  no_args_is_help=True,
+  help=LONG_DESCRIPTION,
+  rich_markup_mode='rich',
 )
 
 
-app: Final[Typer] = Typer()
-
-
-@app.command()
-def get_command(
+@cli.command(
+  rich_help_panel=Panels.analyze,
+  no_args_is_help=True,
+)
+def command(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
+  replace: bool = DEFAULT_REPLACE_OPT,
   threads: int = DEFAULT_THREADS_OPT,
 ):
   """
-  📜 Get FFMPEG transcoding command.
+  📜 Get FFmpeg transcoding command.
   """
   rc: int = Rc.ok
 
@@ -51,29 +92,41 @@ def get_command(
     if _get_command(name, path, threads):
       rc = Rc.must_convert
 
-  raise Exit(code=rc)
+  raise Exit(rc)
 
 
-@app.command()
+@cli.command(
+  rich_help_panel=Panels.convert,
+  no_args_is_help=True,
+)
 def convert(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
+  replace: bool = DEFAULT_REPLACE_OPT,
   threads: int = DEFAULT_THREADS_OPT,
 ):
   """
-  📼 Convert video for Chromecast compatibility.
+  📼 Convert videos so they're compatible with specified device.
   """
+  rc: int = Rc.ok
+
   for path in paths:
-    _convert(name, path, threads)
+    if not convert_from_name_path(name, path, replace, threads):
+      rc = Rc.err
+
+  raise Exit(rc)
 
 
-@app.command()
+@cli.command(
+  rich_help_panel=Panels.analyze,
+  no_args_is_help=True,
+)
 def inspect(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
 ):
   """
-  🔎 Inspect a video to see what attributes should be decoded.
+  🔎 Inspect videos to see what attributes should get transcoded.
   """
   rc: int = Rc.ok
 
@@ -81,38 +134,87 @@ def inspect(
     if _inspect(name, path):
       rc = Rc.must_convert
 
-  raise Exit(code=rc)
+  raise Exit(rc)
 
 
-@app.command()
-def devices():
+@cli.command(
+  rich_help_panel=Panels.supported,
+  # no_args_is_help=True,
+)
+def devices(
+  details: bool = Option(
+    False,
+    '--details', '-d',
+    help=":information: Show detailed device information.",
+    rich_help_panel=Panels.device
+  )
+):
   """
-  📺 List all supported device names.
+  📺 List all supported devices.
   """
   _devices = get_devices_from_file()
 
   print('You can use these device names with the [b]--name[/b] flag:')
-  show_devices(_devices)
+  show_devices(_devices, details)
 
 
-@app.command()
+@cli.command(
+  rich_help_panel=Panels.convert,
+  no_args_is_help=True,
+)
 def watch(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
-  jobs: int = Option(DEFAULT_JOBS, help="Number of simultaneous transcoding jobs"),
+  jobs: int = Option(
+    DEFAULT_JOBS,
+    '--jobs', '-j',
+    help=":input_numbers: Number of simultaneous transcoding jobs.",
+    rich_help_panel=Panels.encoder_options
+  ),
+  replace: bool = DEFAULT_REPLACE_OPT,
   threads: int = DEFAULT_THREADS_OPT,
 ):
   """
-  👀 Watch directories for added videos and convert them.
+  👀 Watch directories for new or modified videos and convert them.
   """
-  coro = convert_videos(*paths, device=name, jobs=jobs, threads=threads)
+  coro = convert_videos(
+    *paths,
+    device=name,
+    jobs=jobs,
+    replace=replace,
+    threads=threads
+  )
   run(coro)
 
 
-@app.callback(help=DESCRIPTION)
+@cli.callback(
+  invoke_without_command=True,
+  no_args_is_help=True,
+  # help=DESCRIPTION,
+  # epilog=EPILOG,
+)
 def main(
   ctx: Context,
-  log_level: str = Option('warn', help="Set the minimum logging level"),
+  log_level: Levels = Option(
+    DEFAULT_LOG_LEVEL,
+    '--log-level', '-l',
+    help="🪵 Set the minimum logging level.",
+    show_default=True,
+    rich_help_panel=Panels.about,
+  ),
+  version: bool = Option(
+    False,
+    '--version', '-v',
+    help="🔢 Show application version and quit.",
+    rich_help_panel=Panels.about,
+  ),
 ):
-  log_level = log_level.upper()
-  logging.basicConfig(level=log_level)
+  setup_logging(log_level)
+
+  if version:
+    print(f'v{__version__}')
+    raise Exit(Rc.ok)
+
+  if not ctx.invoked_subcommand:
+    print('[b red]You need to supply a command.')
+    raise Exit(Rc.no_command)
