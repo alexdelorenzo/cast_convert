@@ -9,7 +9,7 @@ from ..parse import ALIAS_FMTS
 
 
 class NormalizedFormat:
-  unknown: str
+  unknown: Self | str
 
   def __repr__(self) -> str:
     return f"{get_name(self)}({self})"

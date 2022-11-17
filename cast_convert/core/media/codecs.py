@@ -1,26 +1,34 @@
 from __future__ import annotations
 
 import logging
-from enum import StrEnum, auto
-from typing import Self, Type
+from enum import Enum, StrEnum, auto
+from typing import Self, Type, TypeVar
 
 from ..base import SUBTITLE_SEP
 from ..parse import EXTENSIONS, Extension
 from .base import NormalizedFormat
 
 
+E = TypeVar('E', bound=Enum | str)
+
+
+def alias(val: E) -> E:
+  """Denotes an Enum's alias"""
+  return val
+
+
 class Container(NormalizedFormat, StrEnum):
-  unknown: str = auto()
-  avi: str = auto()
-  matroska: str = auto()
-  mkv: str = matroska  # alias
-  mp2t: str = auto()
-  mp3: str = auto()
-  mp4: str = auto()
-  mpeg4: str = mp4  # alias
-  ogg: str = auto()
-  wav: str = auto()
-  webm: str = auto()
+  avi: Self = auto()
+  matroska: Self = auto()
+  mkv: Self = alias(matroska)
+  mp2t: Self = auto()
+  mp3: Self = auto()
+  mp4: Self = auto()
+  mpeg4: Self = alias(mp4)
+  ogg: Self = auto()
+  wav: Self = auto()
+  webm: Self = auto()
+  unknown: Self = auto()
 
   def to_extension(self) -> Extension | None:
     if ext := EXTENSIONS.get(self):
@@ -31,50 +39,50 @@ class Container(NormalizedFormat, StrEnum):
 
 
 class VideoCodec(NormalizedFormat, StrEnum):
-  unknown: str = auto()
-  avc: str = auto()
-  h264: str = avc  # alias
-  div3: str = auto()
-  divx: str = div3  # alias
-  mpeg4visual: str = divx  # alias
-  hevc: str = auto()
-  h265: str = hevc  # alias
-  hdr: str = auto()
-  mpeg4: str = auto()
-  mp4: str = avc  # alias
-  vp8: str = auto()
-  vp9: str = auto()
-  vp09: str = vp9  # alias
-  xvid: str = auto()
+  avc: Self = auto()
+  div3: Self = auto()
+  divx: Self = alias(div3)
+  h264: Self = alias(avc)
+  hdr: Self = auto()
+  hevc: Self = auto()
+  h265: Self = alias(hevc)
+  mp4: Self = alias(avc)
+  mpeg4: Self = auto()
+  mpeg4visual: Self = alias(divx)
+  vp8: Self = auto()
+  vp9: Self = auto()
+  vp09: Self = alias(vp9)
+  xvid: Self = auto()
+  unknown: Self = auto()
 
 
 class AudioCodec(NormalizedFormat, StrEnum):
-  unknown: str = auto()
-  aac: str = auto()
-  ac3: str = auto()
-  eac3: str = auto()
-  eacs: str = auto()
-  flac: str = auto()
-  heaac: str = auto()
-  lcaac: str = auto()
-  mp3: str = auto()
-  opus: str = auto()
-  vorbis: str = auto()
-  wav: str = auto()
-  webm: str = auto()
+  aac: Self = auto()
+  ac3: Self = auto()
+  eac3: Self = auto()
+  eacs: Self = auto()
+  flac: Self = auto()
+  heaac: Self = auto()
+  lcaac: Self = auto()
+  mp3: Self = auto()
+  opus: Self = auto()
+  vorbis: Self = auto()
+  wav: Self = auto()
+  webm: Self = auto()
+  unknown: Self = auto()
 
 
 class Subtitle(NormalizedFormat, StrEnum):
-  unknown: str = auto()
-  ass: str = auto()
-  utf8: str = auto()
-  srt: str = auto()
-  ssa: str = auto()
-  webvtt: str = auto()
-  vtt: str = webvtt  # alias
-  ttml: str = auto()
-  eia608: str = auto()
-  eia708: str = auto()
+  ass: Self = auto()
+  eia608: Self = auto()
+  eia708: Self = auto()
+  srt: Self = auto()
+  ssa: Self = auto()
+  ttml: Self = auto()
+  unknown: Self = auto()
+  utf8: Self = auto()
+  webvtt: Self = auto()
+  vtt: Self = alias(webvtt)
 
   @classmethod
   def from_info(cls: Type[Self], info: str | None) -> Self | None:
@@ -89,8 +97,8 @@ class Subtitle(NormalizedFormat, StrEnum):
 
 
 class ProfileName(NormalizedFormat, StrEnum):
-  main: str = auto()
-  main10: str = auto()
+  main: Self = auto()
+  main10: Self = auto()
 
 
 Containers = list[Container]
