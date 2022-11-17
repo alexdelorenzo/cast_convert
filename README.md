@@ -137,8 +137,8 @@ device names completely.
 The `--name` flag comes *after* [`cast-convert` commands](#commands).
 
 ```bash
-$ cast-convert inspect --name '1st Gen' ~/video.mkv
-[🔄️] Need to convert "/home/user/video.mkv" to play on Chromecast 1st Gen...
+$ cast-convert inspect --name '1st Gen' ~/video.webm
+[🔄️] Need to convert "/home/user/video.webm" to play on Chromecast 1st Gen...
   Must convert from:
     - Container: webm
     - Codec: vp9
