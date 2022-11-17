@@ -38,7 +38,7 @@ setup(
   keywords='chromecast transcode convert video cli'.split(' '),
   entry_points={
     "console_scripts": [
-      "cast-convert = cast_convert.cli:app",
+      "cast-convert = cast_convert.cli:cli",
     ]
   }
 )
