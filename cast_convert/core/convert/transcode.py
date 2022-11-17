@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, Final, Iterable, TYPE_CHECKING, cast
+from dataclasses import dataclass
 from operator import itemgetter
+from typing import Any, Final, ItemsView, Iterable, TYPE_CHECKING, cast
 import logging
 
+from more_itertools import unzip
 from rich import print
 
 from ..base import esc, first
@@ -13,21 +15,31 @@ from ..media.profiles import AudioProfile, Profile, VideoProfile, is_codec_compa
   is_fps_compatible, is_level_compatible, is_resolution_compatible
 from ..model.video import Video
 
-
 if TYPE_CHECKING:
   from ..media.codecs import Container, Subtitle
   from ..model.device import Device
 
+
 SCORE_INDEX: Final[int] = 1
+ALL_SAME: Final[int] = 1
 
 
-Score = int
-ProfileScore = tuple[Profile, Score]
-ProfileScores = Iterable[ProfileScore]
-ScoreMap = dict[Profile, Score]
+Weight = int
+ProfileWeight = tuple[Profile, Weight]
+ProfileWeights = Iterable[ProfileWeight]
+WeightMap = dict[Profile, Weight]
 
 
-compare_score = itemgetter(SCORE_INDEX)
+class TranscodeFormats(Formats):
+  """Intermediary Formats"""
+
+
+@dataclass(eq=True, frozen=True)
+class TranscodeVideoProfile(VideoProfile):
+  """Intermediary VideoProfile"""
+
+
+compare_weight = itemgetter(SCORE_INDEX)
 
 
 def exists(*items: Any) -> bool:
@@ -44,30 +56,48 @@ def transcode_video(
 
   _, video_profile, *_ = video.formats
 
+  if not video_profile:
+    logging.warning(f"{video} has no VideoProfile")
+    return None
+
   if not default_video:
     default_video = get_default_video_profile(device, video)
+
+  video_profile: VideoProfile
+  default_video: VideoProfile
 
   return transcode_video_profile(video_profile, default_video)
 
 
-def get_default_video_profile(device: Device, video: Video) -> VideoProfile | None:
-  vid_prof = video.formats.video_profile
+def same_weights(weights: WeightMap) -> bool:
+  vals = set[int](weights.values())
 
-  scores: ScoreMap = {
-    prof: prof.count
-    for dev_prof in device.video_profiles
-    if (prof := transcode_video_profile(vid_prof, dev_prof))
+  return len(vals) == ALL_SAME
+
+
+def get_default_video_profile(device: Device, video: Video) -> VideoProfile | None:
+  if not (vid_prof := video.formats.video_profile):
+    return None
+
+  vid_prof: VideoProfile
+
+  weights: WeightMap = {
+    prof: trans.weight
+    for prof in device.video_profiles
+    if prof and (trans := transcode_video_profile(vid_prof, prof))
   }
 
-  if not scores:
+  if len(set(weights.values())) == 1:
     logging.info(f'Choosing first {get_name(VideoProfile)} from {device.name}')
     return first(device.video_profiles)
 
-  profile_scores = cast(ProfileScores, scores.items())
-  profile_scores = sorted(profile_scores, key=compare_score)
-  profile, score = first(profile_scores)
+  profile_weights = sorted(weights.items(), key=compare_weight)
+  profile_weights = cast(ProfileWeights, profile_weights)
 
-  return profile
+  profiles, _ = unzip(profile_weights)
+  profiles: Iterable[Profile]
+
+  return first(profiles)
 
 
 def transcode_audio(
@@ -137,7 +167,7 @@ def transcode_to(
   new_container = transcode_container(device, video, default_container)
   new_subtitle = transcode_subtitle(device, video, default_subtitle)
 
-  return Formats(
+  return TranscodeFormats(
     container=new_container,
     video_profile=new_video,
     audio_profile=new_audio,
@@ -146,9 +176,15 @@ def transcode_to(
 
 
 def transcode_video_profile(
-  video_profile: VideoProfile,
-  default_video: VideoProfile,
-) -> VideoProfile:
+  video_profile: VideoProfile | None,
+  default_video: VideoProfile | None,
+) -> VideoProfile | None:
+  if not exists(video_profile, default_video):
+    return None
+
+  video_profile: VideoProfile
+  default_video: VideoProfile
+
   codec, resolution, fps, level = video_profile
   default_codec, default_resolution, default_fps, default_level = default_video
 
@@ -169,7 +205,7 @@ def transcode_video_profile(
   elif exists(level, default_level):
     new_level = None if is_level_compatible(level, default_level) else default_level
 
-  return VideoProfile(
+  return TranscodeVideoProfile(
     codec=new_codec,
     resolution=new_resolution,
     fps=new_fps,
@@ -184,6 +220,9 @@ def transcode_audio_profile(
   if not exists(audio_profile, default_audio):
     return None
 
+  audio_profile: AudioProfile
+  default_audio: AudioProfile
+
   [codec] = audio_profile
   new_codec = None if codec is default_audio.codec else default_audio.codec
 
@@ -191,15 +230,15 @@ def transcode_audio_profile(
 
 
 def transcode_containers(
-  container: Container,
-  default_container: Container,
+  container: Container | None,
+  default_container: Container | None,
 ) -> Container | None:
   return None if container is default_container else default_container
 
 
 def transcode_subtitles(
-  subtitle: Subtitle,
-  default_subtitle: Subtitle,
+  subtitle: Subtitle | None,
+  default_subtitle: Subtitle | None,
 ) -> Subtitle | None:
   return None if subtitle is default_subtitle else default_subtitle
 
@@ -216,7 +255,7 @@ def transcode_formats(formats: Formats, to_formats: Formats) -> Formats | None:
   new_audio = transcode_audio_profile(audio_profile, to_audio)
   new_subtitle = transcode_subtitles(subtitle, to_subtitle)
 
-  return Formats(
+  return TranscodeFormats(
     container=new_container,
     video_profile=new_video,
     audio_profile=new_audio,
