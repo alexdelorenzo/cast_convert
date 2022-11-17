@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from functools import cache, lru_cache
+from functools import cache
 from itertools import chain
 from pathlib import Path
 from typing import Iterable, Self, Type
 import logging
 
-from thefuzz import process
-
-from .video import Video, get_video_profiles
-from ..base import IsCompatible, MIN_FUZZY_MATCH_SCORE, first
+from ..base import IsCompatible, MIN_FUZZY_MATCH_SCORE, first, get_fuzzy_match
 from ..convert.transcode import transcode_to
 from ..exceptions import UnknownFormat
 from ..media.base import get_name
@@ -18,17 +15,18 @@ from ..media.codecs import AudioCodec, Container, Containers, Subtitle, Subtitle
 from ..media.formats import Formats, Metadata, VideoFormat, VideoFormats, are_compatible
 from ..media.profiles import AudioProfile, AudioProfiles, VideoProfile, VideoProfiles
 from ..parse import DEVICE_INFO, Fmts, Yaml, get_yaml
+from .video import Video, get_video_profiles
 
 
 @dataclass(eq=True, frozen=True)
 class Device(IsCompatible):
   name: str
 
-  video_profiles: VideoProfiles = field(default_factory=VideoProfiles)
-  audio_profiles: AudioProfiles = field(default_factory=AudioProfiles)
+  video_profiles: VideoProfiles = field(default_factory=VideoProfiles, hash=False)
+  audio_profiles: AudioProfiles = field(default_factory=AudioProfiles, hash=False)
 
-  containers: Containers = field(default_factory=Containers)
-  subtitles: Subtitles = field(default_factory=Subtitles)
+  containers: Containers = field(default_factory=Containers, hash=False)
+  subtitles: Subtitles = field(default_factory=Subtitles, hash=False)
 
   @classmethod
   def from_yaml(
@@ -165,7 +163,7 @@ def get_device(
   subtitles = map(Subtitle.from_info, subtitle_names)
 
   video = get_video_profiles(profiles)
-  formats = chain(containers, audio, subtitles, video)
+  formats = chain(video, audio, containers, subtitles)
 
   device = Device(name)
   device.add_formats(formats)
@@ -243,18 +241,18 @@ def get_device_with_name(
 def get_devices_from_file(
   device_file: Path = DEVICE_INFO,
 ) -> Devices:
-  devices: Devices = tuple(Device.from_yaml(device_file))
-  return devices
+  return tuple(Device.from_yaml(device_file))
 
 
+@cache
 def get_device_fuzzy(
   name: str,
   devices: Devices,
+  min_score: int = MIN_FUZZY_MATCH_SCORE,
 ) -> Device | None:
   devices = {dev.name: dev for dev in devices}
-  closest_name, score = process.extractOne(name, devices.keys())
-
-  if score < MIN_FUZZY_MATCH_SCORE:
-    return None
+  names = devices.keys()
+  closest_name = get_fuzzy_match(name, names, min_score)
 
   return devices.get(closest_name)
+

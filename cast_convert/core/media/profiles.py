@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import dataclass, asdict
-from typing import TYPE_CHECKING
+from typing import Final, TYPE_CHECKING
 
 from unpackable import Unpackable
 
@@ -11,16 +11,16 @@ from ..base import (
   DEFAULT_PROFILE_RESOLUTION, Fps, Level, Resolution,
 )
 from .base import get_name
-from .codecs import AudioCodec, Codecs, ProfileName, VideoCodec
+from .codecs import AudioCodec, Codecs, Container, ProfileName, Subtitle, VideoCodec
 
 if TYPE_CHECKING:
-  from .formats import Metadata
+  from .formats import Formats, Metadata, are_compatible
+
+INCREMENT: Final[int] = 1
 
 
 @dataclass(eq=True, frozen=True)
-class Profile(ABC, AsDict, AsText):
-  pass
-
+class Profile(ABC, AsDict, AsText, Unpackable):
   @property
   def as_dict(self) -> dict[str, Metadata]:
     return asdict(self)
@@ -33,9 +33,14 @@ class Profile(ABC, AsDict, AsText):
       if val is not None
     )
 
+  @property
+  def count(self) -> int:
+    """Return a count of non-null formats belonging to Profile"""
+    return sum(INCREMENT for fmt in self if fmt is not None)
+
 
 @dataclass(eq=True, frozen=True)
-class AudioProfile(Profile, Unpackable):
+class AudioProfile(Profile):
   codec: AudioCodec | None = AudioCodec.unknown
 
   def __repr__(self) -> str:
@@ -43,7 +48,7 @@ class AudioProfile(Profile, Unpackable):
 
 
 @dataclass(eq=True, frozen=True)
-class VideoProfile(Profile, Unpackable):
+class VideoProfile(Profile):
   codec: VideoCodec | None = VideoCodec.unknown
   resolution: Resolution | None = DEFAULT_PROFILE_RESOLUTION
   fps: Fps | None = DEFAULT_PROFILE_FPS
@@ -51,7 +56,7 @@ class VideoProfile(Profile, Unpackable):
 
 
 @dataclass(eq=True, frozen=True)
-class EncoderProfile(Profile, Unpackable):
+class EncoderProfile(Profile):
   profile: ProfileName | None = None
   level: Level | None = None
 
@@ -102,3 +107,4 @@ def is_codec_compatible(
   other: Codecs | None,
 ) -> bool:
   return codec is other
+

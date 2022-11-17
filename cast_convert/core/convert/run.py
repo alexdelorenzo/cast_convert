@@ -2,15 +2,18 @@ from __future__ import annotations
 
 from enum import StrEnum, auto
 from pathlib import Path
-from typing import Final
+from shlex import quote
+from typing import Final, Iterable
 import logging
 
 import ffmpeg
 from ffmpeg.nodes import FilterableStream, OutputStream
 
+from .transcode import should_transcode
 from ..media.formats import Formats
 from ..media.codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
-from ..base import first, Resolution
+from ..base import DEFAULT_REPLACE, DEFAULT_THREADS, JOIN_COMMAND, first, Resolution
+from ..model.device import load_device_with_name
 from ..parse import Alias, Aliases, AUDIO_ENCODERS, SUBTITLE_ENCODERS, VIDEO_ENCODERS, Extension
 from ..model.video import Video
 
@@ -107,19 +110,36 @@ def get_encoder(codec: Codecs) -> Alias:
   return first(encoders)
 
 
-def transcode_video(video: Video, formats: Formats, threads: int) -> Video:
+def transcode_video(
+  video: Video,
+  formats: Formats,
+  replace: bool = DEFAULT_REPLACE,
+  threads: int = DEFAULT_THREADS,
+) -> Video:
   stream, path = get_stream(video, formats, threads)
-  cmd = get_ffmpeg_cmd(stream)
+  cmd = get_ffmpeg_cmd(stream, video.path)
 
   logging.info(f'Running command: {cmd}')
   stream.run()  # type: ignore
 
+  if replace and path:
+    path.rename(video.path)
+
   return Video.from_path(path)
 
 
-def get_ffmpeg_cmd(stream: OutputStream) -> str:
-  args = stream.compile()  # type: ignore
-  return ' '.join(args)
+def get_ffmpeg_cmd(
+  stream: OutputStream,
+  path: Path,
+) -> str:
+  parent: Path = path.parent
+
+  args: Iterable[str] = (
+    quote(arg) if Path(arg).parent == parent else arg
+    for arg in stream.compile()  # type: ignore
+  )
+
+  return JOIN_COMMAND.join(args)
 
 
 def get_stream(
@@ -241,3 +261,28 @@ def get_video_filters(
     )
 
   return filters
+
+
+def convert_from_name_path(
+  name: str,
+  path: Path,
+  replace: bool = DEFAULT_REPLACE,
+  threads: int = DEFAULT_THREADS,
+) -> bool:
+  video = Video.from_path(path)
+  device = load_device_with_name(name)
+
+  if not should_transcode(device, video):
+    return False
+
+  formats = device.transcode_to(video)
+
+  try:
+    transcode_video(video, formats, replace, threads)
+
+  except Exception as e:
+    logging.exception(e)
+    logging.error(f'Error while converting {video} to {formats}')
+    return False
+
+  return True
