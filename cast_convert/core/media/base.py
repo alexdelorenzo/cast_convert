@@ -4,7 +4,7 @@ import logging
 from enum import StrEnum, auto
 from typing import Any, Self, Type
 
-from ..base import normalize_info
+from ..base import normalize
 from ..parse import ALIAS_FMTS
 
 
@@ -38,7 +38,7 @@ class NormalizedFormat:
     if not isinstance(info, str):
       raise TypeError(f"[{get_name(cls)}] Can't normalize: {info}")
 
-    normalized = normalize_info(info)
+    normalized = normalize(info)
     return cls(normalized)
 
 
