@@ -71,12 +71,12 @@ Paths = set[Path]
 
 
 class Levels(StrEnum):
-  critical: str = auto()
-  debug: str = auto()
-  error: str = auto()
-  fatal: str = auto()
-  info: str = auto()
-  warn: str = auto()
+  critical: Levels = auto()
+  debug: Levels = auto()
+  error: Levels = auto()
+  fatal: Levels = auto()
+  info: Levels = auto()
+  warn: Levels = auto()
 
 
 DEFAULT_LOG_LEVEL: Final[Levels] = Levels('warn')

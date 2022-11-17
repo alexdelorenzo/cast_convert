@@ -43,8 +43,8 @@ class NormalizedFormat:
 
 
 class OnTranscodeErr(NormalizedFormat, StrEnum):
-  cycle_video_encoders: str = auto()
-  cycle_audio_encoders: str = auto()
+  cycle_video_encoders: OnTranscodeErr = auto()
+  cycle_audio_encoders: OnTranscodeErr = auto()
 
 
 def get_name(obj: Any) -> str:
