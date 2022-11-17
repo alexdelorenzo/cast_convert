@@ -19,10 +19,11 @@ from ..model.video import Video
 
 
 DOT: Final[str] = '.'
-SCALE_RESOLUTION: Final[Resolution] = -2  # see: https://stackoverflow.com/a/29582287
 
-DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()  # type: ignore
+DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()
 TRANSCODE_SUFFIX: Final[str] = '_transcoded'
+
+SCALE_RESOLUTION: Final[Resolution] = -2  # see: https://stackoverflow.com/a/29582287
 HWACCEL_DEVICE: Final[Path] = Path('/dev/dri/renderD128')
 
 
@@ -57,6 +58,7 @@ class FfmpegVal(StrEnum):
 
   genpts: str = '+genpts'
   scale_resolution: str = str(SCALE_RESOLUTION)
+  vaapi_device: str = str(HWACCEL_DEVICE)
 
 
 Option = FfmpegOpt | str
@@ -77,7 +79,7 @@ DEFAULT_OUTPUT_OPTS: Final[Options] = {
 HWACCEL_OPTS: Final[Options] = {
   FfmpegOpt.hwaccel: FfmpegVal.vaapi,
   FfmpegOpt.hwaccel_output_format: FfmpegVal.vaapi,
-  FfmpegOpt.vaapi_device: str(HWACCEL_DEVICE),
+  FfmpegOpt.vaapi_device: FfmpegVal.vaapi_device,
 }
 
 DEFAULT_INPUT_OPTS: Final[Options] = {
@@ -145,7 +147,7 @@ def get_ffmpeg_cmd(
 def get_stream(
   video: Video,
   formats: Formats,
-  threads: int,
+  threads: int = DEFAULT_THREADS,
 ) -> tuple[OutputStream, Path]:
   input_opts = get_input_opts(formats)
   output_opts = get_output_opts(video, formats, threads)
@@ -200,7 +202,11 @@ def get_new_path(
   return new_path
 
 
-def get_output_opts(video: Video, formats: Formats, threads: int) -> Options:
+def get_output_opts(
+  video: Video,
+  formats: Formats,
+  threads: int = DEFAULT_THREADS,
+) -> Options:
   opts: Options = DEFAULT_OUTPUT_OPTS.copy()
   opts[FfmpegOpt.threads] = threads
 
