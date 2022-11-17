@@ -176,11 +176,28 @@ def tab_list(
   return text
 
 
+def tabs(
+  text: str | Any,
+  tabs: int = 1,
+  out: bool = False,
+  tick: bool = False,
+) -> str:
+  if tick:
+    text = checklist(text)
+
+  text: str = tab(text, tabs=tabs)
+
+  if out:
+    print(text)
+
+  return text
+
+
 def setup_logging(log_level: Levels = DEFAULT_LOG_LEVEL):
-  log_level = get_fuzzy_match(log_level.upper(), Levels, min_score=0)
+  log_level = get_fuzzy_match(log_level, Levels, min_score=0)
   handlers = [RichHandler(rich_tracebacks=True)]
 
-  logging.basicConfig(level=log_level, handlers=handlers)
+  logging.basicConfig(level=log_level.upper(), handlers=handlers)
   logging.debug(f'Set log level to {log_level}.')
 
 

@@ -3,13 +3,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import NoReturn
 
-from click.exceptions import Exit
-from rich.markup import escape
+from typer import Exit
 from rich import print
+from rich.markup import escape
 
+from ..core.base import DEFAULT_REPLACE, DEFAULT_THREADS, Peekable, Rc, esc, tabs
 from ..core.convert.run import get_ffmpeg_cmd, get_stream
 from ..core.convert.transcode import should_transcode
-from ..core.base import Peekable, Rc, checklist, esc, tab, tab_list
 from ..core.model.device import Device, Devices, get_device_fuzzy, get_devices_from_file
 from ..core.model.video import Video
 from ..core.parse import DEVICE_INFO
@@ -17,12 +17,12 @@ from ..core.parse import DEVICE_INFO
 
 def show_devices(devices: Devices, details: bool = False):
   for device in (devices := Peekable(devices)):
-    tab_list(f'[b]{device.name}', out=True)
+    tabs(f'[b]{device.name}', out=True, tick=True)
 
     if details:
       for profile in device.video_profiles:
-        tab_list(profile.codec.name, tabs=2, out=True)
-        tab_list(profile.text, tabs=3, out=True)
+        tabs(profile.codec.name, tabs=2, out=True, tick=True)
+        tabs(profile.text, tabs=3, out=True, tick=True)
 
       if not devices.is_empty:
         print()
@@ -31,7 +31,8 @@ def show_devices(devices: Devices, details: bool = False):
 def _get_command(
   name: str,
   path: Path,
-  threads: int,
+  replace: bool = DEFAULT_REPLACE,
+  threads: int = DEFAULT_THREADS,
 ) -> bool:
   video = Video.from_path(path)
 
@@ -65,12 +66,12 @@ def _inspect(
   name = device.name
 
   print(f'[b red][🔄️] Need to convert [b blue]"{esc(video.path)}"[/] to play on [yellow]{name}[/]...[/]')
-  print(tab('[b red]Must convert from:'))
-  tab_list(video.formats.text, out=True)
+  tabs('[b red]Must convert from:', out=True)
+  tabs(video.formats.text, out=True, tick=True)
 
-  print(tab('[b green]To:'))
+  tabs('[b green]To:', out=True)
   formats = device.transcode_to(video)
-  tab_list(formats.text, out=True)
+  tabs(formats.text, out=True, tick=True)
 
   return True
 
