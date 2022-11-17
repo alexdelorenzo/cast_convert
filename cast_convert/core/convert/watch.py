@@ -1,25 +1,46 @@
 import logging
 from asyncio import sleep, to_thread, BoundedSemaphore, TaskGroup
 from pathlib import Path
-from typing import AsyncIterable, Final
-from multiprocessing import cpu_count
+from typing import AsyncIterable
 
 from aiopath import AsyncPath
 from watchfiles import awatch, Change
+import psutil
 
 from ..model.video import Video
-from ..base import DEFAULT_MODEL
-from .helpers import _convert
+from ..base import DEFAULT_JOBS, DEFAULT_MODEL, DEFAULT_REPLACE, DEFAULT_THREADS, FILESIZE_CHECK_WAIT, NO_SIZE, Paths
+from .run import convert_from_name_path
 
 
-FILESIZE_CHECK_WAIT: Final[float] = 2.0
-NO_SIZE: Final[int] = -1
+def is_open_in_proc(file: Path | str) -> bool:
+  file = Path(file)
 
-DEFAULT_JOBS: Final[int] = 2
-DEFAULT_THREADS: Final[int] = cpu_count()
+  for proc in psutil.process_iter():
+    files = set[Path]()
+
+    try:
+      files = {Path(f.path) for f in proc.open_files()}
+
+    except Exception as e:
+      logging.exception(e)
+      logging.error(f"Couldn't read open files for {proc.pid} {proc.name()}")
+
+    if file in files:
+      return True
+
+  return False
 
 
-Paths = set[Path]
+async def wait_until_closed(
+  file: Path | str,
+  wait: float = FILESIZE_CHECK_WAIT,
+) -> Path:
+  file = Path(file)
+
+  while is_open_in_proc(file):
+    await sleep(wait)
+
+  return file
 
 
 async def wait_for_stable_size(
@@ -91,15 +112,18 @@ async def convert(
   device: str,
   path: Path,
   sem: BoundedSemaphore,
-  threads: int,
+  replace: bool = DEFAULT_REPLACE,
+  threads: int = DEFAULT_THREADS,
 ):
   path = path.absolute()
 
   async with sem:
     await wait_for_stable_size(path)
 
-    if await is_video(path):
-      await to_thread(_convert, device, path, threads)
+    if not await is_video(path):
+      return
+
+    await to_thread(convert_from_name_path, device, path, replace, threads)
 
 
 async def convert_videos(
@@ -107,6 +131,7 @@ async def convert_videos(
   device: str = DEFAULT_MODEL,
   seen: Paths | None = None,
   jobs: int = DEFAULT_JOBS,
+  replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
 ):
   if seen is None:
@@ -116,5 +141,5 @@ async def convert_videos(
 
   async with TaskGroup() as tg:
     async for path in gen_new_files(*paths, seen=seen):
-      coro = convert(device, path, sem, threads)
+      coro = convert(device, path, sem, replace, threads)
       tg.create_task(coro)
