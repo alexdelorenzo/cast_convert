@@ -1,21 +1,20 @@
 from __future__ import annotations
 
 from asyncio import run
+from enum import StrEnum
 from pathlib import Path
 from typing import Final
-from enum import StrEnum
 
-from click.exceptions import Exit
-from typer import Typer, Option, Argument, Context
 from rich import print
+from typer import Argument, Context, Exit, Option, Typer
 
-from .. import COPYRIGHT_NOTICE, PROJECT_HOME, __version__
-from ..core.base import DEFAULT_JOBS, DEFAULT_LOG_LEVEL, DEFAULT_MODEL, DEFAULT_THREADS, DESCRIPTION, Level, Levels, Rc, \
-  setup_logging
-from ..core.convert.watch import convert_videos
-from ..core.convert.run import convert_from_name_path
-from ..core.model.device import get_devices_from_file
 from .helpers import _get_command, _inspect, show_devices
+from .. import COPYRIGHT_NOTICE, PROJECT_HOME, __version__
+from ..core.base import DEFAULT_JOBS, DEFAULT_LOG_LEVEL, DEFAULT_MODEL, \
+  DEFAULT_THREADS, DESCRIPTION, Levels, Rc, setup_logging
+from ..core.convert.run import convert_from_name_path
+from ..core.convert.watch import convert_videos
+from ..core.model.device import get_devices_from_file
 
 
 class Panels(StrEnum):
@@ -89,7 +88,7 @@ def command(
   rc: int = Rc.ok
 
   for path in paths:
-    if _get_command(name, path, threads):
+    if _get_command(name, path, replace, threads):
       rc = Rc.must_convert
 
   raise Exit(rc)
