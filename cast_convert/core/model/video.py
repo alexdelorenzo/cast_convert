@@ -6,7 +6,7 @@ from typing import Self, Iterable, cast
 from pymediainfo import MediaInfo
 
 from ..base import (
-  IsCompatible, normalize_info, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL,
+  IsCompatible, normalize, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL,
   Level, Fps, LEVEL_SEP, AT, Resolution,
 )
 from ..media.profiles import AudioProfile, VideoProfile
@@ -102,7 +102,7 @@ def profile_to_level(profile: str | None) -> Level:
     case (name, level) | (name, level, _):
       level = level
 
-  if not (level := normalize_info(level, str.isnumeric)):
+  if not (level := normalize(level, str.isnumeric)):
     return DEFAULT_VIDEO_LEVEL
 
   match [*level]:
