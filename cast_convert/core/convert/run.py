@@ -125,7 +125,7 @@ def transcode_video(
   stream.run()  # type: ignore
 
   if replace and path:
-    path.rename(video.path)
+    path = path.rename(video.path)
 
   return Video.from_path(path)
 
