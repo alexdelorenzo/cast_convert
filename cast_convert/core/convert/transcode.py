@@ -1,19 +1,33 @@
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Final, Iterable, TYPE_CHECKING, cast
+from operator import itemgetter
+import logging
 
 from rich import print
 
+from ..base import esc, first
+from ..media.base import get_name
 from ..media.formats import Formats
-from ..media.profiles import AudioProfile, VideoProfile, is_codec_compatible, is_fps_compatible, is_level_compatible, \
-  is_resolution_compatible
+from ..media.profiles import AudioProfile, Profile, VideoProfile, is_codec_compatible, \
+  is_fps_compatible, is_level_compatible, is_resolution_compatible
 from ..model.video import Video
-from .run import transcode_video
 
 
 if TYPE_CHECKING:
   from ..media.codecs import Container, Subtitle
   from ..model.device import Device
+
+SCORE_INDEX: Final[int] = 1
+
+
+Score = int
+ProfileScore = tuple[Profile, Score]
+ProfileScores = Iterable[ProfileScore]
+ScoreMap = dict[Profile, Score]
+
+
+compare_score = itemgetter(SCORE_INDEX)
 
 
 def exists(*items: Any) -> bool:
@@ -31,9 +45,29 @@ def transcode_video(
   _, video_profile, *_ = video.formats
 
   if not default_video:
-    default_video, *_ = device.video_profiles
+    default_video = get_default_video_profile(device, video)
 
   return transcode_video_profile(video_profile, default_video)
+
+
+def get_default_video_profile(device: Device, video: Video) -> VideoProfile | None:
+  vid_prof = video.formats.video_profile
+
+  scores: ScoreMap = {
+    prof: prof.count
+    for dev_prof in device.video_profiles
+    if (prof := transcode_video_profile(vid_prof, dev_prof))
+  }
+
+  if not scores:
+    logging.info(f'Choosing first {get_name(VideoProfile)} from {device.name}')
+    return first(device.video_profiles)
+
+  profile_scores = cast(ProfileScores, scores.items())
+  profile_scores = sorted(profile_scores, key=compare_score)
+  profile, score = first(profile_scores)
+
+  return profile
 
 
 def transcode_audio(
@@ -47,7 +81,8 @@ def transcode_audio(
   *_, audio_profile, _ = video.formats
 
   if not default_audio:
-    default_audio, *_ = device.audio_profiles
+    logging.info(f'Choosing first {get_name(AudioProfile)} from {device.name}')
+    default_audio = first(device.audio_profiles)
 
   return transcode_audio_profile(audio_profile, default_audio)
 
@@ -63,7 +98,8 @@ def transcode_container(
   container, *_ = video.formats
 
   if not default_container:
-    default_container, *_ = device.containers
+    logging.info(f'Choosing first {get_name(Container)} from {device.name}')
+    default_container = first(device.containers)
 
   return transcode_containers(container, default_container)
 
@@ -79,7 +115,8 @@ def transcode_subtitle(
   *_, subtitle = video.formats
 
   if not default_subtitle:
-    default_subtitle, *_ = device.subtitles
+    logging.info(f'Choosing first {get_name(Subtitle)} from {device.name}')
+    default_subtitle = first(device.subtitles)
 
   return transcode_subtitles(subtitle, default_subtitle)
 
@@ -195,7 +232,9 @@ def should_transcode(
     return False
 
   if device.can_play(video):
-    print(f'✅ File [b blue]"{video.path}"[/] is compatible with [b]{device.name}[/].')
+    print(f'[green][✅] File [b blue]"{esc(video.path)}"[/] is compatible with [b]{device.name}[/].')
     return False
 
   return True
+
+
