@@ -1,26 +1,31 @@
 from __future__ import annotations
 
 from abc import ABC
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from typing import Final, TYPE_CHECKING
 
 from unpackable import Unpackable
 
+from .base import get_name
+from .codecs import AudioCodec, Codecs, ProfileName, VideoCodec
 from ..base import (
   AsDict, AsText, DEFAULT_PROFILE_FPS, DEFAULT_PROFILE_LEVEL,
   DEFAULT_PROFILE_RESOLUTION, Fps, Level, Resolution,
 )
-from .base import get_name
-from .codecs import AudioCodec, Codecs, Container, ProfileName, Subtitle, VideoCodec
 
 if TYPE_CHECKING:
-  from .formats import Formats, Metadata, are_compatible
+  from .formats import Metadata
 
+
+NO_BIAS: Final[int] = 0
+CODEC_BIAS: Final[int] = 5
 INCREMENT: Final[int] = 1
 
 
 @dataclass(eq=True, frozen=True)
 class Profile(ABC, AsDict, AsText, Unpackable):
+  codec: Codecs
+
   @property
   def as_dict(self) -> dict[str, Metadata]:
     return asdict(self)
@@ -37,6 +42,14 @@ class Profile(ABC, AsDict, AsText, Unpackable):
   def count(self) -> int:
     """Return a count of non-null formats belonging to Profile"""
     return sum(INCREMENT for fmt in self if fmt is not None)
+
+  @property
+  def bias(self) -> int:
+    return CODEC_BIAS if self.codec else NO_BIAS
+
+  @property
+  def weight(self) -> int:
+    return self.count + self.bias
 
 
 @dataclass(eq=True, frozen=True)
