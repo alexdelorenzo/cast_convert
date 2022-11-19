@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Iterable, NamedTuple
+from collections.abc import Iterable
+from typing import NamedTuple
 
 from .base import get_name
 from .codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
@@ -36,6 +37,24 @@ class Formats(NamedTuple):
           lines.append(f'[b]{key.title()}[/]: [b blue]{val}[/]')
 
     return '\n'.join(lines)
+
+  @property
+  def count(self) -> int:
+    container, *profiles, sub = self
+
+    count = sum(val is not None for val in (container, sub))
+    count += sum(prof.count for prof in profiles if prof)
+
+    return count
+
+  @property
+  def weight(self) -> int:
+    container, *profiles, sub = self
+
+    count = sum(val is not None for val in (container, sub))
+    count += sum(prof.weight for prof in profiles if prof)
+
+    return count
 
 
 Metadata = VideoFormat | Formats
