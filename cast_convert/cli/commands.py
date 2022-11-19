@@ -3,27 +3,27 @@ from __future__ import annotations
 from asyncio import run
 from enum import StrEnum
 from pathlib import Path
-from typing import Final
+from typing import Final, Self
 
 from rich import print
 from typer import Argument, Context, Exit, Option, Typer
 
 from .helpers import _get_command, _inspect, show_devices
-from .. import COPYRIGHT_NOTICE, PROJECT_HOME, __version__
+from .. import COPYRIGHT_NOTICE, LICENSE, PROJECT_HOME, __version__
 from ..core.base import DEFAULT_JOBS, DEFAULT_LOG_LEVEL, DEFAULT_MODEL, \
-  DEFAULT_THREADS, DESCRIPTION, Levels, Rc, setup_logging
-from ..core.convert.run import convert_from_name_path
+  DEFAULT_THREADS, DESCRIPTION, LogLevel, Rc, setup_logging
+from ..core.convert.run import convert_from_name_path, convert_paths
 from ..core.convert.watch import convert_videos
 from ..core.model.device import get_devices_from_file
 
 
 class Panels(StrEnum):
-  about: str = "❓ About"
-  analyze: str = '📊 Analyze'
-  convert: str = '📽️ Convert'
-  device: str = '📺 Device'
-  encoder_options: str = '🖥 Encoder Options'
-  supported: str = "🛠️ Hardware Support"
+  about: Self = "❓ About"
+  analyze: Self = '📊 Analyze'
+  convert: Self = '📽️ Convert'
+  device: Self = '📺 Device'
+  encoder_options: Self = '🖥 Encoder Options'
+  supported: Self = "🛠️ Hardware Support"
 
 
 DEFAULT_NAME_OPT: Final[Option] = Option(
@@ -50,10 +50,39 @@ DEFAULT_REPLACE_OPT: Final[Option] = Option(
 )
 
 DEFAULT_THREADS_OPT: Final[Option] = Option(
-  DEFAULT_THREADS,
+  int(DEFAULT_THREADS / DEFAULT_JOBS),
   '--threads', '-t',
   help="🧵 Number of threads to tell FFMPEG to use per job.",
   rich_help_panel=Panels.encoder_options,
+)
+
+DEFAULT_JOBS_OPT: Final[Option] = Option(
+  DEFAULT_JOBS,
+  '--jobs', '-j',
+  help=":input_numbers: Number of simultaneous transcoding jobs.",
+  rich_help_panel=Panels.encoder_options
+)
+
+DEFAULT_LOG_OPT: Final[Option] = Option(
+  DEFAULT_LOG_LEVEL,
+  '--log-level', '-l',
+  help="🪵 Set the minimum logging level.",
+  show_default=True,
+  rich_help_panel=Panels.about,
+)
+
+DEFAULT_VERSION_OPT: Final[Option] = Option(
+  False,
+  '--version', '-v',
+  help="🔢 Show application version and quit.",
+  rich_help_panel=Panels.about,
+)
+
+DEFAULT_DETAILS_OPT: Final[Option] = Option(
+  False,
+  '--details', '-d',
+  help=":information: Show detailed device information.",
+  rich_help_panel=Panels.device
 )
 
 LONG_DESCRIPTION: Final[str] = f"""
@@ -61,7 +90,7 @@ LONG_DESCRIPTION: Final[str] = f"""
 
 \n\t
   See [b]{PROJECT_HOME}[/b] for more information.
-  {COPYRIGHT_NOTICE}.
+  {COPYRIGHT_NOTICE}. License: {LICENSE}
 """
 
 
@@ -102,18 +131,14 @@ def convert(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
   replace: bool = DEFAULT_REPLACE_OPT,
+  jobs: int = DEFAULT_JOBS_OPT,
   threads: int = DEFAULT_THREADS_OPT,
 ):
   """
-  📼 Convert videos so they're compatible with specified device.
+  📼 Convert videos so that they're compatible with specified device.
   """
-  rc: int = Rc.ok
-
-  for path in paths:
-    if not convert_from_name_path(name, path, replace, threads):
-      rc = Rc.err
-
-  raise Exit(rc)
+  coro = convert_paths(name, replace, threads, jobs, *paths)
+  run(coro)
 
 
 @cli.command(
@@ -141,12 +166,7 @@ def inspect(
   # no_args_is_help=True,
 )
 def devices(
-  details: bool = Option(
-    False,
-    '--details', '-d',
-    help=":information: Show detailed device information.",
-    rich_help_panel=Panels.device
-  )
+  details: bool = DEFAULT_DETAILS_OPT,
 ):
   """
   📺 List all supported devices.
@@ -164,12 +184,7 @@ def devices(
 def watch(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
-  jobs: int = Option(
-    DEFAULT_JOBS,
-    '--jobs', '-j',
-    help=":input_numbers: Number of simultaneous transcoding jobs.",
-    rich_help_panel=Panels.encoder_options
-  ),
+  jobs: int = DEFAULT_JOBS_OPT,
   replace: bool = DEFAULT_REPLACE_OPT,
   threads: int = DEFAULT_THREADS_OPT,
 ):
@@ -189,24 +204,11 @@ def watch(
 @cli.callback(
   invoke_without_command=True,
   no_args_is_help=True,
-  # help=DESCRIPTION,
-  # epilog=EPILOG,
 )
 def main(
   ctx: Context,
-  log_level: Levels = Option(
-    DEFAULT_LOG_LEVEL,
-    '--log-level', '-l',
-    help="🪵 Set the minimum logging level.",
-    show_default=True,
-    rich_help_panel=Panels.about,
-  ),
-  version: bool = Option(
-    False,
-    '--version', '-v',
-    help="🔢 Show application version and quit.",
-    rich_help_panel=Panels.about,
-  ),
+  log_level: LogLevel = DEFAULT_LOG_OPT,
+  version: bool = DEFAULT_VERSION_OPT,
 ):
   setup_logging(log_level)
 
