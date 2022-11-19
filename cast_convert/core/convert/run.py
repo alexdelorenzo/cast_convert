@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from asyncio import BoundedSemaphore, TaskGroup, to_thread
+from collections.abc import Iterable
 from enum import StrEnum, auto
 from pathlib import Path
 from shlex import quote
-from typing import Final, Iterable
+from typing import Final, Self
 import logging
 
 import ffmpeg
@@ -28,37 +30,37 @@ HWACCEL_DEVICE: Final[Path] = Path('/dev/dri/renderD128')
 
 
 class FfmpegOpt(StrEnum):
-  acodec: str = auto()
-  vcodec: str = auto()
-  scodec: str = auto()
-  vprofile: str = auto()
-  vlevel: str = auto()
-  fps: str = auto()
-  r: str = auto()
+  acodec: Self = auto()
+  vcodec: Self = auto()
+  scodec: Self = auto()
+  vprofile: Self = auto()
+  vlevel: Self = auto()
+  fps: Self = auto()
+  r: Self = auto()
 
-  fflags: str = auto()
-  movflags: str = auto()
+  fflags: Self = auto()
+  movflags: Self = auto()
 
-  hwaccel: str = auto()
-  hwaccel_output_format: str = auto()
-  vaapi_device: str = auto()
+  hwaccel: Self = auto()
+  hwaccel_output_format: Self = auto()
+  vaapi_device: Self = auto()
 
-  scale: str = auto()
-  threads: str = auto()
+  scale: Self = auto()
+  threads: Self = auto()
 
 
 class FfmpegArg(StrEnum):
-  y: str = '-y'
+  y: Self = '-y'
 
 
 class FfmpegVal(StrEnum):
-  copy: str = auto()
-  vaapi: str = auto()
-  faststart: str = auto()
+  copy: Self = auto()
+  vaapi: Self = auto()
+  faststart: Self = auto()
 
-  genpts: str = '+genpts'
-  scale_resolution: str = str(SCALE_RESOLUTION)
-  vaapi_device: str = str(HWACCEL_DEVICE)
+  genpts: Self = '+genpts'
+  scale_resolution: Self = str(SCALE_RESOLUTION)
+  vaapi_device: Self = str(HWACCEL_DEVICE)
 
 
 Option = FfmpegOpt | str
@@ -118,7 +120,7 @@ def transcode_video(
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
 ) -> Video:
-  stream, path = get_stream(video, formats, threads)
+  stream, path = get_stream(video, formats, threads, replace)
   cmd = get_ffmpeg_cmd(stream, video.path)
 
   logging.info(f'Running command: {cmd}')
@@ -148,10 +150,11 @@ def get_stream(
   video: Video,
   formats: Formats,
   threads: int = DEFAULT_THREADS,
+  replace: bool = DEFAULT_REPLACE,
 ) -> tuple[OutputStream, Path]:
   input_opts = get_input_opts(formats)
   output_opts = get_output_opts(video, formats, threads)
-  new_path = get_new_path(video, formats)
+  new_path = get_new_path(video, formats, replace)
 
   stream = ffmpeg.input(
     str(video.path),
@@ -180,6 +183,7 @@ def get_stream(
 def get_new_path(
   video: Video,
   formats: Formats,
+  replace: bool = DEFAULT_REPLACE,
   suffix: str = TRANSCODE_SUFFIX,
 ) -> Path:
   container, video_profile, audio, subtitle = formats
@@ -274,21 +278,39 @@ def convert_from_name_path(
   path: Path,
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
-) -> bool:
+) -> Video | None:
   video = Video.from_path(path)
   device = load_device_with_name(name)
 
   if not should_transcode(device, video):
-    return False
+    return None
 
-  formats = device.transcode_to(video)
+  if not (formats := device.transcode_to(video)):
+    return None
 
   try:
-    transcode_video(video, formats, replace, threads)
+    return transcode_video(video, formats, replace, threads)
 
   except Exception as e:
     logging.exception(e)
     logging.error(f'Error while converting {video} to {formats}')
-    return False
 
-  return True
+    return None
+
+
+async def convert_paths(
+  name: str,
+  replace: bool,
+  threads: int,
+  jobs: int,
+  *paths: Path,
+):
+  sem = BoundedSemaphore(jobs)
+
+  async def convert(path: Path):
+    async with sem:
+      await to_thread(convert_from_name_path, name, path, replace, threads)
+
+  async with TaskGroup() as tg:
+    for path in paths:
+      tg.create_task(convert(path))

@@ -16,6 +16,8 @@ from ..core.parse import DEVICE_INFO
 
 
 def show_devices(devices: Devices, details: bool = False):
+  devices: Peekable[Device]
+
   for device in (devices := Peekable(devices)):
     tabs(f'[b]{device.name}', out=True, tick=True)
 
@@ -43,7 +45,7 @@ def _get_command(
     return False
 
   formats = device.transcode_to(video)
-  stream, _ = get_stream(video, formats, threads)
+  stream, _ = get_stream(video, formats, threads, replace)
 
   cmd = get_ffmpeg_cmd(stream, video.path)
   print(f'[b]{escape(cmd)}')

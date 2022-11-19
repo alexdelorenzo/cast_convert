@@ -1,7 +1,9 @@
 from __future__ import annotations
+
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Self, Iterable, cast
+from typing import Self, cast
 
 from pymediainfo import MediaInfo
 
@@ -80,13 +82,13 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
       break
 
   height, width = video.height, video.width
-  fps = video.original_frame_rate or video.frame_rate
+  fps = video.original_frame_rate or video.frame_rate or DEFAULT_VIDEO_FPS
   profile = video.format_profile
 
   return VideoProfile(
     codec=codec,
     resolution=Resolution(height),
-    fps=Fps(fps if fps else DEFAULT_VIDEO_FPS),
+    fps=Fps(fps),
     level=profile_to_level(profile)
   )
 

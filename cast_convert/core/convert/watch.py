@@ -1,7 +1,7 @@
 import logging
-from asyncio import sleep, to_thread, BoundedSemaphore, TaskGroup
+from asyncio import gather, sleep, to_thread, BoundedSemaphore, TaskGroup
+from collections.abc import AsyncIterable
 from pathlib import Path
-from typing import AsyncIterable
 
 from aiopath import AsyncPath
 from watchfiles import awatch, Change
@@ -82,11 +82,11 @@ async def is_video(path: Path) -> bool:
   return False
 
 
-def get_new_file(file: str, change: Change, seen: Paths) -> Path | None:
+def get_new_path(file: str, change: Change, seen: Paths) -> Path | None:
   path = Path(file)
 
   if path in seen:
-    return
+    return None
 
   seen.add(path)
 
@@ -104,7 +104,7 @@ async def gen_new_files(
 
   async for changes in awatch(*paths):
     for change, file in changes:
-      if path := get_new_file(file, change, seen):
+      if path := get_new_path(file, change, seen):
         yield path
 
 
@@ -114,16 +114,16 @@ async def convert(
   sem: BoundedSemaphore,
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
-):
+) -> Video | None:
   path = path.absolute()
 
   async with sem:
-    await wait_for_stable_size(path)
+    await gather(wait_for_stable_size(path), wait_until_closed(path))
 
     if not await is_video(path):
-      return
+      return None
 
-    await to_thread(convert_from_name_path, device, path, replace, threads)
+    return await to_thread(convert_from_name_path, device, path, replace, threads)
 
 
 async def convert_videos(
@@ -141,5 +141,6 @@ async def convert_videos(
 
   async with TaskGroup() as tg:
     async for path in gen_new_files(*paths, seen=seen):
+      path = AsyncPath(path).absolute()
       coro = convert(device, path, sem, replace, threads)
       tg.create_task(coro)

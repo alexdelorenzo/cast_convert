@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from operator import itemgetter
-from typing import Any, Final, ItemsView, Iterable, TYPE_CHECKING, cast
+from typing import Any, Final, TYPE_CHECKING, cast
 import logging
 
 from more_itertools import unzip
