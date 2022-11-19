@@ -11,6 +11,9 @@ from ..parse import ALIAS_FMTS
 class NormalizedFormat:
   unknown: Self | str
 
+  def __bool__(self) -> bool:
+    return self != self.unknown
+
   def __repr__(self) -> str:
     return f"{get_name(self)}({self})"
 
