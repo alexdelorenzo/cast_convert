@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from functools import cache
 from itertools import chain
 from pathlib import Path
-from typing import Iterable, Self, Type
+from typing import Self, Type
 import logging
 
 from ..base import IsCompatible, MIN_FUZZY_MATCH_SCORE, first, get_fuzzy_match
