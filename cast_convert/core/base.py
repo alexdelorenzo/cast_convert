@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable, Callable
 from decimal import Decimal
 from enum import IntEnum, StrEnum, auto
-from functools import cache
 from multiprocessing import cpu_count
 from pathlib import Path
 from typing import (
-  Any, Callable, Final, Iterable, Protocol, TYPE_CHECKING, TypeVar,
+  Any, Final, Protocol, Self, TYPE_CHECKING, TypeVar,
 )
 
 from more_itertools import peekable
@@ -70,16 +70,17 @@ DESCRIPTION: Final[str] = \
 Paths = set[Path]
 
 
-class Levels(StrEnum):
-  critical: Levels = auto()
-  debug: Levels = auto()
-  error: Levels = auto()
-  fatal: Levels = auto()
-  info: Levels = auto()
-  warn: Levels = auto()
+class LogLevel(StrEnum):
+  notset: Self = auto()
+  debug: Self = auto()
+  info: Self = auto()
+  warn: Self = auto()
+  error: Self = auto()
+  critical: Self = auto()
+  fatal: Self = auto()
 
 
-DEFAULT_LOG_LEVEL: Final[Levels] = Levels('warn')
+DEFAULT_LOG_LEVEL: Final[LogLevel] = LogLevel('warn')
 
 
 class Rc(IntEnum):
@@ -92,23 +93,21 @@ class Rc(IntEnum):
   no_matching_device: int = auto()
 
   must_convert: int = auto()
+  failed_conversion: int = auto()
 
 
 class IsCompatible(Protocol):
-  def is_compatible(self, other: Metadata) -> bool:
-    pass
+  def is_compatible(self, other: Metadata) -> bool: ...
 
 
 class AsDict(Protocol):
   @property
-  def as_dict(self) -> dict[str, Metadata]:
-    pass
+  def as_dict(self) -> dict[str, Metadata]: ...
 
 
 class AsText(Protocol):
   @property
-  def text(self) -> str:
-    pass
+  def text(self) -> str: ...
 
 
 class Peekable(peekable, Iterable[T]):
@@ -123,6 +122,10 @@ class Peekable(peekable, Iterable[T]):
 def first(iterable: Iterable[T], default: Item = None) -> Item:
   iterator = iter(iterable)
   return next(iterator, default)
+
+
+def identity(obj: T) -> T:
+  return obj
 
 
 def normalize(
@@ -163,19 +166,6 @@ def checklist(text: str | Any) -> str:
   return NEW_LINE.join(f'{TAB}- {line}' for line in lines)
 
 
-def tab_list(
-  text: str | Any,
-  tabs: int = 1,
-  out: bool = False,
-) -> str:
-  text: str = tab(checklist(text), tabs=tabs)
-
-  if out:
-    print(text)
-
-  return text
-
-
 def tabs(
   text: str | Any,
   tabs: int = 1,
@@ -193,20 +183,20 @@ def tabs(
   return text
 
 
-def setup_logging(log_level: Levels = DEFAULT_LOG_LEVEL):
-  log_level = get_fuzzy_match(log_level, Levels, min_score=0)
+def setup_logging(level: LogLevel = DEFAULT_LOG_LEVEL):
   handlers = [RichHandler(rich_tracebacks=True)]
 
-  logging.basicConfig(level=log_level.upper(), handlers=handlers)
-  logging.debug(f'Set log level to {log_level}.')
+  logging.basicConfig(level=level.upper(), handlers=handlers)
+  logging.debug(f'Set log level to {level}.')
 
 
 def get_fuzzy_match(
   name: str,
-  items: Iterable[T],
+  items: Iterable[str],
   min_score: int = MIN_FUZZY_MATCH_SCORE,
-) -> T | None:
+) -> str | None:
   closest, score = process.extractOne(name, items)
+  logging.debug(f"Fuzzy match: {name} -> {closest} ({score})")
 
   if score < min_score:
     return None
