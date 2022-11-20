@@ -9,10 +9,11 @@ from rich import print
 from typer import Argument, Context, Exit, Option, Typer
 
 from .helpers import _get_command, _inspect, show_devices
-from .. import COPYRIGHT_NOTICE, LICENSE, PROJECT_HOME, __version__
+from .. import CLI_ENTRY, COPYRIGHT_NOTICE, DESCRIPTION, LICENSE, PROJECT_HOME, __version__
 from ..core.base import DEFAULT_JOBS, DEFAULT_LOG_LEVEL, DEFAULT_MODEL, \
-  DEFAULT_THREADS, DESCRIPTION, LogLevel, Rc, setup_logging
-from ..core.convert.run import convert_from_name_path, convert_paths
+  DEFAULT_THREADS, LogLevel, Rc, Strategy, bad_file_exit, setup_logging
+
+from ..core.convert.run import convert_paths
 from ..core.convert.watch import convert_videos
 from ..core.model.device import get_devices_from_file
 
@@ -71,6 +72,14 @@ DEFAULT_LOG_OPT: Final[Option] = Option(
   rich_help_panel=Panels.about,
 )
 
+DEFAULT_STRATEGY_OPT: Final[Option] = Option(
+  Strategy.quit,
+  '--error', '-e',
+  help="❗ Set the error handling strategy.",
+  show_default=True,
+  rich_help_panel=Panels.analyze,
+)
+
 DEFAULT_VERSION_OPT: Final[Option] = Option(
   False,
   '--version', '-v',
@@ -93,11 +102,11 @@ LONG_DESCRIPTION: Final[str] = f"""
   {COPYRIGHT_NOTICE}. License: {LICENSE}
 """
 
-
 cli: Final[Typer] = Typer(
   no_args_is_help=True,
   help=LONG_DESCRIPTION,
   rich_markup_mode='rich',
+  name=CLI_ENTRY
 )
 
 
@@ -105,11 +114,13 @@ cli: Final[Typer] = Typer(
   rich_help_panel=Panels.analyze,
   no_args_is_help=True,
 )
+@bad_file_exit
 def command(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
   replace: bool = DEFAULT_REPLACE_OPT,
   threads: int = DEFAULT_THREADS_OPT,
+  error: Strategy = DEFAULT_STRATEGY_OPT,
 ):
   """
   📜 Get FFmpeg transcoding command.
@@ -117,7 +128,7 @@ def command(
   rc: int = Rc.ok
 
   for path in paths:
-    if _get_command(name, path, replace, threads):
+    if _get_command(name, path, replace, threads, error):
       rc = Rc.must_convert
 
   raise Exit(rc)
@@ -127,17 +138,19 @@ def command(
   rich_help_panel=Panels.convert,
   no_args_is_help=True,
 )
+@bad_file_exit
 def convert(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
   replace: bool = DEFAULT_REPLACE_OPT,
   jobs: int = DEFAULT_JOBS_OPT,
   threads: int = DEFAULT_THREADS_OPT,
+  error: Strategy = DEFAULT_STRATEGY_OPT,
 ):
   """
   📼 Convert videos so that they're compatible with specified device.
   """
-  coro = convert_paths(name, replace, threads, jobs, *paths)
+  coro = convert_paths(name, replace, threads, jobs, *paths, strategy=error)
   run(coro)
 
 
@@ -145,9 +158,11 @@ def convert(
   rich_help_panel=Panels.analyze,
   no_args_is_help=True,
 )
+@bad_file_exit
 def inspect(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
+  error: Strategy = DEFAULT_STRATEGY_OPT,
 ):
   """
   🔎 Inspect videos to see what attributes should get transcoded.
@@ -155,7 +170,7 @@ def inspect(
   rc: int = Rc.ok
 
   for path in paths:
-    if _inspect(name, path):
+    if _inspect(name, path, error):
       rc = Rc.must_convert
 
   raise Exit(rc)
@@ -181,12 +196,14 @@ def devices(
   rich_help_panel=Panels.convert,
   no_args_is_help=True,
 )
+@bad_file_exit
 def watch(
   name: str = DEFAULT_NAME_OPT,
   paths: list[Path] = DEFAULT_PATHS_ARG,
   jobs: int = DEFAULT_JOBS_OPT,
   replace: bool = DEFAULT_REPLACE_OPT,
   threads: int = DEFAULT_THREADS_OPT,
+  error: Strategy = DEFAULT_STRATEGY_OPT,
 ):
   """
   👀 Watch directories for new or modified videos and convert them.
@@ -196,7 +213,7 @@ def watch(
     device=name,
     jobs=jobs,
     replace=replace,
-    threads=threads
+    threads=threads,
   )
   run(coro)
 
