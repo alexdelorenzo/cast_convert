@@ -1,12 +1,12 @@
 from __future__ import annotations
-from sys import version_info
+
 from pathlib import Path
 from typing import Final
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
-from cast_convert import NAME, __version__
-from cast_convert.core.base import DESCRIPTION
+from cast_convert import AUTHOR_INFO, DESCRIPTION, ENTRY_POINTS, \
+  LICENSE, NAME, PROJECT_HOME, __version__
 
 
 REQUIREMENTS: list[str] = (
@@ -14,7 +14,11 @@ REQUIREMENTS: list[str] = (
   .read_text()
   .split('\n')
 )
-REQUIREMENTS = [req for req in REQUIREMENTS if req]
+REQUIREMENTS = [
+  rule
+  for req in REQUIREMENTS
+  if (rule := req.strip()) and not rule.startswith('#')
+]
 
 ASSET_DIRS: Final[list[str]] = [
   'assets/*.yml',
@@ -28,17 +32,13 @@ setup(
   name=NAME,
   version=__version__,
   description=DESCRIPTION,
-  url="https://github.com/alexdelorenzo/cast_convert",
-  author="Alex DeLorenzo (alexdelorenzo.dev)",
-  license="AGPL 3.0",
+  url=PROJECT_HOME,
+  author=AUTHOR_INFO,
+  license=LICENSE,
   packages=[*find_packages()],
   package_data=PKG_DATA,
   zip_safe=True,
   install_requires=REQUIREMENTS,
   keywords='chromecast transcode convert video cli'.split(' '),
-  entry_points={
-    "console_scripts": [
-      "cast-convert = cast_convert.cli:cli",
-    ]
-  }
+  entry_points=ENTRY_POINTS
 )
