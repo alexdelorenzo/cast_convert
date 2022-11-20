@@ -9,15 +9,14 @@ import logging
 from more_itertools import unzip
 from rich import print
 
-from ..base import esc, first
-from ..media.base import get_name
+from ..base import esc, first, get_name
+from ..media.codecs import Container, Subtitle
 from ..media.formats import Formats
 from ..media.profiles import AudioProfile, Profile, VideoProfile, is_codec_compatible, \
   is_fps_compatible, is_level_compatible, is_resolution_compatible
 from ..model.video import Video
 
 if TYPE_CHECKING:
-  from ..media.codecs import Container, Subtitle
   from ..model.device import Device
 
 
@@ -276,5 +275,4 @@ def should_transcode(
     return False
 
   return True
-
 
