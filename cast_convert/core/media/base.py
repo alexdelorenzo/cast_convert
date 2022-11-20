@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import logging
 from enum import StrEnum, auto
-from typing import Any, Self, Type
+from typing import Self, Type
 
-from ..base import normalize
+from ..base import WithName, get_name, normalize
 from ..parse import ALIAS_FMTS
 
 
-class NormalizedFormat:
+class NormalizedFormat(WithName):
   unknown: Self | str
 
   def __bool__(self) -> bool:
@@ -35,25 +35,21 @@ class NormalizedFormat:
 
   @classmethod
   def from_info(cls: Type[Self], info: str | None) -> Self:
+    name = get_name(cls)
+
     if not info:
+      logging.info(f"[{name}] no info supplied: {info}")
       return cls.unknown
 
     if not isinstance(info, str):
-      raise TypeError(f"[{get_name(cls)}] Can't normalize: {info}")
+      raise TypeError(f"[{name}] Can't normalize: {info}")
 
     normalized = normalize(info)
+    logging.debug(f'{name}({info}) normalized as {name}({normalized})')
+
     return cls(normalized)
 
 
 class OnTranscodeErr(NormalizedFormat, StrEnum):
   cycle_video_encoders: OnTranscodeErr = auto()
   cycle_audio_encoders: OnTranscodeErr = auto()
-
-
-def get_name(obj: Any) -> str:
-  match obj:
-    case type() as cls:
-      return cls.__name__
-
-    case _:
-      return type(obj).__name__
