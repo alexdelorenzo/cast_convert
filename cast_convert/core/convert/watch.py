@@ -7,8 +7,10 @@ from aiopath import AsyncPath
 from watchfiles import awatch, Change
 import psutil
 
+from ..exceptions import UnknownFormat
 from ..model.video import Video
-from ..base import DEFAULT_JOBS, DEFAULT_MODEL, DEFAULT_REPLACE, DEFAULT_THREADS, FILESIZE_CHECK_WAIT, NO_SIZE, Paths
+from ..base import DEFAULT_JOBS, DEFAULT_MODEL, DEFAULT_REPLACE, DEFAULT_THREADS, FILESIZE_CHECK_WAIT, NO_SIZE, Paths, \
+  Strategy, get_error_handler, handle_errors
 from .run import convert_from_name_path
 
 
@@ -133,14 +135,15 @@ async def convert_videos(
   jobs: int = DEFAULT_JOBS,
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
+  error: Strategy = Strategy.quit,
 ):
   if seen is None:
     seen = Paths()
 
   sem = BoundedSemaphore(jobs)
+  handled_converter = get_error_handler(convert, UnknownFormat, strategy=error)
 
   async with TaskGroup() as tg:
     async for path in gen_new_files(*paths, seen=seen):
-      path = AsyncPath(path).absolute()
-      coro = convert(device, path, sem, replace, threads)
+      coro = handled_converter(device, path, sem, replace, threads)
       tg.create_task(coro)
