@@ -3,9 +3,9 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import NamedTuple
 
-from .base import get_name
 from .codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
 from .profiles import AudioProfile, Profile, Profiles, VideoProfile, is_video_profile_compatible
+from ..base import HasName, NEW_LINE, get_name, has_items
 
 
 VideoFormat = Codecs | Profiles | Container | Subtitle
@@ -18,25 +18,35 @@ class Formats(NamedTuple):
   audio_profile: AudioProfile | None = None
   subtitle: Subtitle | None = None
 
-  def is_compatible(self, other: Metadata) -> bool:
+  def __bool__(self) -> bool:  # Protocol: HasItems
+    return has_items(self)
+
+  def is_compatible(self, other: Metadata) -> bool:  # Protocol: IsCompatible
     return is_compatible(self, other)
 
   @property
-  def text(self) -> str:
+  def as_dict(self) -> dict[str, Metadata]:  # Protocol: AsDict
+    return self._asdict()
+
+  @property
+  def text(self) -> str:  # Protocol: AsText
     lines = list[str]()
 
-    for key, val in self._asdict().items():
+    for name, val in self.as_dict.items():
       match val:
-        case None:
-          pass
-
         case Profile() as profile:
           lines.append(profile.text)
 
-        case _:
-          lines.append(f'[b]{key.title()}[/]: [b blue]{val}[/]')
+        case HasName():
+          lines.append(f'[b]{val.name}[/]: [b blue]{val}[/]')
 
-    return '\n'.join(lines)
+        case None:
+          pass
+
+        case _:
+          lines.append(f'[b]{name.title()}[/]: [b blue]{val}[/]')
+
+    return NEW_LINE.join(lines)
 
   @property
   def count(self) -> int:
