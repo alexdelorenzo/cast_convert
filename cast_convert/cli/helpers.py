@@ -1,18 +1,24 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import NoReturn
+from typing import AsyncIterable, Iterable, NoReturn
 
+from aiopath import AsyncPath
 from typer import Exit
 from rich import print
 from rich.markup import escape
 
-from ..core.base import DEFAULT_REPLACE, DEFAULT_THREADS, Peekable, Rc, esc, tabs
+from ..core.base import DEFAULT_REPLACE, DEFAULT_THREADS, Peekable, Rc, Strategy, esc, \
+  get_error_handler, handle_errors, tabs
 from ..core.convert.run import get_ffmpeg_cmd, get_stream
 from ..core.convert.transcode import should_transcode
+from ..core.exceptions import UnknownFormat
 from ..core.model.device import Device, Devices, get_device_fuzzy, get_devices_from_file
 from ..core.model.video import Video
 from ..core.parse import DEVICE_INFO
+
+
+GLOB_FILES_RECURSIVE = '**/*.*'
 
 
 def show_devices(devices: Devices, details: bool = False):
@@ -35,13 +41,16 @@ def _get_command(
   path: Path,
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
+  error: Strategy = Strategy.quit,
 ) -> bool:
   video = Video.from_path(path)
 
   if not (device := _get_device_from_name(name)):
     raise Exit(Rc.no_matching_device)
 
-  if not should_transcode(device, video):
+  handled_inspector = get_error_handler(should_transcode, UnknownFormat, strategy=error)
+
+  if not handled_inspector(device, video):
     return False
 
   formats = device.transcode_to(video)
@@ -56,18 +65,21 @@ def _get_command(
 def _inspect(
   name: str,
   path: Path,
+  error: Strategy = Strategy.quit
 ) -> bool:
   video = Video.from_path(path)
 
   if not (device := _get_device_from_name(name)):
     raise Exit(Rc.no_matching_device)
 
-  if not should_transcode(device, video):
+  handled_inspector = get_error_handler(should_transcode, UnknownFormat, strategy=error)
+
+  if not handled_inspector(device, video):
     return False
 
   name = device.name
 
-  print(f'[b red][🔄️] Need to convert [b blue]"{esc(video.path)}"[/] to play on [yellow]{name}[/]...[/]')
+  print(f'[b red][❌️] Need to convert [b blue]"{esc(video.path)}"[/] to play on [yellow]{name}[/]...[/]')
   tabs('[b red]Must convert from:', out=True)
   tabs(video.formats.text, out=True, tick=True)
 
@@ -93,7 +105,24 @@ def _get_device_from_name(
   return dev
 
 
-def check_paths(paths: list[Path]) -> NoReturn | None:
-  if not paths:
-    print('[b red][❌] No paths supplied.')
-    raise Exit(Rc.missing_args)
+def gen_paths(*paths: Path) -> Iterable[Path]:
+  for path in paths:
+    if path.is_dir():
+      yield from path.glob(GLOB_FILES_RECURSIVE)
+      continue
+
+    yield path
+
+
+async def gen_paths(*paths: Path) -> AsyncIterable[Path]:
+  paths = map(AsyncPath, paths)
+
+  for path in paths:
+    if await path.is_dir():
+      async for path in path.glob(GLOB_FILES_RECURSIVE):
+        yield path
+
+      continue
+
+    yield path
+
