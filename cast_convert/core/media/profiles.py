@@ -2,28 +2,24 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import asdict, dataclass
-from typing import Final, TYPE_CHECKING
+from functools import cache
+from typing import TYPE_CHECKING
 
 from unpackable import Unpackable
 
-from .base import get_name
-from .codecs import AudioCodec, Codecs, ProfileName, VideoCodec
+from .codecs import AudioCodec, Codec, Codecs, ProfileName, VideoCodec
 from ..base import (
-  AsDict, AsText, DEFAULT_PROFILE_FPS, DEFAULT_PROFILE_LEVEL,
-  DEFAULT_PROFILE_RESOLUTION, Fps, Level, Resolution,
+  AsDict, AsText, CODEC_BIAS, DEFAULT_PROFILE_FPS, DEFAULT_PROFILE_LEVEL,
+  DEFAULT_PROFILE_RESOLUTION, Fps, HasName, WithName, HasWeight, INCREMENT, IsCompatible, Level, NEW_LINE,
+  NO_BIAS, Resolution, get_name,
 )
 
 if TYPE_CHECKING:
   from .formats import Metadata
 
 
-NO_BIAS: Final[int] = 0
-CODEC_BIAS: Final[int] = 5
-INCREMENT: Final[int] = 1
-
-
 @dataclass(eq=True, frozen=True)
-class Profile(ABC, AsDict, AsText, Unpackable):
+class Profile(ABC, AsDict, AsText, HasWeight, IsCompatible, WithName, Unpackable):
   codec: Codecs
 
   @property
@@ -32,8 +28,8 @@ class Profile(ABC, AsDict, AsText, Unpackable):
 
   @property
   def text(self):
-    return '\n'.join(
-      f'[b]{key.title()}[/]: [b blue]{val}[/]'
+    return NEW_LINE.join(
+      f'[b]{get_label(key, val)}[/]: [b blue]{val}[/]'
       for key, val in self.as_dict.items()
       if val is not None
     )
@@ -54,22 +50,51 @@ class Profile(ABC, AsDict, AsText, Unpackable):
 
 @dataclass(eq=True, frozen=True)
 class AudioProfile(Profile):
+  """Audio Profile"""
   codec: AudioCodec | None = AudioCodec.unknown
 
   def __repr__(self) -> str:
     return f"{get_name(self)}({self.codec})"
 
+  def is_compatible(self, other: Metadata) -> bool:
+    match other:
+      case AudioProfile() as profile:
+        return is_codec_compatible(self.codec, profile.codec)
+
+      case AudioCodec() as codec:
+        return is_codec_compatible(self.codec, codec)
+
+    super().is_compatible(other)
+
 
 @dataclass(eq=True, frozen=True)
-class VideoProfile(Profile):
+class VideoProfile(Profile, IsCompatible):
+  """Video Profile"""
   codec: VideoCodec | None = VideoCodec.unknown
   resolution: Resolution | None = DEFAULT_PROFILE_RESOLUTION
   fps: Fps | None = DEFAULT_PROFILE_FPS
   level: Level | None = DEFAULT_PROFILE_LEVEL
 
+  def is_compatible(self, other: Metadata) -> bool:
+    match other:
+      case VideoProfile() as profile:
+        return is_video_profile_compatible(self, other)
+
+      case Resolution() as resolution:
+        return is_resolution_compatible(self.resolution, resolution)
+
+      case Fps() as fps:
+        return is_fps_compatible(self.fps, fps)
+
+      case Level() as level:
+        return is_level_compatible(self.level, level)
+
+    super().is_compatible(other)
+
 
 @dataclass(eq=True, frozen=True)
 class EncoderProfile(Profile):
+  """Encoder Profile"""
   profile: ProfileName | None = None
   level: Level | None = None
 
@@ -121,3 +146,17 @@ def is_codec_compatible(
 ) -> bool:
   return codec is other
 
+
+@cache
+def get_label(key: str, val: Metadata) -> str:
+  match val:
+    case Codec() | HasName() as has_name:
+      label = has_name.name.title()
+
+    case _:
+      label = key.title()
+
+  if len(label) <= 3:
+    label = label.upper()
+
+  return label
