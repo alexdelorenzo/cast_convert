@@ -4,15 +4,15 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Self, cast
+import logging
 
 from pymediainfo import MediaInfo
 
 from ..base import (
-  IsCompatible, normalize, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL,
+  IsCompatible, VariableFps, get_name, normalize, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL,
   Level, Fps, LEVEL_SEP, AT, Resolution,
 )
 from ..media.profiles import AudioProfile, VideoProfile
-from ..media.base import get_name
 from ..media.formats import Formats, VideoFormat, is_compatible
 from ..media.codecs import AudioCodec, Container, Subtitle, VideoCodec
 from ..parse import Yaml
@@ -27,13 +27,25 @@ class Video(IsCompatible):
   data: MediaInfo
 
   @classmethod
-  def from_path(cls, path: Path) -> Self:
+  def from_path(cls, path: Path | str) -> Self:
+    path = Path(path)
     data: MediaInfo = MediaInfo.parse(path)
 
     [general] = data.general_tracks
     title = general.file_name or general.complete_name
 
-    container = Container.from_info(general.format)
+    container = Container.from_info(
+      general.codec_id or
+      general.format or
+      general.file_extension
+    )
+
+    if exts := general.fileextension_invalid:
+      logging.error(f"{path} has an invalid file extension, not in: {exts}")
+
+    if exts and container is Container.unknown:
+      container = Container.invalid
+
     subtitle = Subtitle.from_info(general.text_codecs)
 
     video_profile = get_video_profile(data)
@@ -82,13 +94,18 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
       break
 
   height, width = video.height, video.width
-  fps = video.original_frame_rate or video.frame_rate or DEFAULT_VIDEO_FPS
   profile = video.format_profile
+
+  fps = Fps(video.original_frame_rate or video.frame_rate or DEFAULT_VIDEO_FPS)
+
+  if not fps and (mode := video.frame_rate_mode):
+    logging.warning(f"Assuming VFR, detected FPS: {mode}")
+    fps = VariableFps
 
   return VideoProfile(
     codec=codec,
     resolution=Resolution(height),
-    fps=Fps(fps),
+    fps=fps,
     level=profile_to_level(profile)
   )
 
