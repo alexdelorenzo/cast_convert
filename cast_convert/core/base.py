@@ -79,7 +79,7 @@ class Fps(Decimal, WithName):
     if self is VariableFps:
       return VFR_DESCRIPTION
 
-    return super().__str__(self)
+    return super().__str__()
 
 
 VariableFps: Final[Fps] = Fps('-1')
