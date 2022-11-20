@@ -3,6 +3,7 @@ from __future__ import annotations
 from asyncio import BoundedSemaphore, TaskGroup, to_thread
 from collections.abc import Iterable
 from enum import StrEnum, auto
+from functools import partial
 from pathlib import Path
 from shlex import quote
 from typing import Final, Self
@@ -12,9 +13,11 @@ import ffmpeg
 from ffmpeg.nodes import FilterableStream, OutputStream
 
 from .transcode import should_transcode
+from ..exceptions import UnknownFormat
 from ..media.formats import Formats
 from ..media.codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
-from ..base import DEFAULT_REPLACE, DEFAULT_THREADS, JOIN_COMMAND, first, Resolution
+from ..base import DEFAULT_REPLACE, DEFAULT_THREADS, JOIN_COMMAND, Strategy, first, Resolution, get_error_handler, \
+  handle_errors
 from ..model.device import load_device_with_name
 from ..parse import Alias, Aliases, AUDIO_ENCODERS, SUBTITLE_ENCODERS, VIDEO_ENCODERS, Extension
 from ..model.video import Video
@@ -48,6 +51,8 @@ class FfmpegOpt(StrEnum):
   scale: Self = auto()
   threads: Self = auto()
 
+  vsync: Self = auto()
+
 
 class FfmpegArg(StrEnum):
   y: Self = '-y'
@@ -61,6 +66,8 @@ class FfmpegVal(StrEnum):
   genpts: Self = '+genpts'
   scale_resolution: Self = str(SCALE_RESOLUTION)
   vaapi_device: Self = str(HWACCEL_DEVICE)
+
+  vfr: Self = auto()
 
 
 Option = FfmpegOpt | str
@@ -120,16 +127,21 @@ def transcode_video(
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
 ) -> Video:
-  stream, path = get_stream(video, formats, threads, replace)
+  stream, converted = get_stream(video, formats, threads, replace)
   cmd = get_ffmpeg_cmd(stream, video.path)
 
   logging.info(f'Running command: {cmd}')
   stream.run()  # type: ignore
 
-  if replace and path:
-    path = path.rename(video.path)
+  orig: Path = video.path
 
-  return Video.from_path(path)
+  if replace and converted:
+    if orig != (new_name := orig.with_suffix(converted.suffix)):
+      orig.unlink(missing_ok=True)
+
+    converted = converted.rename(new_name)
+
+  return Video.from_path(converted)
 
 
 def get_ffmpeg_cmd(
@@ -187,7 +199,7 @@ def get_new_path(
   suffix: str = TRANSCODE_SUFFIX,
 ) -> Path:
   container, video_profile, audio, subtitle = formats
-  codec, *_ = video_profile
+  # codec, *_ = video_profile
 
   ext: Extension = video.path.suffix
 
@@ -229,6 +241,7 @@ def get_output_opts(
   *_, fps, level = profile
 
   if fps:
+    opts[FfmpegOpt.vsync] = FfmpegVal.vfr
     opts[FfmpegOpt.r] = fps
 
   if level:
@@ -304,12 +317,14 @@ async def convert_paths(
   threads: int,
   jobs: int,
   *paths: Path,
+  strategy: Strategy = Strategy.quit
 ):
   sem = BoundedSemaphore(jobs)
+  handled_converter = get_error_handler(convert_from_name_path, UnknownFormat, strategy=strategy)
 
   async def convert(path: Path):
     async with sem:
-      await to_thread(convert_from_name_path, name, path, replace, threads)
+      await to_thread(handled_converter, name, path, replace, threads)
 
   async with TaskGroup() as tg:
     for path in paths:
