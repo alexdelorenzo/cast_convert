@@ -1,21 +1,25 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterable, Callable
+import sys
+from collections.abc import Iterable
 from decimal import Decimal
 from enum import IntEnum, StrEnum, auto
+from functools import wraps
 from multiprocessing import cpu_count
 from pathlib import Path
 from typing import (
-  Any, Final, Protocol, Self, TYPE_CHECKING, TypeVar,
+  Any, Callable, Final, ParamSpec, Protocol, Self, TYPE_CHECKING, TypeVar, runtime_checkable,
 )
 
 from more_itertools import peekable
+from rich import print
 from rich.logging import RichHandler
 from rich.markup import escape
-from rich import print
 from thefuzz import process
+from typer import Exit
 
+from .exceptions import CannotCompare, UnknownFormat
 
 if TYPE_CHECKING:
   from .media.formats import Metadata
@@ -40,21 +44,57 @@ MIN_FUZZY_MATCH_SCORE: Final[int] = 30
 FILESIZE_CHECK_WAIT: Final[float] = 2.0
 NO_SIZE: Final[int] = -1
 
+NO_BIAS: Final[int] = 0
+CODEC_BIAS: Final[int] = 5
+INCREMENT: Final[int] = 1
 
-T = TypeVar('T')
-U = TypeVar('U')
 
-Item = T | U | None
+class WithName:
+  @property
+  def name(self) -> str:
+    if doc := self.__doc__:
+      name, *_ = doc.split(NEW_LINE)
+      return name
+
+    return get_name(self)
+
+
+@runtime_checkable
+class HasName(Protocol):
+  @property
+  def name(self) -> str: ...
 
 
 class Decimal(Decimal):
+  def __format__(self, *args, **kwargs) -> str:
+    return str(self)
+
   def __repr__(self) -> str:
     return str(self)
 
 
-Fps = Decimal
-Level = Decimal
-Resolution = int
+class Fps(Decimal, WithName):
+  """Frame rate"""
+  def __str__(self) -> str:
+    if self is VariableFps:
+      return VFR_DESCRIPTION
+
+    return super().__str__(self)
+
+
+VariableFps: Final[Fps] = Fps('-1')
+VFR_DESCRIPTION: Final[str] = 'Variable frame rate'
+
+
+class Level(Decimal, WithName):
+  """Encoder Level"""
+  pass
+
+
+class Resolution(int, WithName):
+  """Resolution Height"""
+  pass
+
 
 DEFAULT_VIDEO_FPS: Final[Fps] = Fps()
 DEFAULT_VIDEO_LEVEL: Final[Level] = Level()
@@ -63,15 +103,8 @@ DEFAULT_PROFILE_FPS: Final[Fps] = Fps('24.0')
 DEFAULT_PROFILE_LEVEL: Final[Level] = Level('0.0')
 DEFAULT_PROFILE_RESOLUTION: Final[Resolution] = Resolution(720)
 
-DESCRIPTION: Final[str] = \
-  "📽️ Identify and convert videos to formats that are Chromecast supported."
-
-
-Paths = set[Path]
-
 
 class LogLevel(StrEnum):
-  notset: Self = auto()
   debug: Self = auto()
   info: Self = auto()
   warn: Self = auto()
@@ -81,6 +114,24 @@ class LogLevel(StrEnum):
 
 
 DEFAULT_LOG_LEVEL: Final[LogLevel] = LogLevel('warn')
+
+
+T = TypeVar('T')
+U = TypeVar('U')
+P = ParamSpec('P')
+
+Item = T | U | None
+
+Paths = set[Path]
+
+Decorated = Callable[P, T]
+Decoratable = Callable[P, T]
+Decorator = Callable[[Decoratable], Decorated]
+
+
+class Strategy(StrEnum):
+  quit: Self = auto()
+  skip: Self = auto()
 
 
 class Rc(IntEnum):
@@ -94,20 +145,44 @@ class Rc(IntEnum):
 
   must_convert: int = auto()
   failed_conversion: int = auto()
+  unknown_format: int = auto()
 
 
+@runtime_checkable
 class IsCompatible(Protocol):
-  def is_compatible(self, other: Metadata) -> bool: ...
+  def is_compatible(self, other: Metadata) -> bool:
+    raise CannotCompare(f"Can't compare {self} with {other}")
 
 
+@runtime_checkable
 class AsDict(Protocol):
   @property
   def as_dict(self) -> dict[str, Metadata]: ...
 
 
+@runtime_checkable
 class AsText(Protocol):
   @property
   def text(self) -> str: ...
+
+
+@runtime_checkable
+class HasWeight(Protocol):
+  @property
+  def bias(self) -> int:
+    return NO_BIAS
+
+  @property
+  def count(self) -> int: ...
+
+  @property
+  def weight(self) -> int: ...
+
+
+@runtime_checkable
+class HasItems(Protocol):
+  def __bool__(self) -> bool:
+    return has_items(self)
 
 
 class Peekable(peekable, Iterable[T]):
@@ -117,6 +192,53 @@ class Peekable(peekable, Iterable[T]):
   @property
   def is_empty(self) -> bool:
     return not self
+
+
+def has_items(obj: Any) -> bool:
+  try:
+    items = iter(obj)
+
+  except TypeError as e:
+    logging.warning(f"[{e}] Can't get an iterator for type {get_name(obj)}")
+    items = obj.__dict__.values()
+
+  return any(item is not None for item in items)
+
+
+def handle_errors(*exceptions: type[Exception], strategy: Strategy = Strategy.quit) -> Decorator:
+  def wrapper(func: Decoratable) -> Decorated:
+    @wraps(func)
+    def new(*args: P.args, **kwargs: P.kwargs) -> T:
+      try:
+        return func(*args, **kwargs)
+
+      except exceptions as e:
+        logging.exception(e)
+        logging.error(f'Failed: {func.__name__}({args=}, {kwargs=})')
+
+        match strategy:
+          case Strategy.quit:
+            print(f'[b red]Quitting because of error:[/] {e}', file=sys.stderr)
+            raise Exit(Rc.err) from e
+
+          case Strategy.skip:
+            logging.warning(f'[{strategy}] Encountered error: {e}, skipping.')
+
+    return new
+
+  return wrapper
+
+
+def get_error_handler(
+  func: Decoratable,
+  *exceptions: type[Exception],
+  strategy: Strategy = Strategy.quit
+) -> Decorated:
+  error_handler = handle_errors(*exceptions, strategy=strategy)
+  return error_handler(func)
+
+
+bad_file_exit: Final[Decorator] = handle_errors(UnknownFormat)
 
 
 def first(iterable: Iterable[T], default: Item = None) -> Item:
@@ -202,3 +324,12 @@ def get_fuzzy_match(
     return None
 
   return closest
+
+
+def get_name(obj: Any) -> str:
+  match obj:
+    case type() as cls:
+      return cls.__name__
+
+    case _:
+      return type(obj).__name__
