@@ -9,15 +9,19 @@ class StreamNotFoundException(CastConvertException):
   pass
 
 
-class VideoError(CastConvertException):
+class FormatError(CastConvertException):
   pass
 
 
-class UnknownFormat(VideoError):
+class CannotCompare(FormatError):
   pass
 
 
-class FileNotVideo(VideoError):
+class UnknownFormat(FormatError):
+  pass
+
+
+class FileNotVideo(FormatError):
   pass
 
 
