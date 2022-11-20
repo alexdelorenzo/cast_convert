@@ -4,7 +4,7 @@ import logging
 from enum import Enum, StrEnum, auto
 from typing import Self, Type, TypeVar
 
-from ..base import SUBTITLE_SEP
+from ..base import WithName, SUBTITLE_SEP, get_name
 from ..parse import EXTENSIONS, Extension
 from .base import NormalizedFormat
 
@@ -18,16 +18,20 @@ def alias(val: E) -> E:
 
 
 class Container(NormalizedFormat, StrEnum):
+  """File Container"""
   avi: Self = auto()
   matroska: Self = auto()
   mkv: Self = alias(matroska)
   mp2t: Self = auto()
   mp3: Self = auto()
   mp4: Self = auto()
+  mpegts: Self = auto()
+  isom: Self = alias(mp4)
   mpeg4: Self = alias(mp4)
   ogg: Self = auto()
   wav: Self = auto()
   webm: Self = auto()
+  invalid: Self = auto()
   unknown: Self = auto()
 
   def to_extension(self) -> Extension | None:
@@ -38,7 +42,12 @@ class Container(NormalizedFormat, StrEnum):
     return None
 
 
-class VideoCodec(NormalizedFormat, StrEnum):
+class Codec(NormalizedFormat, StrEnum):
+  pass
+
+
+class VideoCodec(Codec):
+  """Video Codec"""
   avc: Self = auto()
   div3: Self = auto()
   divx: Self = alias(div3)
@@ -56,11 +65,13 @@ class VideoCodec(NormalizedFormat, StrEnum):
   unknown: Self = auto()
 
 
-class AudioCodec(NormalizedFormat, StrEnum):
+class AudioCodec(Codec):
+  """Audio Codec"""
   aac: Self = auto()
   ac3: Self = auto()
   eac3: Self = auto()
   eacs: Self = auto()
+  dts: Self = auto()
   flac: Self = auto()
   heaac: Self = auto()
   lcaac: Self = auto()
@@ -77,12 +88,13 @@ class Subtitle(NormalizedFormat, StrEnum):
   eia608: Self = auto()
   eia708: Self = auto()
   srt: Self = auto()
+  utf8: Self = alias(srt)
   ssa: Self = auto()
   ttml: Self = auto()
   unknown: Self = auto()
-  utf8: Self = auto()
   webvtt: Self = auto()
   vtt: Self = alias(webvtt)
+  dwebvtt: Self = alias(webvtt)
 
   @classmethod
   def from_info(cls: Type[Self], info: str | None) -> Self | None:
