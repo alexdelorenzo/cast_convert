@@ -10,16 +10,26 @@ from unpackable import Unpackable
 from .codecs import AudioCodec, Codec, Codecs, ProfileName, VideoCodec
 from ..base import (
   AsDict, AsText, CODEC_BIAS, DEFAULT_PROFILE_FPS, DEFAULT_PROFILE_LEVEL,
-  DEFAULT_PROFILE_RESOLUTION, Fps, HasName, WithName, HasWeight, INCREMENT, IsCompatible, Level, NEW_LINE,
-  NO_BIAS, Resolution, get_name,
+  DEFAULT_PROFILE_RESOLUTION, Fps, HasItems, HasName, HasWeight,
+  IsCompatible, Level, NEW_LINE, NO_BIAS, Resolution, WithName, get_name,
 )
+
 
 if TYPE_CHECKING:
   from .formats import Metadata
 
 
 @dataclass(eq=True, frozen=True)
-class Profile(ABC, AsDict, AsText, HasWeight, IsCompatible, WithName, Unpackable):
+class Profile(
+  ABC,
+  AsDict,
+  AsText,
+  HasItems,
+  HasWeight,
+  IsCompatible,
+  WithName,
+  Unpackable
+):
   codec: Codecs
 
   @property
@@ -37,7 +47,7 @@ class Profile(ABC, AsDict, AsText, HasWeight, IsCompatible, WithName, Unpackable
   @property
   def count(self) -> int:
     """Return a count of non-null formats belonging to Profile"""
-    return sum(INCREMENT for fmt in self if fmt is not None)
+    return sum(fmt is not None for fmt in self)
 
   @property
   def bias(self) -> int:

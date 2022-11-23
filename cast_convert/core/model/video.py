@@ -121,6 +121,8 @@ def profile_to_level(profile: str | None) -> Level:
     case (name, level) | (name, level, _):
       level = level
 
+  logging.debug(f"[Encoder profile] '{profile}' -> ({name=}, {level=})")
+
   if not (level := normalize(level, str.isnumeric)):
     return DEFAULT_VIDEO_LEVEL
 
@@ -143,9 +145,18 @@ def get_video_profiles(profiles: Yaml) -> Iterable[VideoProfile]:
     [name, attrs], *_ = profile.items()
     codec = VideoCodec.from_info(name)
 
+    if (resolution := attrs.get('resolution')) is not None:
+      resolution = Resolution(resolution)
+
+    if (fps := attrs.get('fps')) is not None:
+      fps = Fps(fps)
+
+    if (level := attrs.get('level')) is not None:
+      level = Level(level)
+
     yield VideoProfile(
       codec=codec,
-      resolution=Resolution(attrs.get('resolution')),
-      fps=Fps(attrs.get('fps')),
-      level=Level(attrs.get('level')),
+      resolution=resolution,
+      fps=fps,
+      level=level,
     )
