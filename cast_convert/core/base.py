@@ -8,6 +8,7 @@ from enum import IntEnum, StrEnum, auto
 from functools import wraps
 from multiprocessing import cpu_count
 from pathlib import Path
+from types import FunctionType, MethodType
 from typing import (
   Any, Callable, Final, ParamSpec, Protocol, Self,
   TYPE_CHECKING, TypeVar, runtime_checkable,
@@ -22,9 +23,9 @@ from typer import Exit
 
 from .exceptions import CannotCompare, UnknownFormat
 
-
 if TYPE_CHECKING:
   from .media.formats import Metadata
+
 
 DEFAULT_MODEL: Final[str] = 'Chromecast 1st Gen'
 DEFAULT_REPLACE: Final[bool] = False
@@ -50,15 +51,12 @@ CODEC_BIAS: Final[int] = 5
 INCREMENT: Final[int] = 1
 
 
-class WithName:
-  @property
-  @staticmethod
-  def name(self) -> str:
-    if doc := self.__doc__:
-      name, *_ = doc.split(NEW_LINE)
-      return name
+class Decimal(Decimal):
+  def __format__(self, *args, **kwargs) -> str:
+    return str(self)
 
-    return get_name(self)
+  def __repr__(self) -> str:
+    return str(self)
 
 
 @runtime_checkable
@@ -67,12 +65,21 @@ class HasName(Protocol):
   def name(self) -> str: ...
 
 
-class Decimal(Decimal):
-  def __format__(self, *args, **kwargs) -> str:
-    return str(self)
+# Python 3.11 removed the ability to use @classmethod with @property
+# see: https://stackoverflow.com/a/13624858
+class classproperty(property):
+  def __get__(self, instance: Self, owner: type[Self]) -> Any:
+    return self.fget(owner)
 
-  def __repr__(self) -> str:
-    return str(self)
+
+class WithName:
+  @classproperty
+  def name(self: Self) -> str:
+    if doc := self.__doc__:
+      name, *_ = doc.split(NEW_LINE)
+      return name
+
+    return get_name(self)
 
 
 class Fps(Decimal, WithName):
@@ -311,7 +318,6 @@ def setup_logging(level: LogLevel = DEFAULT_LOG_LEVEL):
   handlers = [RichHandler(rich_tracebacks=True)]
 
   logging.basicConfig(level=level.upper(), handlers=handlers)
-  logging.debug(f'Set log level to {level}.')
 
 
 def get_fuzzy_match(
@@ -332,6 +338,12 @@ def get_name(obj: Any) -> str:
   match obj:
     case type() as cls:
       return cls.__name__
+
+    case (FunctionType() | MethodType()) as func:
+      return func.__name__
+
+    case has_name if name := getattr(has_name, '__name__', None):
+      return name
 
     case _:
       return type(obj).__name__

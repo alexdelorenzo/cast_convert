@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import AsyncIterable, Iterable
+from collections.abc import Iterable, AsyncIterable
 
 from aiopath import AsyncPath
 from rich import print
