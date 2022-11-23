@@ -1,20 +1,20 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Self, cast
-import logging
 
 from pymediainfo import MediaInfo
 
 from ..base import (
-  IsCompatible, VariableFps, get_name, normalize, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL,
-  Level, Fps, LEVEL_SEP, AT, Resolution,
+  AT, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL, Fps, IsCompatible, LEVEL_SEP,
+  Level, Resolution, VariableFps, normalize,
 )
-from ..media.profiles import AudioProfile, VideoProfile
-from ..media.formats import Formats, VideoFormat, is_compatible
 from ..media.codecs import AudioCodec, Container, Subtitle, VideoCodec
+from ..media.formats import Formats, VideoFormat, is_compatible
+from ..media.profiles import AudioProfile, VideoProfile
 from ..parse import Yaml
 
 

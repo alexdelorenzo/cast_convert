@@ -9,7 +9,8 @@ from functools import wraps
 from multiprocessing import cpu_count
 from pathlib import Path
 from typing import (
-  Any, Callable, Final, ParamSpec, Protocol, Self, TYPE_CHECKING, TypeVar, runtime_checkable,
+  Any, Callable, Final, ParamSpec, Protocol, Self,
+  TYPE_CHECKING, TypeVar, runtime_checkable,
 )
 
 from more_itertools import peekable
@@ -21,9 +22,9 @@ from typer import Exit
 
 from .exceptions import CannotCompare, UnknownFormat
 
+
 if TYPE_CHECKING:
   from .media.formats import Metadata
-
 
 DEFAULT_MODEL: Final[str] = 'Chromecast 1st Gen'
 DEFAULT_REPLACE: Final[bool] = False
@@ -116,7 +117,6 @@ class LogLevel(StrEnum):
 
 
 DEFAULT_LOG_LEVEL: Final[LogLevel] = LogLevel('warn')
-
 
 T = TypeVar('T')
 U = TypeVar('U')

@@ -1,26 +1,24 @@
 from __future__ import annotations
 
+import logging
 from asyncio import BoundedSemaphore, TaskGroup, to_thread
 from collections.abc import Iterable
 from enum import StrEnum, auto
-from functools import partial
 from pathlib import Path
 from shlex import quote
 from typing import Final, Self
-import logging
 
 import ffmpeg
 from ffmpeg.nodes import FilterableStream, OutputStream
 
 from .transcode import should_transcode
+from ..base import DEFAULT_REPLACE, DEFAULT_THREADS, JOIN_COMMAND, Resolution, Strategy, first, get_error_handler
 from ..exceptions import UnknownFormat
-from ..media.formats import Formats
 from ..media.codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
-from ..base import DEFAULT_REPLACE, DEFAULT_THREADS, JOIN_COMMAND, Strategy, first, Resolution, get_error_handler, \
-  handle_errors
+from ..media.formats import Formats
 from ..model.device import load_device_with_name
-from ..parse import Alias, Aliases, AUDIO_ENCODERS, SUBTITLE_ENCODERS, VIDEO_ENCODERS, Extension
 from ..model.video import Video
+from ..parse import AUDIO_ENCODERS, Alias, Aliases, Extension, SUBTITLE_ENCODERS, VIDEO_ENCODERS
 
 
 DOT: Final[str] = '.'

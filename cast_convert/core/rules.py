@@ -1,6 +1,5 @@
-from .media.base import OnTranscodeErr
 from .media.codecs import Codecs
-from .parse import ENCODERS, Aliases
+from .parse import Aliases, ENCODERS
 
 
 def remove_encoder(codec: Codecs):

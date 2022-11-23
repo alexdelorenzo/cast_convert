@@ -4,9 +4,9 @@ import logging
 from enum import Enum, StrEnum, auto
 from typing import Self, Type, TypeVar
 
-from ..base import WithName, SUBTITLE_SEP, get_name
-from ..parse import EXTENSIONS, Extension
 from .base import NormalizedFormat
+from ..base import SUBTITLE_SEP
+from ..parse import EXTENSIONS, Extension
 
 
 E = TypeVar('E', bound=Enum | str)
