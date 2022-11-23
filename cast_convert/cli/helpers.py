@@ -1,18 +1,19 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import AsyncIterable, Iterable, NoReturn
+from typing import AsyncIterable, Iterable
 
 from aiopath import AsyncPath
-from typer import Exit
 from rich import print
 from rich.markup import escape
+from typer import Exit
 
 from ..core.base import DEFAULT_REPLACE, DEFAULT_THREADS, Peekable, Rc, Strategy, esc, \
-  get_error_handler, handle_errors, tabs
+  get_error_handler, tabs
 from ..core.convert.run import get_ffmpeg_cmd, get_stream
 from ..core.convert.transcode import should_transcode
 from ..core.exceptions import UnknownFormat
+from ..core.media.codecs import AudioCodec
 from ..core.model.device import Device, Devices, get_device_fuzzy, get_devices_from_file
 from ..core.model.video import Video
 from ..core.parse import DEVICE_INFO
@@ -29,7 +30,12 @@ def show_devices(devices: Devices, details: bool = False):
 
     if details:
       for profile in device.video_profiles:
-        tabs(profile.codec.name, tabs=2, out=True, tick=True)
+        tabs(profile.codec, tabs=2, out=True, tick=True)
+        tabs(profile.text, tabs=3, out=True, tick=True)
+
+      tabs(AudioCodec.name, tabs=2, out=True, tick=True)
+      for profile in device.audio_profiles:
+        tabs(profile.codec, tabs=2, out=True, tick=True)
         tabs(profile.text, tabs=3, out=True, tick=True)
 
       if not devices.is_empty:
