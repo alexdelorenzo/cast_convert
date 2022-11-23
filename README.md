@@ -2,11 +2,11 @@
 
 Identify and convert videos to formats that are Chromecast supported.
 
-`cast_convert` can tell you whether videos will play correctly on your casting devices. If they won't, this project can convert videos into formats that devices do support.
+Cast Convert can tell you whether videos will play correctly on your casting devices. If they won't, this project can convert videos into formats that devices do support.
 
 [Click here to see a list of supported devices](#supported-devices).
 
-### What `cast_convert` does
+### What Cast Convert does
 
 `cast_convert` can identify and correct a video's incompatibility with a device caused by the video's:
 
@@ -22,7 +22,47 @@ Identify and convert videos to formats that are Chromecast supported.
 This utility can tell you if a video will or won't play correctly on your casting device. It can then efficiently modify
 the video so that it will play on the device.
 
-### About
+### Why use Cast Convert over other options?
+
+Cast Convert calculates the least amount of transcoding required to playback videos. It also has detailed support profiles for every format supported by each  device, whereas other transcoding options tend to force all videos into one format.
+
+For example, you may have a video named `video.mp4` that isn't compatible with your device. Cast Control can generate a transcoding plan that does the least amount of transcoding necessisary instead of blindly transcoding every video into the same format.
+
+You can use `cast-convert inspect` to scan the video and come up with the most efficient transcoding plan:
+```bash
+$ cast-convert inspect --name '1st Gen' video.mp4
+[❌️] Need to convert "~/video.mp4" to play on Chromecast 1st Gen...
+  Must convert from:
+    - File Container: mp4
+    - Video Codec: vp9
+    - Resolution Height: 640
+    - Frame Rate: 29.970
+    - Audio Codec: mp3
+  To:
+    - Video Codec: avc
+    - Encoder Level: 4.1
+```
+
+Since the video is encoded with a supported audio codec, within a supported container and supported framerate and resolution, only the video encoding must change.
+
+If you used another tool, it may have tried to convert *all* videos to the same format, no matter how inefficient it is. That means `video.mp4` might have more than its video encoding changed, it might have to have its container, audio codec and framerate changed, as well. That can take up an unnecessary amount of time and resources.
+
+Similarly, the following might have its video track transcoded, too, despite only the audio track needing to be converted to a supported format:
+
+```bash
+$ cast-convert inspect --name '1st Gen' video.mp4
+[❌️] Need to convert "~/video.mp4" to play on Chromecast 1st Gen...
+  Must convert from:
+    - File Container: mp4
+    - Video Codec: vp9
+    - Resolution Height: 640
+    - Frame Rate: 29.970
+    - Audio Codec: dts
+  To:
+    - Audio Codec: mp3
+```
+
+### About Cast Convert
 
 Individual casting devices like the Chromecast have unique video encoding, audio encoding and container support
 combinations for video files. `cast_convert` has detailed compatibility profiles for each individual Chromecast model on
@@ -110,7 +150,7 @@ $ cast-convert --help
 
 ### Parameters
 
-### `--log-level`
+#### `--log-level`
 
 You can set the log level using the `--log-level` flag:
 
@@ -129,7 +169,7 @@ You can use these device names with the --name flag:
 
 Default log level is `warn`.
 
-### `--name`
+#### `--name`
 
 You can specify the model of your device with the `--name` flag. It uses fuzzy matching, so you don't have to type out
 device names completely.
@@ -152,7 +192,7 @@ $ cast-convert inspect --name '1st Gen' ~/video.webm
 
 Default device name is `Chromecast 1st Gen`.
 
-### `PATHS`
+#### `PATHS`
 
 You can specify one or more file or directory paths as `PATHS` arguments.
 
@@ -170,7 +210,7 @@ copy -threads 12 -vcodec libx264 -vlevel 4.1 'vid2_transcoded.mkv' -y
 
 ### Commands
 
-### `convert`
+#### `convert`
 
 ```bash
  Usage: cast-convert convert [OPTIONS] 📂PATHS
@@ -194,7 +234,7 @@ copy -threads 12 -vcodec libx264 -vlevel 4.1 'vid2_transcoded.mkv' -y
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
-### `devices`
+#### `devices`
 
 ```bash
  Usage: cast-convert devices [OPTIONS]
@@ -209,7 +249,7 @@ copy -threads 12 -vcodec libx264 -vlevel 4.1 'vid2_transcoded.mkv' -y
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
-### `command`
+#### `command`
 
 ```bash
  Usage: cast-convert command [OPTIONS] 📂PATHS
@@ -233,7 +273,7 @@ copy -threads 12 -vcodec libx264 -vlevel 4.1 'vid2_transcoded.mkv' -y
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
-### `inspect`
+#### `inspect`
 
 ```bash
  Usage: cast-convert inspect [OPTIONS] 📂PATHS 
@@ -251,7 +291,7 @@ copy -threads 12 -vcodec libx264 -vlevel 4.1 'vid2_transcoded.mkv' -y
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
-### `watch`
+#### `watch`
 
 ```bash
  Usage: cast-convert watch [OPTIONS] 📂PATHS
