@@ -51,6 +51,7 @@ INCREMENT: Final[int] = 1
 
 class WithName:
   @property
+  @staticmethod
   def name(self) -> str:
     if doc := self.__doc__:
       name, *_ = doc.split(NEW_LINE)
@@ -75,6 +76,7 @@ class Decimal(Decimal):
 
 class Fps(Decimal, WithName):
   """Frame rate"""
+
   def __str__(self) -> str:
     if self is VariableFps:
       return VFR_DESCRIPTION
@@ -136,16 +138,16 @@ class Strategy(StrEnum):
 
 class Rc(IntEnum):
   """Return codes"""
-  ok: int = 0
-  err: int = auto()
+  ok: Self = 0
+  err: Self = auto()
 
-  no_command: int = auto()
-  missing_args: int = auto()
-  no_matching_device: int = auto()
+  no_command: Self = auto()
+  missing_args: Self = auto()
+  no_matching_device: Self = auto()
 
-  must_convert: int = auto()
-  failed_conversion: int = auto()
-  unknown_format: int = auto()
+  must_convert: Self = auto()
+  failed_conversion: Self = auto()
+  unknown_format: Self = auto()
 
 
 @runtime_checkable
@@ -206,9 +208,9 @@ def has_items(obj: Any) -> bool:
 
 
 def handle_errors(*exceptions: type[Exception], strategy: Strategy = Strategy.quit) -> Decorator:
-  def wrapper(func: Decoratable) -> Decorated:
+  def decorator(func: Decoratable) -> Decorated:
     @wraps(func)
-    def new(*args: P.args, **kwargs: P.kwargs) -> T:
+    def decorated(*args: P.args, **kwargs: P.kwargs) -> T:
       try:
         return func(*args, **kwargs)
 
@@ -224,9 +226,9 @@ def handle_errors(*exceptions: type[Exception], strategy: Strategy = Strategy.qu
           case Strategy.skip:
             logging.warning(f'[{strategy}] Encountered error: {e}, skipping.')
 
-    return new
+    return decorated
 
-  return wrapper
+  return decorator
 
 
 def get_error_handler(
