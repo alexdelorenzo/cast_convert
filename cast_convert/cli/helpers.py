@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from collections.abc import Iterable, AsyncIterable
+from typing import Final
 
 from aiopath import AsyncPath
 from rich import print
@@ -19,7 +20,7 @@ from ..core.model.video import Video
 from ..core.parse import DEVICE_INFO
 
 
-GLOB_FILES_RECURSIVE = '**/*.*'
+GLOB_FILES_RECURSIVE: Final[str] = '**/*.*'
 
 
 def show_devices(devices: Devices, details: bool = False):
