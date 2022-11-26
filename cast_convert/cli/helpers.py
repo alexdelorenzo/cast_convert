@@ -9,15 +9,16 @@ from rich import print
 from rich.markup import escape
 from typer import Exit
 
-from ..core.base import DEFAULT_REPLACE, DEFAULT_THREADS, Peekable, Rc, Strategy, esc, \
-  get_error_handler, tabs
+
 from ..core.convert.run import get_ffmpeg_cmd, get_stream
 from ..core.convert.transcode import should_transcode
-from ..core.exceptions import UnknownFormat
 from ..core.media.codecs import AudioCodec
 from ..core.model.device import Device, Devices, get_device_fuzzy, get_devices_from_file
 from ..core.model.video import Video
+from ..core.base import DEFAULT_REPLACE, DEFAULT_THREADS, Peekable, Rc, Strategy, esc, \
+  get_error_handler, tabs
 from ..core.parse import DEVICE_INFO
+from ..core.exceptions import UnknownFormat
 
 
 GLOB_FILES_RECURSIVE: Final[str] = '**/*.*'
