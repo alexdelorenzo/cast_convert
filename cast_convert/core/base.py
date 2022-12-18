@@ -223,7 +223,7 @@ def handle_errors(*exceptions: type[Exception], strategy: Strategy = Strategy.qu
 
       except exceptions as e:
         logging.exception(e)
-        logging.error(f'Failed: {func.__name__}({args=}, {kwargs=})')
+        logging.error(f'Failed: {get_name(func)}({args=}, {kwargs=})')
 
         match strategy:
           case Strategy.quit:
