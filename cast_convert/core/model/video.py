@@ -10,8 +10,9 @@ from pymediainfo import MediaInfo
 
 from ..base import (
   AT, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL, Fps, IsCompatible, LEVEL_SEP,
-  Level, Resolution, VariableFps, normalize,
+  Level, Resolution, VariableFps,
 )
+from ..fmt import normalize
 from ..media.codecs import AudioCodec, Container, Subtitle, VideoCodec
 from ..media.formats import Formats, VideoFormat, is_compatible
 from ..media.profiles import AudioProfile, VideoProfile

@@ -9,7 +9,8 @@ import logging
 from more_itertools import unzip
 from rich import print
 
-from ..base import esc, first, get_name
+from ..base import first, get_name
+from ..fmt import esc
 from ..media.codecs import Container, Subtitle
 from ..media.formats import Formats
 from ..media.profiles import AudioProfile, Profile, VideoProfile, is_codec_compatible, \
@@ -76,15 +77,15 @@ def same_weights(weights: WeightMap) -> bool:
 
 
 def get_default_video_profile(device: Device, video: Video) -> VideoProfile | None:
-  if not (vid_prof := video.formats.video_profile):
+  if not (video_profile := video.formats.video_profile):
     return None
 
-  vid_prof: VideoProfile
+  video_profile: VideoProfile
 
   weights: WeightMap = {
     prof: trans.weight
     for prof in device.video_profiles
-    if prof and (trans := transcode_video_profile(vid_prof, prof))
+    if prof and (trans := transcode_video_profile(video_profile, prof))
   }
 
   if len(set(weights.values())) == 1:
@@ -94,8 +95,8 @@ def get_default_video_profile(device: Device, video: Video) -> VideoProfile | No
   profile_weights = sorted(weights.items(), key=compare_weight)
   profile_weights = cast(ProfileWeights, profile_weights)
 
-  profiles, _ = unzip(profile_weights)
   profiles: Iterable[Profile]
+  profiles, _ = unzip(profile_weights)
 
   return first(profiles)
 

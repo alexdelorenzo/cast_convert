@@ -17,7 +17,6 @@ from typing import (
 from more_itertools import peekable
 from rich import print
 from rich.logging import RichHandler
-from rich.markup import escape
 from thefuzz import process
 from typer import Exit
 
@@ -257,61 +256,6 @@ def first(iterable: Iterable[T], default: Item = None) -> Item:
 
 def identity(obj: T) -> T:
   return obj
-
-
-def normalize(
-  text: str,
-  condition: Callable[[str], bool] = str.isalnum,
-  transform: Callable[[str], str] = lambda x: x,
-) -> str:
-  text = text.casefold()
-
-  return ''.join(
-    transform(char)
-    for char in text
-    if condition(char)
-  )
-
-
-def esc(text: str | Any) -> str:
-  return escape(str(text))
-
-
-def tab(text: str | Any, tabs: int = 1) -> str:
-  indent: str = TAB * tabs
-
-  if not isinstance(text, str):
-    text: str = str(text)
-
-  lines = text.split(NEW_LINE)
-
-  return NEW_LINE.join(f'{indent}{line}' for line in lines)
-
-
-def checklist(text: str | Any) -> str:
-  if not isinstance(text, str):
-    text: str = str(text)
-
-  lines = text.split(NEW_LINE)
-
-  return NEW_LINE.join(f'{TAB}- {line}' for line in lines)
-
-
-def tabs(
-  text: str | Any,
-  tabs: int = 1,
-  out: bool = False,
-  tick: bool = False,
-) -> str:
-  if tick:
-    text = checklist(text)
-
-  text: str = tab(text, tabs=tabs)
-
-  if out:
-    print(text)
-
-  return text
 
 
 def setup_logging(level: LogLevel = DEFAULT_LOG_LEVEL):
