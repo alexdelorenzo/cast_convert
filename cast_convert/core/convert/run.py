@@ -289,6 +289,7 @@ def convert_from_name_path(
   path: Path,
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
+  subtitles: Path | None = None,
 ) -> Video | None:
   video = Video.from_path(path)
   device = load_device_with_name(name)
@@ -315,7 +316,8 @@ async def convert_paths(
   threads: int,
   jobs: int,
   *paths: Path,
-  strategy: Strategy = Strategy.quit
+  strategy: Strategy = Strategy.quit,
+  subtitles: Path | None = None,
 ):
   sem = BoundedSemaphore(jobs)
   handled_converter = get_error_handler(convert_from_name_path, UnknownFormat, strategy=strategy)

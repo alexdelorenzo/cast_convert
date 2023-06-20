@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 from operator import itemgetter
+from pathlib import Path
 from typing import Any, Final, TYPE_CHECKING, cast
 import logging
 
@@ -16,6 +17,7 @@ from ..media.formats import Formats
 from ..media.profiles import AudioProfile, Profile, VideoProfile, is_codec_compatible, \
   is_fps_compatible, is_level_compatible, is_resolution_compatible
 from ..model.video import Video
+
 
 if TYPE_CHECKING:
   from ..model.device import Device
@@ -51,7 +53,7 @@ def transcode_video(
   device: Device,
   video: Video,
   default_video: VideoProfile | None = None,
-) -> VideoProfile | None:
+) -> TranscodeVideoProfile | None:
   if device.can_play_video(video):
     return None
 
@@ -83,12 +85,14 @@ def get_default_video_profile(device: Device, video: Video) -> VideoProfile | No
   video_profile: VideoProfile
 
   weights: WeightMap = {
-    prof: trans.weight
-    for prof in device.video_profiles
-    if prof and (trans := transcode_video_profile(video_profile, prof))
+    profile: transcoded.weight
+    for profile in device.video_profiles
+    if profile and (transcoded := transcode_video_profile(video_profile, profile))
   }
 
-  if len(set(weights.values())) == 1:
+  unique_weights: set[int] = set(weights.values())
+
+  if len(unique_weights) == ALL_SAME:
     logging.info(f'Choosing first {get_name(VideoProfile)} from {device.name}')
     return first(device.video_profiles)
 
@@ -159,7 +163,7 @@ def transcode_to(
   default_audio: AudioProfile | None = None,
   default_container: Container | None = None,
   default_subtitle: Subtitle | None = None,
-) -> Formats | None:
+) -> TranscodeFormats | None:
   if device.can_play(video):
     return None
 
@@ -179,7 +183,7 @@ def transcode_to(
 def transcode_video_profile(
   video_profile: VideoProfile | None,
   default_video: VideoProfile | None,
-) -> VideoProfile | None:
+) -> TranscodeVideoProfile | None:
   if not exists(video_profile, default_video):
     return None
 
@@ -244,7 +248,7 @@ def transcode_subtitles(
   return None if subtitle is default_subtitle else default_subtitle
 
 
-def transcode_formats(formats: Formats, to_formats: Formats) -> Formats | None:
+def transcode_formats(formats: Formats, to_formats: Formats) -> TranscodeFormats | None:
   if formats == to_formats:
     return None
 
@@ -267,6 +271,7 @@ def transcode_formats(formats: Formats, to_formats: Formats) -> Formats | None:
 def should_transcode(
   device: Device,
   video: Video,
+  subtitles: Path | None = None,
 ) -> bool:
   if not device:
     return False

@@ -49,6 +49,7 @@ def _get_command(
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
   error: Strategy = Strategy.quit,
+  subtitles: Path | None = None,
 ) -> bool:
   video = Video.from_path(path)
 
@@ -72,7 +73,8 @@ def _get_command(
 def _inspect(
   name: str,
   path: Path,
-  error: Strategy = Strategy.quit
+  error: Strategy = Strategy.quit,
+  subtitles: Path | None = None,
 ) -> bool:
   video = Video.from_path(path)
 

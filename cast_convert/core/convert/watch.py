@@ -116,6 +116,7 @@ async def convert(
   sem: BoundedSemaphore,
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
+  subtitles: Path | None = None,
 ) -> Video | None:
   path = path.absolute()
 
@@ -136,6 +137,7 @@ async def convert_videos(
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
   error: Strategy = Strategy.quit,
+  subtitles: Path | None = None,
 ):
   if seen is None:
     seen = Paths()
