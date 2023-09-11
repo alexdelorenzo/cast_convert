@@ -122,6 +122,10 @@ def profile_to_level(profile: str | None) -> Level:
     case (name, level) | (name, level, _):
       level = level
 
+    case rest:
+      logging.warning(f"Unknown profile format: {rest}")
+      return DEFAULT_VIDEO_LEVEL
+
   logging.debug(f"[Encoder profile] '{profile}' -> ({name=}, {level=})")
 
   if not (level := normalize(level, str.isnumeric)):
