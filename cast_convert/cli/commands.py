@@ -94,7 +94,7 @@ DEFAULT_DETAILS_OPT: Final[Option] = Option(
   rich_help_panel=Panels.device
 )
 
-DEFAULT_SUBTITLE_ARG: Final[Argument] = Argument(
+DEFAULT_SUBTITLE_OPT: Final[Argument] = Option(
   None,
   '--subtitle', '-s',
   help='Path to subtitle file to embed.',
@@ -131,7 +131,7 @@ def command(
   replace: bool = DEFAULT_REPLACE_OPT,
   threads: int = DEFAULT_THREADS_OPT,
   error: Strategy = DEFAULT_STRATEGY_OPT,
-  subtitle: Path | None = DEFAULT_SUBTITLE_ARG,
+  subtitle: Path | None = DEFAULT_SUBTITLE_OPT,
 ):
   """
   📜 Get FFmpeg transcoding command.
@@ -157,7 +157,7 @@ def convert(
   jobs: int = DEFAULT_JOBS_OPT,
   threads: int = DEFAULT_THREADS_OPT,
   error: Strategy = DEFAULT_STRATEGY_OPT,
-  subtitle: Path | None = DEFAULT_SUBTITLE_ARG,
+  subtitle: Path | None = DEFAULT_SUBTITLE_OPT,
 ):
   """
   📼 Convert videos so that they're compatible with specified device.
@@ -216,7 +216,7 @@ def watch(
   replace: bool = DEFAULT_REPLACE_OPT,
   threads: int = DEFAULT_THREADS_OPT,
   error: Strategy = DEFAULT_STRATEGY_OPT,
-  subtitle: Path | None = DEFAULT_SUBTITLE_ARG,
+  subtitle: Path | None = DEFAULT_SUBTITLE_OPT,
 ):
   """
   👀 Watch directories for new or modified videos and convert them.
