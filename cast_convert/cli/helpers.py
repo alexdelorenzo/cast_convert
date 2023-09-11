@@ -10,7 +10,7 @@ from rich.markup import escape
 from typer import Exit
 
 from ..core.convert.run import get_ffmpeg_cmd, get_stream
-from ..core.convert.transcode import should_transcode, show_transcode_confirmation
+from ..core.convert.transcode import should_transcode, show_transcode_dismissal
 from ..core.media.codecs import AudioCodec
 from ..core.model.device import Device, Devices, get_device_fuzzy, get_devices_from_file
 from ..core.model.video import Video
@@ -59,7 +59,7 @@ def _get_command(
   should_transcode_handled = get_error_handler(should_transcode, UnknownFormat, strategy=error)
 
   if not should_transcode_handled(device, video, subtitles):
-    show_transcode_confirmation(video, device)
+    show_transcode_dismissal(video, device)
     return False
 
   formats = device.transcode_to(video)
@@ -85,7 +85,7 @@ def _inspect(
   should_transcode_handled = get_error_handler(should_transcode, UnknownFormat, strategy=error)
 
   if not should_transcode_handled(device, video, subtitles):
-    show_transcode_confirmation(video, device)
+    show_transcode_dismissal(video, device)
     return False
 
   name = device.name

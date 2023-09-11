@@ -11,7 +11,7 @@ from typing import Final, Self
 import ffmpeg
 from ffmpeg.nodes import FilterableStream, OutputStream
 
-from .transcode import should_transcode, show_transcode_confirmation
+from .transcode import should_transcode, show_transcode_dismissal
 from ..base import DEFAULT_REPLACE, DEFAULT_THREADS, JOIN_COMMAND, Resolution, Strategy, first, get_error_handler
 from ..exceptions import UnknownFormat
 from ..media.codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
@@ -295,7 +295,7 @@ def convert_from_name_path(
   device = load_device_with_name(name)
 
   if not should_transcode(device, video):
-    show_transcode_confirmation(video, device)
+    show_transcode_dismissal(video, device)
     return None
 
   if not (formats := device.transcode_to(video)):

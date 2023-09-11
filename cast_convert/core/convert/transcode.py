@@ -281,5 +281,6 @@ def should_transcode(
 
   return True
 
-def show_transcode_confirmation(video: Video, device: Device):
+
+def show_transcode_dismissal(video: Video, device: Device):
   print(f'[green][✅] File [b blue]"{esc(video.path)}"[/] is compatible with [b]{device.name}[/].')
