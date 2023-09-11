@@ -122,7 +122,7 @@ def profile_to_level(profile: str | None) -> Level:
     case (name, level) | (name, level, _):
       level = level
 
-    case level if level.isnumeric():
+    case [level] if level.isnumeric():
       return Level(level)
 
     case rest:
