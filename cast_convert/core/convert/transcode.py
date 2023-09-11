@@ -277,8 +277,9 @@ def should_transcode(
     return False
 
   if device.can_play(video):
-    print(f'[green][✅] File [b blue]"{esc(video.path)}"[/] is compatible with [b]{device.name}[/].')
     return False
 
   return True
 
+def show_transcode_confirmation(video: Video, device: Device):
+  print(f'[green][✅] File [b blue]"{esc(video.path)}"[/] is compatible with [b]{device.name}[/].')
