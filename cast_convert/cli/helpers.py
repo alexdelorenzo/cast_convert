@@ -85,7 +85,10 @@ def _inspect(
   should_transcode_handled = get_error_handler(should_transcode, UnknownFormat, strategy=error)
 
   if not should_transcode_handled(device, video, subtitles):
+    print(f'[green][📁] Encoding properties for [b blue]"{path}"[/]:')
+    tabs(video.formats.text, out=True, tick=True)
     show_transcode_dismissal(video, device)
+
     return False
 
   name = device.name
@@ -94,8 +97,9 @@ def _inspect(
   tabs('[b red]Must convert from:', out=True)
   tabs(video.formats.text, out=True, tick=True)
 
-  tabs('[b green]To:', out=True)
   formats = device.transcode_to(video)
+
+  tabs('[b green]To:', out=True)
   tabs(formats.text, out=True, tick=True)
 
   return True

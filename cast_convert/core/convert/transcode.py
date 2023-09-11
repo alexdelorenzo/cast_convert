@@ -283,4 +283,4 @@ def should_transcode(
 
 
 def show_transcode_dismissal(video: Video, device: Device):
-  print(f'[green][✅] File [b blue]"{esc(video.path)}"[/] is compatible with [b]{device.name}[/].')
+  print(f'[green][✅] Video [b blue]"{esc(video.path)}"[/] is compatible with [b]{device.name}[/].')
