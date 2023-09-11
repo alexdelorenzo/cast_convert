@@ -83,7 +83,7 @@ def _inspect(
 
   handled_inspector = get_error_handler(should_transcode, UnknownFormat, strategy=error)
 
-  if not handled_inspector(device, video):
+  if not handled_inspector(device, video, subtitles):
     return False
 
   name = device.name
