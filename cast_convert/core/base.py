@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import sys
+from abc import abstractmethod
 from collections.abc import Iterable
 from decimal import Decimal
 from enum import IntEnum, StrEnum, auto
@@ -61,6 +62,7 @@ class Decimal(Decimal):
 @runtime_checkable
 class HasName(Protocol):
   @property
+  @abstractmethod
   def name(self) -> str: ...
 
 
@@ -165,12 +167,14 @@ class IsCompatible(Protocol):
 @runtime_checkable
 class AsDict(Protocol):
   @property
+  @abstractmethod
   def as_dict(self) -> dict[str, Metadata]: ...
 
 
 @runtime_checkable
 class AsText(Protocol):
   @property
+  @abstractmethod
   def text(self) -> str: ...
 
 
@@ -181,9 +185,11 @@ class HasWeight(Protocol):
     return NO_BIAS
 
   @property
+  @abstractmethod
   def count(self) -> int: ...
 
   @property
+  @abstractmethod
   def weight(self) -> int: ...
 
 
