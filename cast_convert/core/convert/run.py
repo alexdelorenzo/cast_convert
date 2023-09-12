@@ -124,6 +124,7 @@ def transcode_video(
   formats: Formats,
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
+  subtitle: Path | None = None,
 ) -> Video:
   stream, converted = get_stream(video, formats, threads, replace)
   cmd = get_ffmpeg_cmd(stream, video.path)
@@ -289,12 +290,12 @@ def convert_from_name_path(
   path: Path,
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
-  subtitles: Path | None = None,
+  subtitle: Path | None = None,
 ) -> Video | None:
   video = Video.from_path(path)
   device = load_device_with_name(name)
 
-  if not should_transcode(device, video):
+  if not should_transcode(device, video, subtitle):
     show_transcode_dismissal(video, device)
     return None
 
@@ -302,7 +303,7 @@ def convert_from_name_path(
     return None
 
   try:
-    return transcode_video(video, formats, replace, threads)
+    return transcode_video(video, formats, replace, threads, subtitle)
 
   except Exception as e:
     logging.exception(e)

@@ -227,6 +227,8 @@ def watch(
     jobs=jobs,
     replace=replace,
     threads=threads,
+    error=error,
+    subtitle=subtitle,
   )
   run(coro)
 

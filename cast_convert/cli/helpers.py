@@ -49,7 +49,7 @@ def _get_command(
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
   error: Strategy = Strategy.quit,
-  subtitles: Path | None = None,
+  subtitle: Path | None = None,
 ) -> bool:
   video = Video.from_path(path)
 
@@ -58,7 +58,7 @@ def _get_command(
 
   should_transcode_handled = get_error_handler(should_transcode, UnknownFormat, strategy=error)
 
-  if not should_transcode_handled(device, video, subtitles):
+  if not should_transcode_handled(device, video, subtitle):
     show_transcode_dismissal(video, device)
     return False
 
@@ -75,7 +75,7 @@ def _inspect(
   name: str,
   path: Path,
   error: Strategy = Strategy.quit,
-  subtitles: Path | None = None,
+  subtitle: Path | None = None,
 ) -> bool:
   video = Video.from_path(path)
 
@@ -84,7 +84,7 @@ def _inspect(
 
   should_transcode_handled = get_error_handler(should_transcode, UnknownFormat, strategy=error)
 
-  if not should_transcode_handled(device, video, subtitles):
+  if not should_transcode_handled(device, video, subtitle):
     print(f'[green][📁] Encoding properties for [b blue]"{path}"[/]:')
     tabs(video.formats.text, out=True, tick=True)
     show_transcode_dismissal(video, device)

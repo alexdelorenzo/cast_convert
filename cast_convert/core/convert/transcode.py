@@ -271,7 +271,7 @@ def transcode_formats(formats: Formats, to_formats: Formats) -> TranscodeFormats
 def should_transcode(
   device: Device,
   video: Video,
-  subtitles: Path | None = None,
+  subtitle: Path | None = None,
 ) -> bool:
   if not device:
     return False
