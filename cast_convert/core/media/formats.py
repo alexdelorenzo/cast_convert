@@ -5,7 +5,7 @@ from typing import NamedTuple
 
 from .codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
 from .profiles import AudioProfile, Profile, Profiles, VideoProfile, is_video_profile_compatible
-from ..base import HasName, NEW_LINE, get_name, has_items
+from ..base import HasName, NEW_LINE, NO_BIAS, get_name, has_items
 
 
 VideoFormat = Codecs | Profiles | Container | Subtitle
@@ -49,7 +49,11 @@ class Formats(NamedTuple):
     return NEW_LINE.join(lines)
 
   @property
-  def count(self) -> int:
+  def bias(self) -> int:  # Protocol: HasWeight
+    return NO_BIAS
+
+  @property
+  def count(self) -> int:  # Protocol: HasWeight
     container, *profiles, sub = self
 
     count = sum(val is not None for val in (container, sub))
@@ -58,7 +62,7 @@ class Formats(NamedTuple):
     return count
 
   @property
-  def weight(self) -> int:
+  def weight(self) -> int:  # Protocol: HasWeight
     container, *profiles, sub = self
 
     count = sum(val is not None for val in (container, sub))
