@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC
 from dataclasses import asdict, dataclass
 from functools import cache
-from typing import TYPE_CHECKING
+from typing import Final, TYPE_CHECKING
 
 from unpackable import Unpackable
 
@@ -14,9 +14,11 @@ from ..base import (
   IsCompatible, Level, NEW_LINE, NO_BIAS, Resolution, WithName, get_name,
 )
 
-
 if TYPE_CHECKING:
   from .formats import Metadata
+
+
+ACRONYM_LIMIT: Final[int] = 3
 
 
 @dataclass(eq=True, frozen=True)
@@ -37,7 +39,7 @@ class Profile(
     return asdict(self)
 
   @property
-  def text(self):
+  def text(self) -> str:
     return NEW_LINE.join(
       f'[b]{get_label(key, val)}[/]: [b blue]{val}[/]'
       for key, val in self.as_dict.items()
@@ -59,7 +61,7 @@ class Profile(
 
 
 @dataclass(eq=True, frozen=True)
-class AudioProfile(Profile):
+class AudioProfile(Profile, IsCompatible):
   """Audio Profile"""
   codec: AudioCodec | None = AudioCodec.unknown
 
@@ -166,7 +168,7 @@ def get_label(key: str, val: Metadata) -> str:
     case _:
       label = key.title()
 
-  if len(label) <= 3:
+  if len(label) <= ACRONYM_LIMIT:
     label = label.upper()
 
   return label
