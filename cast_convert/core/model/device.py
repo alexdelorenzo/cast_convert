@@ -81,7 +81,7 @@ class Device(IsCompatible):
       return True
 
     if audio_profile.codec is AudioCodec.unknown:
-      raise UnknownFormat(f"Missing {get_name(AudioCodec)} for {video}")
+      raise UnknownFormat(f"Missing {get_name(AudioCodec)}({audio_profile.codec}) for {video}")
 
     can_play = any(video.is_compatible(profile) for profile in self.audio_profiles)
 
