@@ -80,6 +80,7 @@ class AudioCodec(Codec):
   vorbis: Self = auto()
   wav: Self = auto()
   webm: Self = auto()
+  wma: Self = auto()
   unknown: Self = auto()
 
 
