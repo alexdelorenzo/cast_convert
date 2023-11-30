@@ -290,12 +290,12 @@ def convert_from_name_path(
   path: Path,
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
-  subtitle: Path | None = None,
+  subtitles: Path | None = None,
 ) -> Video | None:
   video = Video.from_path(path)
   device = load_device_with_name(name)
 
-  if not should_transcode(device, video, subtitle):
+  if not should_transcode(device, video, subtitles):
     show_transcode_dismissal(video, device)
     return None
 
@@ -303,7 +303,7 @@ def convert_from_name_path(
     return None
 
   try:
-    return transcode_video(video, formats, replace, threads, subtitle)
+    return transcode_video(video, formats, replace, threads, subtitles)
 
   except Exception as e:
     logging.exception(e)
@@ -326,7 +326,7 @@ async def convert_paths(
 
   async def convert(path: Path):
     async with sem:
-      await to_thread(handled_converter, name, path, replace, threads)
+      await to_thread(handled_converter, name, path, replace, threads, subtitles)
 
   async with TaskGroup() as tg:
     for path in paths:

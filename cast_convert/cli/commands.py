@@ -13,9 +13,13 @@ from .helpers import _get_command, _inspect, show_devices
 from .. import CLI_ENTRY, COPYRIGHT_NOTICE, DESCRIPTION, LICENSE, PROJECT_HOME, __version__
 from ..core.base import DEFAULT_JOBS, DEFAULT_LOG_LEVEL, DEFAULT_MODEL, \
   DEFAULT_THREADS, LogLevel, Rc, Strategy, bad_file_exit, setup_logging
+
 from ..core.convert.run import convert_paths
 from ..core.convert.watch import convert_videos
 from ..core.model.device import get_devices_from_file
+
+
+THREAD_COUNT: Final[int] = max(int(DEFAULT_THREADS / DEFAULT_JOBS), 1)
 
 
 class Panels(StrEnum):
@@ -51,7 +55,7 @@ DEFAULT_REPLACE_OPT: Final[OptionInfo] = Option(
 )
 
 DEFAULT_THREADS_OPT: Final[OptionInfo] = Option(
-  int(DEFAULT_THREADS / DEFAULT_JOBS),
+  THREAD_COUNT,
   '--threads', '-t',
   help="🧵 Number of threads to tell FFMPEG to use per job.",
   rich_help_panel=Panels.encoder_options,
@@ -131,7 +135,7 @@ def command(
   replace: bool = DEFAULT_REPLACE_OPT,
   threads: int = DEFAULT_THREADS_OPT,
   error: Strategy = DEFAULT_STRATEGY_OPT,
-  subtitle: Path | None = DEFAULT_SUBTITLE_OPT,
+  subtitles: Path | None = DEFAULT_SUBTITLE_OPT,
 ):
   """
   📜 Get FFmpeg transcoding command.
@@ -139,7 +143,7 @@ def command(
   rc: int = Rc.ok
 
   for path in paths:
-    if _get_command(name, path, replace, threads, error):
+    if _get_command(name, path, replace, threads, error, subtitles):
       rc = Rc.must_convert
 
   raise Exit(rc)
@@ -157,12 +161,12 @@ def convert(
   jobs: int = DEFAULT_JOBS_OPT,
   threads: int = DEFAULT_THREADS_OPT,
   error: Strategy = DEFAULT_STRATEGY_OPT,
-  subtitle: Path | None = DEFAULT_SUBTITLE_OPT,
+  subtitles: Path | None = DEFAULT_SUBTITLE_OPT,
 ):
   """
   📼 Convert videos so that they're compatible with specified device.
   """
-  coro = convert_paths(name, replace, threads, jobs, *paths, strategy=error)
+  coro = convert_paths(name, replace, threads, jobs, *paths, strategy=error, subtitles=subtitles)
   run(coro)
 
 
