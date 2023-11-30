@@ -6,7 +6,7 @@ from collections.abc import Iterable
 from enum import StrEnum, auto
 from pathlib import Path
 from shlex import quote
-from typing import Final, Self
+from typing import Final
 
 import ffmpeg
 from ffmpeg.nodes import FilterableStream, OutputStream
@@ -31,41 +31,41 @@ HWACCEL_DEVICE: Final[Path] = Path('/dev/dri/renderD128')
 
 
 class FfmpegOpt(StrEnum):
-  acodec: Self = auto()
-  vcodec: Self = auto()
-  scodec: Self = auto()
-  vprofile: Self = auto()
-  vlevel: Self = auto()
-  fps: Self = auto()
-  r: Self = auto()
+  acodec = auto()
+  vcodec = auto()
+  scodec = auto()
+  vprofile = auto()
+  vlevel = auto()
+  fps = auto()
+  r = auto()
 
-  fflags: Self = auto()
-  movflags: Self = auto()
+  fflags = auto()
+  movflags = auto()
 
-  hwaccel: Self = auto()
-  hwaccel_output_format: Self = auto()
-  vaapi_device: Self = auto()
+  hwaccel = auto()
+  hwaccel_output_format = auto()
+  vaapi_device = auto()
 
-  scale: Self = auto()
-  threads: Self = auto()
+  scale = auto()
+  threads = auto()
 
-  vsync: Self = auto()
+  vsync = auto()
 
 
 class FfmpegArg(StrEnum):
-  y: Self = '-y'
+  y = '-y'
 
 
 class FfmpegVal(StrEnum):
-  copy: Self = auto()
-  vaapi: Self = auto()
-  faststart: Self = auto()
+  copy = auto()
+  vaapi = auto()
+  faststart = auto()
 
-  genpts: Self = '+genpts'
-  scale_resolution: Self = str(SCALE_RESOLUTION)
-  vaapi_device: Self = str(HWACCEL_DEVICE)
+  genpts = '+genpts'
+  scale_resolution = str(SCALE_RESOLUTION)
+  vaapi_device = str(HWACCEL_DEVICE)
 
-  vfr: Self = auto()
+  vfr = auto()
 
 
 Option = FfmpegOpt | str

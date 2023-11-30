@@ -10,10 +10,7 @@ from functools import wraps
 from multiprocessing import cpu_count
 from pathlib import Path
 from types import FunctionType, MethodType
-from typing import (
-  Any, Callable, Final, ParamSpec, Protocol, Self,
-  TYPE_CHECKING, TypeVar, runtime_checkable,
-)
+from typing import (Any, Callable, Final, Protocol, Self, TYPE_CHECKING, override, runtime_checkable)
 
 from more_itertools import peekable
 from rich import print
@@ -22,6 +19,7 @@ from thefuzz import process
 from typer import Exit
 
 from .exceptions import CannotCompare, UnknownFormat
+
 
 if TYPE_CHECKING:
   from .media.formats import Metadata
@@ -52,24 +50,19 @@ INCREMENT: Final[int] = 1
 
 
 class Decimal(Decimal):
+  @override
   def __format__(self, *args, **kwargs) -> str:
     return str(self)
 
+  @override
   def __repr__(self) -> str:
     return str(self)
-
-
-@runtime_checkable
-class HasName(Protocol):
-  @property
-  @abstractmethod
-  def name(self) -> str: ...
 
 
 # Python 3.11 removed the ability to use @classmethod with @property
 # see: https://stackoverflow.com/a/13624858
 class classproperty(property):
-  def __get__(self, instance: Self, owner: type[Self]) -> Any:
+  def __get__(self: Self, instance: Self, owner: type[Self]) -> Any:
     return self.fget(owner)
 
 
@@ -116,46 +109,48 @@ DEFAULT_PROFILE_RESOLUTION: Final[Resolution] = Resolution(720)
 
 
 class LogLevel(StrEnum):
-  debug: Self = auto()
-  info: Self = auto()
-  warn: Self = auto()
-  error: Self = auto()
-  critical: Self = auto()
-  fatal: Self = auto()
+  debug = auto()
+  info = auto()
+  warn = auto()
+  error = auto()
+  critical = auto()
+  fatal = auto()
 
 
-DEFAULT_LOG_LEVEL: Final[LogLevel] = LogLevel('warn')
+DEFAULT_LOG_LEVEL: Final[LogLevel] = LogLevel.warn
 
-T = TypeVar('T')
-U = TypeVar('U')
-P = ParamSpec('P')
 
-Item = T | U | None
+type Item[T, U] = T | U | None
+type Paths = set[Path]
 
-Paths = set[Path]
-
-Decorated = Callable[P, T]
-Decoratable = Callable[P, T]
-Decorator = Callable[[Decoratable], Decorated]
+type Decorated[**P, T] = Callable[P, T]
+type Decoratable[**P, T] = Callable[P, T]
+type Decorator[**P, T] = Callable[[Decoratable], Decorated]
 
 
 class Strategy(StrEnum):
-  quit: Self = auto()
-  skip: Self = auto()
+  quit = auto()
+  skip = auto()
+  force = auto()
 
 
 class Rc(IntEnum):
   """Return codes"""
   ok: Self = 0
-  err: Self = auto()
+  err = auto()
 
-  no_command: Self = auto()
-  missing_args: Self = auto()
-  no_matching_device: Self = auto()
+  no_command = auto()
+  missing_args = auto()
+  no_matching_device = auto()
 
-  must_convert: Self = auto()
-  failed_conversion: Self = auto()
-  unknown_format: Self = auto()
+  must_convert = auto()
+  failed_conversion = auto()
+  unknown_format = auto()
+
+
+@runtime_checkable
+class HasName(Protocol):
+  name: str
 
 
 @runtime_checkable
@@ -199,7 +194,7 @@ class HasItems(Protocol):
     return has_items(self)
 
 
-class Peekable(peekable, Iterable[T]):
+class Peekable[T](peekable, Iterable[T]):
   """Generic and typed `peekable` with convenience methods."""
   iterable: Iterable[T]
 
@@ -220,7 +215,7 @@ def has_items(obj: Any) -> bool:
 
 
 def handle_errors(*exceptions: type[Exception], strategy: Strategy = Strategy.quit) -> Decorator:
-  def decorator(func: Decoratable) -> Decorated:
+  def decorator[**P, T](func: Decoratable) -> Decorated:
     @wraps(func)
     def decorated(*args: P.args, **kwargs: P.kwargs) -> T:
       try:
@@ -255,12 +250,12 @@ def get_error_handler(
 bad_file_exit: Final[Decorator] = handle_errors(UnknownFormat)
 
 
-def first(iterable: Iterable[T], default: Item = None) -> Item:
+def first[T](iterable: Iterable[T], default: Item = None) -> Item:
   iterator = iter(iterable)
   return next(iterator, default)
 
 
-def identity(obj: T) -> T:
+def identity[T](obj: T) -> T:
   return obj
 
 
@@ -294,6 +289,9 @@ def get_name(obj: Any) -> str:
 
     case has_name if name := getattr(has_name, '__name__', None):
       return name
+
+    case HasName() as has_name:
+      return has_name.name
 
     case _:
       return type(obj).__name__

@@ -19,20 +19,20 @@ def alias(val: E) -> E:
 
 class Container(NormalizedFormat, StrEnum):
   """File Container"""
-  avi: Self = auto()
-  matroska: Self = auto()
-  mkv: Self = alias(matroska)
-  mp2t: Self = auto()
-  mp3: Self = auto()
-  mp4: Self = auto()
-  mpegts: Self = auto()
-  isom: Self = alias(mp4)
-  mpeg4: Self = alias(mp4)
-  ogg: Self = auto()
-  wav: Self = auto()
-  webm: Self = auto()
-  invalid: Self = auto()
-  unknown: Self = auto()
+  avi = auto()
+  matroska = auto()
+  mkv = alias(matroska)
+  mp2t = auto()
+  mp3 = auto()
+  mp4 = auto()
+  mpegts = auto()
+  isom = alias(mp4)
+  mpeg4 = alias(mp4)
+  ogg = auto()
+  wav = auto()
+  webm = auto()
+  invalid = auto()
+  unknown = auto()
 
   def to_extension(self) -> Extension | None:
     if ext := EXTENSIONS.get(self):
@@ -48,54 +48,54 @@ class Codec(NormalizedFormat, StrEnum):
 
 class VideoCodec(Codec):
   """Video Codec"""
-  avc: Self = auto()
-  div3: Self = auto()
-  divx: Self = alias(div3)
-  h264: Self = alias(avc)
-  hdr: Self = auto()
-  hevc: Self = auto()
-  h265: Self = alias(hevc)
-  mp4: Self = alias(avc)
-  mpeg4: Self = auto()
-  mpeg4visual: Self = alias(divx)
-  vp8: Self = auto()
-  vp9: Self = auto()
-  vp09: Self = alias(vp9)
-  xvid: Self = auto()
-  unknown: Self = auto()
+  avc = auto()
+  div3 = auto()
+  divx = alias(div3)
+  h264 = alias(avc)
+  hdr = auto()
+  hevc = auto()
+  h265 = alias(hevc)
+  mp4 = alias(avc)
+  mpeg4 = auto()
+  mpeg4visual = alias(divx)
+  vp8 = auto()
+  vp9 = auto()
+  vp09 = alias(vp9)
+  xvid = auto()
+  unknown = auto()
 
 
 class AudioCodec(Codec):
   """Audio Codec"""
-  aac: Self = auto()
-  ac3: Self = auto()
-  eac3: Self = auto()
-  eacs: Self = auto()
-  dts: Self = auto()
-  flac: Self = auto()
-  heaac: Self = auto()
-  lcaac: Self = auto()
-  mp3: Self = auto()
-  opus: Self = auto()
-  vorbis: Self = auto()
-  wav: Self = auto()
-  webm: Self = auto()
-  wma: Self = auto()
-  unknown: Self = auto()
+  aac = auto()
+  ac3 = auto()
+  eac3 = auto()
+  eacs = auto()
+  dts = auto()
+  flac = auto()
+  heaac = auto()
+  lcaac = auto()
+  mp3 = auto()
+  opus = auto()
+  vorbis = auto()
+  wav = auto()
+  webm = auto()
+  wma = auto()
+  unknown = auto()
 
 
 class Subtitle(NormalizedFormat, StrEnum):
-  ass: Self = auto()
-  eia608: Self = auto()
-  eia708: Self = auto()
-  srt: Self = auto()
-  utf8: Self = alias(srt)
-  ssa: Self = auto()
-  ttml: Self = auto()
-  unknown: Self = auto()
-  webvtt: Self = auto()
-  vtt: Self = alias(webvtt)
-  dwebvtt: Self = alias(webvtt)
+  ass = auto()
+  eia608 = auto()
+  eia708 = auto()
+  srt = auto()
+  utf8 = alias(srt)
+  ssa = auto()
+  ttml = auto()
+  unknown = auto()
+  webvtt = auto()
+  vtt = alias(webvtt)
+  dwebvtt = alias(webvtt)
 
   @classmethod
   def from_info(cls: Type[Self], info: str | None) -> Self | None:
@@ -110,8 +110,8 @@ class Subtitle(NormalizedFormat, StrEnum):
 
 
 class ProfileName(NormalizedFormat, StrEnum):
-  main: Self = auto()
-  main10: Self = auto()
+  main = auto()
+  main10 = auto()
 
 
 Containers = list[Container]
