@@ -135,7 +135,7 @@ def command(
   replace: bool = DEFAULT_REPLACE_OPT,
   threads: int = DEFAULT_THREADS_OPT,
   error: Strategy = DEFAULT_STRATEGY_OPT,
-  subtitles: Path | None = DEFAULT_SUBTITLE_OPT,
+  subtitle: Path | None = DEFAULT_SUBTITLE_OPT,
 ):
   """
   📜 Get FFmpeg transcoding command.
@@ -143,7 +143,7 @@ def command(
   rc: int = Rc.ok
 
   for path in paths:
-    if _get_command(name, path, replace, threads, error, subtitles):
+    if _get_command(name, path, replace, threads, error, subtitle):
       rc = Rc.must_convert
 
   raise Exit(rc)
@@ -161,12 +161,12 @@ def convert(
   jobs: int = DEFAULT_JOBS_OPT,
   threads: int = DEFAULT_THREADS_OPT,
   error: Strategy = DEFAULT_STRATEGY_OPT,
-  subtitles: Path | None = DEFAULT_SUBTITLE_OPT,
+  subtitle: Path | None = DEFAULT_SUBTITLE_OPT,
 ):
   """
   📼 Convert videos so that they're compatible with specified device.
   """
-  coro = convert_paths(name, replace, threads, jobs, *paths, strategy=error, subtitles=subtitles)
+  coro = convert_paths(name, replace, threads, jobs, *paths, strategy=error, subtitle=subtitle)
   run(coro)
 
 

@@ -126,17 +126,17 @@ def transcode_video(
   threads: int = DEFAULT_THREADS,
   subtitle: Path | None = None,
 ) -> Video:
-  stream, converted = get_stream(video, formats, threads, replace)
+  stream, converted = get_stream(video, formats, threads, replace, subtitle)
   cmd = get_ffmpeg_cmd(stream, video.path)
 
   logging.info(f'Running command: {cmd}')
   stream.run()  # type: ignore
 
-  orig: Path = video.path
+  original: Path = video.path
 
   if replace and converted:
-    if orig != (new_name := orig.with_suffix(converted.suffix)):
-      orig.unlink(missing_ok=True)
+    if original != (new_name := original.with_suffix(converted.suffix)):
+      original.unlink(missing_ok=True)
 
     converted = converted.rename(new_name)
 
@@ -162,6 +162,7 @@ def get_stream(
   formats: Formats,
   threads: int = DEFAULT_THREADS,
   replace: bool = DEFAULT_REPLACE,
+  subtitle: Path | None = None,
 ) -> tuple[OutputStream, Path]:
   input_opts = get_input_opts(formats)
   output_opts = get_output_opts(video, formats, threads)
@@ -290,12 +291,12 @@ def convert_from_name_path(
   path: Path,
   replace: bool = DEFAULT_REPLACE,
   threads: int = DEFAULT_THREADS,
-  subtitles: Path | None = None,
+  subtitle: Path | None = None,
 ) -> Video | None:
   video = Video.from_path(path)
   device = load_device_with_name(name)
 
-  if not should_transcode(device, video, subtitles):
+  if not should_transcode(device, video, subtitle):
     show_transcode_dismissal(video, device)
     return None
 
@@ -303,7 +304,7 @@ def convert_from_name_path(
     return None
 
   try:
-    return transcode_video(video, formats, replace, threads, subtitles)
+    return transcode_video(video, formats, replace, threads, subtitle)
 
   except Exception as e:
     logging.exception(e)
@@ -319,14 +320,14 @@ async def convert_paths(
   jobs: int,
   *paths: Path,
   strategy: Strategy = Strategy.quit,
-  subtitles: Path | None = None,
+  subtitle: Path | None = None,
 ):
   sem = BoundedSemaphore(jobs)
   handled_converter = get_error_handler(convert_from_name_path, UnknownFormat, strategy=strategy)
 
   async def convert(path: Path):
     async with sem:
-      await to_thread(handled_converter, name, path, replace, threads, subtitles)
+      await to_thread(handled_converter, name, path, replace, threads, subtitle)
 
   async with TaskGroup() as tg:
     for path in paths:
