@@ -111,7 +111,8 @@ class EncoderProfile(Profile):
   level: Level | None = None
 
 
-Profiles = AudioProfile | VideoProfile
+type Profiles = AudioProfile | VideoProfile
+
 VideoProfiles = list[VideoProfile]
 AudioProfiles = list[AudioProfile]
 

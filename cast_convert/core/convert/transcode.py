@@ -29,10 +29,10 @@ SCORE_INDEX: Final[int] = 1
 ALL_SAME: Final[int] = 1
 
 
-Weight = int
-ProfileWeight = tuple[Profile, Weight]
-ProfileWeights = Iterable[ProfileWeight]
-WeightMap = dict[Profile, Weight]
+type Weight = int
+type ProfileWeight = tuple[Profile, Weight]
+type ProfileWeights = Iterable[ProfileWeight]
+type WeightMap = dict[Profile, Weight]
 
 
 class TranscodeFormats(Formats):

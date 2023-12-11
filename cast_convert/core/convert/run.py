@@ -70,12 +70,12 @@ class FfmpegVal(StrEnum):
   vfr = auto()
 
 
-Option = FfmpegOpt | str
-Arg = FfmpegArg | str
-Val = FfmpegVal | str | float | int
+type Option = FfmpegOpt | str
+type Arg = FfmpegArg | str
+type Val = FfmpegVal | str | float | int
 
-Args = list[Arg]
-Options = dict[Option, Val]
+type Args = list[Arg]
+type Options = dict[Option, Val]
 
 
 DEFAULT_OUTPUT_OPTS: Final[Options] = {

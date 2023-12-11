@@ -213,7 +213,7 @@ def is_compatible(device: Device, other: Metadata) -> bool:
   super(Device, device).is_compatible(other)
 
 
-Devices = tuple[Device, ...]
+type Devices = tuple[Device, ...]
 
 
 @cache

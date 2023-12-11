@@ -13,20 +13,20 @@ DEVICE_INFO: Final[Path] = ASSET_DIR / 'support.yml'
 SUPPORT_INFO: Final[Path] = ASSET_DIR / 'support.yml'
 
 
-Fmt = str
-Alias = str
-Extension = str
+type Fmt = str
+type Alias = str
+type Extension = str
 
-Fmts = list[Fmt]
-Aliases = list[Alias]
-FmtAliases = dict[Fmt, Aliases]
-AliasFmts = dict[Alias, Fmt]
+type Fmts = list[Fmt]
+type Aliases = list[Alias]
+type FmtAliases = dict[Fmt, Aliases]
+type AliasFmts = dict[Alias, Fmt]
 
-FmtExtensions = dict[Fmt, Extension]
+type FmtExtensions = dict[Fmt, Extension]
 
-FfmpegCodecs = dict[str, FmtAliases]
+type FfmpegCodecs = dict[str, FmtAliases]
 
-Yaml = dict[str, ...] | list['Yaml'] | dict[str, 'Yaml']
+type Yaml = dict[str, Any] | list[Yaml] | dict[str, Yaml]
 
 
 def get_yaml(path: Path = DEVICE_INFO) -> Yaml:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from enum import Enum, StrEnum, auto
-from typing import Self, Type, TypeVar
+from typing import Self, Type
 
 from .base import NormalizedFormat
 from ..base import SUBTITLE_SEP
@@ -114,6 +114,7 @@ class ProfileName(NormalizedFormat, StrEnum):
   main10 = auto()
 
 
+type Codecs = AudioCodec | VideoCodec
+
 Containers = list[Container]
 Subtitles = list[Subtitle]
-Codecs = AudioCodec | VideoCodec

@@ -7,9 +7,9 @@ from .codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
 from .profiles import AudioProfile, Profile, Profiles, VideoProfile, is_video_profile_compatible
 from ..base import HasName, NEW_LINE, NO_BIAS, get_name, has_items
 
-
-VideoFormat = Codecs | Profiles | Container | Subtitle
-VideoFormats = Iterable[VideoFormat]
+type VideoFormat = Codecs | Profiles | Container | Subtitle
+type VideoFormats = Iterable[VideoFormat]
+type FormatPairs = Iterable[tuple[VideoFormat, VideoFormat]]
 
 
 class Formats(NamedTuple):
@@ -71,7 +71,7 @@ class Formats(NamedTuple):
     return count
 
 
-Metadata = VideoFormat | Formats
+type Metadata = VideoFormat | Formats
 
 
 def are_compatible(metadata: Metadata, other: Metadata) -> bool:
@@ -107,9 +107,6 @@ def are_compatible(metadata: Metadata, other: Metadata) -> bool:
       return False
 
   raise TypeError(f'Cannot compare {get_name(metadata)} with {get_name(other)}')
-
-
-FormatPairs = Iterable[tuple[VideoFormat, VideoFormat]]
 
 
 def are_fmts_compatible(formats: Formats, other: Formats) -> bool:
