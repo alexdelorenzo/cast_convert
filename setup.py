@@ -28,6 +28,8 @@ PKG_DATA: Final[dict[str, list[str]]] = {
   NAME: ASSET_DIRS
 }
 
+PYTHON_VERSION: str = '>=3.12'
+
 setup(
   name=NAME,
   version=__version__,
@@ -40,5 +42,6 @@ setup(
   zip_safe=True,
   install_requires=REQUIREMENTS,
   keywords='chromecast transcode convert video cli'.split(' '),
-  entry_points=ENTRY_POINTS
+  entry_points=ENTRY_POINTS,
+  python_requires=PYTHON_VERSION,
 )
