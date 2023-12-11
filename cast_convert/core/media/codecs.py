@@ -9,10 +9,10 @@ from ..base import SUBTITLE_SEP
 from ..parse import EXTENSIONS, Extension
 
 
-E = TypeVar('E', bound=Enum | str)
+log = logging.getLogger(__name__)
 
 
-def alias(val: E) -> E:
+def alias[E: Enum | str](val: E) -> E:
   """Denotes an Enum's alias"""
   return val
 
@@ -38,7 +38,7 @@ class Container(NormalizedFormat, StrEnum):
     if ext := EXTENSIONS.get(self):
       return ext
 
-    logging.warning(f"Can't find {self.name} in {EXTENSIONS}")
+    log.warning(f"Can't find {self.name} in {EXTENSIONS}")
     return None
 
 
