@@ -174,7 +174,7 @@ _device: &device
         <<: *profile
         fps: 60
         level: '4.1'
-        resolution: 720
+        resolution: 1280x720
 
     - vp8:
         <<: *profile
@@ -182,7 +182,7 @@ _device: &device
     - vp8:
         <<: *profile
         fps: 60
-        resolution: 720
+        resolution: 1280x720
 
 
 # Device names and supported profiles from https://developers.google.com/cast/docs/media
@@ -207,7 +207,7 @@ devices:
       - vp8:
           <<: *profile
           fps: 60
-          resolution: 720
+          resolution: 1280x720
 
   Chromecast Ultra:
     <<: *device
@@ -271,13 +271,13 @@ devices:
           <<: *profile
           fps: 60
           level: '4.1'
-          resolution: 720
+          resolution: 1280x720
 
       - vp9:
           <<: *profile
           fps: 60
           level: '4.0'
-          resolution: 720
+          resolution: 1280x720
 
   Nest Hub Max:
     <<: *device
@@ -286,13 +286,13 @@ devices:
           <<: *profile
           fps: 60
           level: '4.1'
-          resolution: 720
+          resolution: 1280x720
 
       - vp9:
           <<: *profile
           fps: 60
           level: '4.0'
-          resolution: 720
+          resolution: 1280x720
 
   Test Device:
     <<: *device
@@ -301,4 +301,4 @@ devices:
           <<: *profile
           fps: 60
           level: '4.0'
-          resolution: 720
+          resolution: 1280x720

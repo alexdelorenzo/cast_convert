@@ -28,7 +28,7 @@ DOT: Final[str] = '.'
 DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()
 TRANSCODE_SUFFIX: Final[str] = '_transcoded'
 
-SCALE_RESOLUTION: Final[Resolution] = -2  # see: https://stackoverflow.com/a/29582287
+SCALE_RESOLUTION: Final[int] = -2  # see: https://stackoverflow.com/a/29582287
 HWACCEL_DEVICE: Final[Path] = Path('/dev/dri/renderD128')
 
 
@@ -275,13 +275,14 @@ def get_video_filters(
     return None
 
   video_codec, resolution, fps, level = formats.video_profile
+  height, width = resolution
   filters: FilterableStream | None = None
 
   if resolution:
     filters = ffmpeg.filter(
       stream,
       FfmpegOpt.scale,
-      resolution,
+      height,  # resolution
       FfmpegVal.scale_resolution,
     )
 

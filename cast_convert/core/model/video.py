@@ -108,7 +108,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
 
   return VideoProfile(
     codec=codec,
-    resolution=Resolution(height),
+    resolution=Resolution.new(height, width),
     fps=fps,
     level=profile_to_level(profile)
   )
@@ -157,7 +157,7 @@ def get_video_profiles(profiles: Yaml) -> Iterable[VideoProfile]:
     codec = VideoCodec.from_info(name)
 
     if (resolution := attrs.get('resolution')) is not None:
-      resolution = Resolution(resolution)
+      resolution = Resolution.from_str(resolution)
 
     if (fps := attrs.get('fps')) is not None:
       fps = Fps(fps)

@@ -150,7 +150,7 @@ def is_resolution_compatible(
   resolution: Resolution | None,
   max_resolution: Resolution | None
 ) -> bool:
-  return resolution is max_resolution or resolution <= max_resolution
+  return resolution == max_resolution or resolution <= max_resolution
 
 
 def is_codec_compatible(

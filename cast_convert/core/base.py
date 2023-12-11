@@ -6,11 +6,11 @@ from abc import abstractmethod
 from collections.abc import Iterable
 from decimal import Decimal
 from enum import IntEnum, StrEnum, auto
-from functools import wraps
+from functools import total_ordering, wraps
 from multiprocessing import cpu_count
 from pathlib import Path
 from types import FunctionType, MethodType
-from typing import (Any, Callable, Final, Protocol, Self, TYPE_CHECKING, override, runtime_checkable)
+from typing import (Any, Callable, Final, NamedTuple, Protocol, Self, TYPE_CHECKING, override, runtime_checkable)
 
 from more_itertools import peekable
 from rich import print
@@ -97,9 +97,55 @@ class Level(Decimal, WithName):
   pass
 
 
-class Resolution(int, WithName):
+class Height(int, WithName):
   """Resolution Height"""
-  pass
+
+  def is_compatible(self, other: Self) -> bool:
+    return self >= other
+
+
+class Width(int, WithName):
+  """Resolution Height"""
+
+  def is_compatible(self, other: Self) -> bool:
+    return self >= other
+
+
+@total_ordering
+class Resolution(NamedTuple):
+  """Resolution"""
+
+  height: Height
+  width: Width
+
+  @classmethod
+  def new(cls: type[Self], height: int = 0, width: int = 0) -> Self:
+    return cls(Height(height), Width(width))
+
+  @classmethod
+  def from_str(cls: type[Self], text: str) -> Self:
+    height, width = text.split('x')
+    return cls.new(height, width)
+
+  def __str__(self) -> str:
+    return f"{self.width}x{self.height}"
+
+  def __lt__(self, other: Self | Height | Width | Any) -> bool:
+    match other:
+      case Resolution(width, height):
+        return self.width < width and self.height < height
+
+      case Height(height):
+        return self.height < height
+
+      case Width(width):
+        return self.width < width
+
+      case _:
+        return NotImplemented
+
+  def is_compatible(self, other: Resolution) -> bool:
+    return self >= other
 
 
 DEFAULT_VIDEO_FPS: Final[Fps] = Fps()
@@ -107,7 +153,7 @@ DEFAULT_VIDEO_LEVEL: Final[Level] = Level()
 
 DEFAULT_PROFILE_FPS: Final[Fps] = Fps('24.0')
 DEFAULT_PROFILE_LEVEL: Final[Level] = Level('0.0')
-DEFAULT_PROFILE_RESOLUTION: Final[Resolution] = Resolution(720)
+DEFAULT_PROFILE_RESOLUTION: Final[Resolution] = Resolution(Width(1280), Height(720))
 
 
 class LogLevel(StrEnum):
