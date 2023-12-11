@@ -275,7 +275,7 @@ def get_video_filters(
     return None
 
   video_codec, resolution, fps, level = formats.video_profile
-  height, width = resolution
+  width, height = resolution
   filters: FilterableStream | None = None
 
   if resolution:

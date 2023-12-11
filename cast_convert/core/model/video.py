@@ -108,7 +108,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
 
   return VideoProfile(
     codec=codec,
-    resolution=Resolution.new(height, width),
+    resolution=Resolution.new(width, height),
     fps=fps,
     level=profile_to_level(profile)
   )

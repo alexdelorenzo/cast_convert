@@ -115,17 +115,17 @@ class Width(int, WithName):
 class Resolution(NamedTuple):
   """Resolution"""
 
-  height: Height
   width: Width
+  height: Height
 
   @classmethod
-  def new(cls: type[Self], height: int = 0, width: int = 0) -> Self:
-    return cls(Height(height), Width(width))
+  def new(cls: type[Self], width: int = 0, height: int = 0) -> Self:
+    return cls(Width(width), Height(height))
 
   @classmethod
   def from_str(cls: type[Self], text: str) -> Self:
-    height, width = text.split('x')
-    return cls.new(height, width)
+    width, height = text.split('x')
+    return cls.new(width, height)
 
   def __str__(self) -> str:
     return f"{self.width}x{self.height}"
