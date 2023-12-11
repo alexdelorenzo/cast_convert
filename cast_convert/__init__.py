@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Final
 
 
-__version__: Final[str] = '0.13.0'
+__version__: Final[str] = '0.13.1'
 
 NAME: Final[str] = 'cast_convert'
 PROJECT_HOME: Final[str] = 'https://github.com/alexdelorenzo/cast_contvert'
