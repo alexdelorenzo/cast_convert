@@ -18,6 +18,9 @@ from ..parse import DEVICE_INFO, Fmts, Yaml, get_yaml
 from .video import Video, get_video_profiles
 
 
+log = logging.getLogger(__name__)
+
+
 @dataclass(eq=True, frozen=True)
 class Device(IsCompatible):
   name: str
@@ -86,7 +89,7 @@ class Device(IsCompatible):
     can_play = any(video.is_compatible(profile) for profile in self.audio_profiles)
 
     if not can_play:
-      logging.info(f"{audio_profile} not compatible with {self.audio_profiles}")
+      log.info(f"{audio_profile} not compatible with {self.audio_profiles}")
 
     return can_play
 
@@ -102,7 +105,7 @@ class Device(IsCompatible):
     can_play = any(video.is_compatible(profile) for profile in self.video_profiles)
 
     if not can_play:
-      logging.info(f"{video_profile} not compatible with {self.video_profiles}")
+      log.info(f"{video_profile} not compatible with {self.video_profiles}")
 
     return can_play
 
@@ -113,7 +116,7 @@ class Device(IsCompatible):
       raise UnknownFormat(f"Missing {get_name(Container)} for {video}")
 
     if not (can_play := container in self.containers):
-      logging.info(f"{container} not compatible with {self.containers}")
+      log.info(f"{container} not compatible with {self.containers}")
 
     return can_play
 

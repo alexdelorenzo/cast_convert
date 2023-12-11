@@ -25,6 +25,8 @@ if TYPE_CHECKING:
   from .media.formats import Metadata
 
 
+log = logging.getLogger(__name__)
+
 DEFAULT_MODEL: Final[str] = 'Chromecast 1st Gen'
 DEFAULT_REPLACE: Final[bool] = False
 DEFAULT_JOBS: Final[int] = 2
@@ -208,7 +210,7 @@ def has_items(obj: Any) -> bool:
     items = iter(obj)
 
   except TypeError as e:
-    logging.warning(f"[{e}] Can't get an iterator for type {get_name(obj)}")
+    log.warning(f"[{e}] Can't get an iterator for type {get_name(obj)}")
     items = obj.__dict__.values()
 
   return any(item is not None for item in items)
@@ -222,8 +224,8 @@ def handle_errors(*exceptions: type[Exception], strategy: Strategy = Strategy.qu
         return func(*args, **kwargs)
 
       except exceptions as e:
-        logging.exception(e)
-        logging.error(f'Failed: {get_name(func)}({args=}, {kwargs=})')
+        log.exception(e)
+        log.error(f'Failed: {get_name(func)}({args=}, {kwargs=})')
 
         match strategy:
           case Strategy.quit:
@@ -231,7 +233,7 @@ def handle_errors(*exceptions: type[Exception], strategy: Strategy = Strategy.qu
             raise Exit(Rc.err) from e
 
           case Strategy.skip:
-            logging.warning(f'[{strategy}] Encountered error: {e}, skipping.')
+            log.warning(f'[{strategy}] Encountered error: {e}, skipping.')
 
     return decorated
 
@@ -271,7 +273,7 @@ def get_fuzzy_match(
   min_score: int = MIN_FUZZY_MATCH_SCORE,
 ) -> str | None:
   closest, score = process.extractOne(name, items)
-  logging.debug(f"Fuzzy match: {name} -> {closest} ({score})")
+  log.debug(f"Fuzzy match: {name} -> {closest} ({score})")
 
   if score < min_score:
     return None

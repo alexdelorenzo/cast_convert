@@ -19,6 +19,9 @@ from ..media.profiles import AudioProfile, VideoProfile
 from ..parse import Yaml
 
 
+log = logging.getLogger(__name__)
+
+
 @dataclass
 class Video(IsCompatible):
   name: str
@@ -42,7 +45,7 @@ class Video(IsCompatible):
     )
 
     if exts := general.fileextension_invalid:
-      logging.error(f"{path} has an invalid file extension, not in: {exts}")
+      log.error(f"{path} has an invalid file extension, not in: {exts}")
 
     if exts and container is Container.unknown:
       container = Container.invalid
@@ -100,7 +103,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
   fps = Fps(video.original_frame_rate or video.frame_rate or DEFAULT_VIDEO_FPS)
 
   if not fps and (mode := video.frame_rate_mode):
-    logging.warning(f"Assuming VFR, detected FPS: {mode}")
+    log.warning(f"Assuming VFR, detected FPS: {mode}")
     fps = VariableFps
 
   return VideoProfile(
@@ -126,10 +129,10 @@ def profile_to_level(profile: str | None) -> Level:
       return Level(level)
 
     case rest:
-      logging.warning(f"Unknown profile format: {rest}")
+      log.warning(f"Unknown profile format: {rest}")
       return DEFAULT_VIDEO_LEVEL
 
-  logging.debug(f"[Encoder profile] '{profile}' -> ({name=}, {level=})")
+  log.debug(f"[Encoder profile] '{profile}' -> ({name=}, {level=})")
 
   if not (level := normalize(level, str.isnumeric)):
     return DEFAULT_VIDEO_LEVEL

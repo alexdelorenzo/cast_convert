@@ -9,6 +9,9 @@ from ..fmt import normalize
 from ..parse import ALIAS_FMTS
 
 
+log = logging.getLogger(__name__)
+
+
 class NormalizedFormat(WithName):
   unknown: Self | str
 
@@ -21,17 +24,17 @@ class NormalizedFormat(WithName):
   @classmethod
   def _missing_(cls: Type[Self], value: str) -> Self:
     name = get_name(cls)
-    logging.info(f"[{name}] Missing: {value}")
+    log.info(f"[{name}] Missing: {value}")
 
     if alias := getattr(cls, value, None):
-      logging.info(f"[{name}] Using {alias} as an alias for {value}")
+      log.info(f"[{name}] Using {alias} as an alias for {value}")
       return alias
 
     if alias := ALIAS_FMTS.get(value):
-      logging.info(f"[{name}] Using {alias} as an alias for {value}")
+      log.info(f"[{name}] Using {alias} as an alias for {value}")
       return cls(alias)
 
-    logging.info(f"[{name}] Not found, using `unknown` instead of {value}")
+    log.info(f"[{name}] Not found, using `unknown` instead of {value}")
     return cls.unknown
 
   @classmethod
@@ -39,14 +42,14 @@ class NormalizedFormat(WithName):
     name = get_name(cls)
 
     if not info:
-      logging.info(f"[{name}] no info supplied: {info}")
+      log.info(f"[{name}] no info supplied: {info}")
       return cls.unknown
 
     if not isinstance(info, str):
       raise TypeError(f"[{name}] Can't normalize: {info}")
 
     normalized = normalize(info)
-    logging.debug(f'{name}({info}) normalized as {name}({normalized})')
+    log.debug(f'{name}({info}) normalized as {name}({normalized})')
 
     return cls(normalized)
 

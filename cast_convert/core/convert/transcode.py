@@ -23,6 +23,8 @@ if TYPE_CHECKING:
   from ..model.device import Device
 
 
+log = logging.getLogger(__name__)
+
 SCORE_INDEX: Final[int] = 1
 ALL_SAME: Final[int] = 1
 
@@ -60,7 +62,7 @@ def transcode_video(
   _, video_profile, *_ = video.formats
 
   if not video_profile:
-    logging.warning(f"{video} has no VideoProfile")
+    log.warning(f"{video} has no VideoProfile")
     return None
 
   if not default_video:
@@ -93,7 +95,7 @@ def get_default_video_profile(device: Device, video: Video) -> VideoProfile | No
   unique_weights: set[int] = set(weights.values())
 
   if len(unique_weights) == ALL_SAME:
-    logging.info(f'Choosing first {get_name(VideoProfile)} from {device.name}')
+    log.info(f'Choosing first {get_name(VideoProfile)} from {device.name}')
     return first(device.video_profiles)
 
   profile_weights = sorted(weights.items(), key=compare_weight)
@@ -116,7 +118,7 @@ def transcode_audio(
   *_, audio_profile, _ = video.formats
 
   if not default_audio:
-    logging.info(f'Choosing first {get_name(AudioProfile)} from {device.name}')
+    log.info(f'Choosing first {get_name(AudioProfile)} from {device.name}')
     default_audio = first(device.audio_profiles)
 
   return transcode_audio_profile(audio_profile, default_audio)
@@ -133,7 +135,7 @@ def transcode_container(
   container, *_ = video.formats
 
   if not default_container:
-    logging.info(f'Choosing first {get_name(Container)} from {device.name}')
+    log.info(f'Choosing first {get_name(Container)} from {device.name}')
     default_container = first(device.containers)
 
   return transcode_containers(container, default_container)
@@ -150,7 +152,7 @@ def transcode_subtitle(
   *_, subtitle = video.formats
 
   if not default_subtitle:
-    logging.info(f'Choosing first {get_name(Subtitle)} from {device.name}')
+    log.info(f'Choosing first {get_name(Subtitle)} from {device.name}')
     default_subtitle = first(device.subtitles)
 
   return transcode_subtitles(subtitle, default_subtitle)

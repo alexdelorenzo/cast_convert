@@ -14,6 +14,9 @@ from ..exceptions import UnknownFormat
 from ..model.video import Video
 
 
+log = logging.getLogger(__name__)
+
+
 def is_open_in_proc(file: Path | str) -> bool:
   file = Path(file)
 
@@ -24,8 +27,8 @@ def is_open_in_proc(file: Path | str) -> bool:
       files = {Path(f.path) for f in proc.open_files()}
 
     except Exception as e:
-      logging.exception(e)
-      logging.error(f"Couldn't read open files for {proc.pid} {proc.name()}")
+      log.exception(e)
+      log.error(f"Couldn't read open files for {proc.pid} {proc.name()}")
 
     if file in files:
       return True
@@ -64,7 +67,7 @@ async def wait_for_stable_size(
       await sleep(wait)
 
     except Exception as e:
-      logging.exception(e)
+      log.exception(e)
       previous = NO_SIZE
 
 
@@ -73,14 +76,14 @@ async def is_video(path: Path) -> bool:
     video = await to_thread(Video.from_path, path)
 
   except Exception as e:
-    logging.exception(e)
-    logging.error(f'Not a video: {path}')
+    log.exception(e)
+    log.error(f'Not a video: {path}')
     return False
 
   if video.formats.video_profile:
     return True
 
-  logging.error(f'Not a video: {path}')
+  log.error(f'Not a video: {path}')
   return False
 
 

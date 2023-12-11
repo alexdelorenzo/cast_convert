@@ -21,6 +21,8 @@ from ..model.video import Video
 from ..parse import AUDIO_ENCODERS, Alias, Aliases, Extension, SUBTITLE_ENCODERS, VIDEO_ENCODERS
 
 
+log = logging.getLogger(__name__)
+
 DOT: Final[str] = '.'
 
 DEFAULT_EXT: Final[Extension] = Container.matroska.to_extension()
@@ -129,7 +131,7 @@ def transcode_video(
   stream, converted = get_stream(video, formats, threads, replace, subtitle)
   cmd = get_ffmpeg_cmd(stream, video.path)
 
-  logging.info(f'Running command: {cmd}')
+  log.info(f'Running command: {cmd}')
   stream.run()  # type: ignore
 
   original: Path = video.path
@@ -307,8 +309,8 @@ def convert_from_name_path(
     return transcode_video(video, formats, replace, threads, subtitle)
 
   except Exception as e:
-    logging.exception(e)
-    logging.error(f'Error while converting {video} to {formats}')
+    log.exception(e)
+    log.error(f'Error while converting {video} to {formats}')
 
     return None
 
