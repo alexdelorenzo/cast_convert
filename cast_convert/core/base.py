@@ -68,14 +68,19 @@ class classproperty(property):
     return self.fget(owner)
 
 
-class WithName:
-  @classproperty
-  def name(self: Self) -> str:
-    if doc := self.__doc__:
-      name, *_ = doc.split(NEW_LINE)
-      return name
+def with_name(self: Self) -> str:
+  if doc := self.__doc__:
+    name, *_ = doc.split(NEW_LINE)
+    return name
 
-    return get_name(self)
+  return get_name(self)
+
+
+type NameMethod = Callable[[Self], str]
+
+
+class WithName:
+  name: NameMethod = classproperty(with_name)
 
 
 class Fps(Decimal, WithName):
@@ -117,6 +122,10 @@ class Resolution(NamedTuple):
 
   width: Width
   height: Height
+
+  @classproperty
+  def name(cls: type[Self]) -> str:
+    return with_name(cls)
 
   @classmethod
   def new(cls: type[Self], width: int = 0, height: int = 0) -> Self:
