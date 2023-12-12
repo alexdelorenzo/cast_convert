@@ -41,7 +41,7 @@ class Profile(
   @property
   def text(self) -> str:
     return NEW_LINE.join(
-      f'[b]{get_label(key, val)}[/]: [b blue]{val}[/]'
+      format_label(key, val)
       for key, val in self.as_dict.items()
       if val is not None
     )
@@ -173,3 +173,9 @@ def get_label(key: str, val: Metadata) -> str:
     label = label.upper()
 
   return label
+
+
+def format_label(key: str, val: Metadata) -> str:
+  label = get_label(key, val)
+
+  return f'[b]{label}[/]: [b blue]{val}[/]'
