@@ -8,7 +8,7 @@ Cast Convert can tell you whether videos will play correctly on your casting dev
 
 ### What Cast Convert does
 
-`cast_convert` can identify and correct a video's incompatibility with a device caused by the video's:
+`cast-convert` can identify and correct a video's incompatibility with a device caused by the video's:
 
 - Video encoding
 - Audio encoding
@@ -65,10 +65,10 @@ $ cast-convert inspect --name '1st Gen' video.mp4
 ### About Cast Convert
 
 Individual casting devices like the Chromecast have unique video encoding, audio encoding and container support
-combinations for video files. `cast_convert` has detailed compatibility profiles for each individual Chromecast model on
+combinations for video files. Cast Convert has detailed compatibility profiles for each individual Chromecast model on
 the market.
 
-`cast_convert` will inspect a video's metadata to determine what video attributes must get changed to successfully play
+`cast-convert` will inspect a video's metadata to determine what video attributes must get changed to successfully play
 it. To use resources efficiently, it will determine only the minimum amount of transcoding needed to successfully play
 each video back.
 
