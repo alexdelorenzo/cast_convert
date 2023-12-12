@@ -46,12 +46,7 @@ def checklist(text: str | Any) -> str:
   return NEW_LINE.join(f'{TAB}- {line}' for line in lines)
 
 
-def tabs(
-  text: str | Any,
-  tabs: int = 1,
-  out: bool = False,
-  tick: bool = False,
-) -> str:
+def tabs(text: str | Any, tabs: int = 1, out: bool = False, tick: bool = False) -> str:
   if tick:
     text = checklist(text)
 
