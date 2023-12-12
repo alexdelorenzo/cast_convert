@@ -25,8 +25,11 @@ class Container(NormalizedFormat, StrEnum):
   mp2t = auto()
   mp3 = auto()
   mp4 = auto()
+  mp41 = alias(mp4)
+  mp42 = alias(mp4)
   mpegts = auto()
   isom = alias(mp4)
+  iso4 = alias(isom)
   mpeg4 = alias(mp4)
   ogg = auto()
   wav = auto()
@@ -38,7 +41,7 @@ class Container(NormalizedFormat, StrEnum):
     if ext := EXTENSIONS.get(self):
       return ext
 
-    log.warning(f"Can't find {self.name} in {EXTENSIONS}")
+    log.warning(f"Can't find {self.name} in {EXTENSIONS=}")
     return None
 
 
@@ -96,6 +99,7 @@ class Subtitle(NormalizedFormat, StrEnum):
   utf8 = alias(srt)
   ssa = auto()
   ttml = auto()
+  timedtext = alias(ttml)
   unknown = auto()
   webvtt = auto()
   vtt = alias(webvtt)
