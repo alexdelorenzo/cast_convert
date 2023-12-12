@@ -21,6 +21,8 @@ from typer import Exit
 from .exceptions import CannotCompare, UnknownFormat
 
 
+RESOLUTION_SEP = 'x'
+
 if TYPE_CHECKING:
   from .media.formats import Metadata
 
@@ -102,6 +104,7 @@ class Level(Decimal, WithName):
   pass
 
 
+# @total_ordering
 class Height(int, WithName):
   """Resolution Height"""
 
@@ -109,6 +112,7 @@ class Height(int, WithName):
     return self >= other
 
 
+# @total_ordering
 class Width(int, WithName):
   """Resolution Height"""
 
@@ -116,42 +120,59 @@ class Width(int, WithName):
     return self >= other
 
 
-@total_ordering
+type Components = Width | Height | int | float
+
+
+# @total_ordering
 class Resolution(NamedTuple):
   """Resolution"""
 
   width: Width
   height: Height
 
+  def __lt__(self, other: Self | Components | Any) -> bool:
+    match other:
+      case Resolution(width, height):
+        return self.width < width or self.height < height
+
+      case Height(height) | int(height) | float(height):
+        return self.height < height
+
+      case Width(width) | int(width) | float(width):
+        return self.width < width
+
+      case _:
+        raise ValueError(f"Can't compare with {other}")
+
+  def __eq__(self, other: Self | Components | Any) -> bool:
+    match other:
+      case Resolution(width, height):
+        return self.width == width and self.height == height
+
+      case Height(height) | int(height) | float(height):
+        return self.height == height
+
+      case Width(width) | int(width) | float(width):
+        return self.width == width
+
+      case _:
+        raise ValueError(f"Can't compare with {other}")
+
+  def __str__(self) -> str:
+    return f"{self.width}{RESOLUTION_SEP}{self.height}"
+
   @classproperty
   def name(cls: type[Self]) -> str:
     return with_name(cls)
 
   @classmethod
-  def new(cls: type[Self], width: int = 0, height: int = 0) -> Self:
-    return cls(Width(width), Height(height))
-
-  @classmethod
   def from_str(cls: type[Self], text: str) -> Self:
-    width, height = text.split('x')
+    width, height = text.split(RESOLUTION_SEP)
     return cls.new(width, height)
 
-  def __str__(self) -> str:
-    return f"{self.width}x{self.height}"
-
-  def __lt__(self, other: Self | Height | Width | Any) -> bool:
-    match other:
-      case Resolution(width, height):
-        return self.width < width and self.height < height
-
-      case Height(height):
-        return self.height < height
-
-      case Width(width):
-        return self.width < width
-
-      case _:
-        return NotImplemented
+  @classmethod
+  def new(cls: type[Self], width: int = 0, height: int = 0) -> Self:
+    return cls(Width(width), Height(height))
 
   def is_compatible(self, other: Resolution) -> bool:
     return self >= other
