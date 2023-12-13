@@ -86,14 +86,14 @@ each video back.
 
 ### Minimum
 
-- Python 3.11
-- `mediainfo`
-- `ffmpeg`
+- [Python 3.12](https://www.python.org/downloads/)
+- [`mediainfo`](https://mediaarea.net/en/MediaInfo)
+- [`ffmpeg`](https://ffmpeg.org/)
 
 ### Encoders
 
-- `libmp3lame`
-- `x264`
+- [`libmp3lame`](https://lame.sourceforge.io/)
+- [`x264`](https://www.videolan.org/developers/x264.html)
 
 ## Installation
 
