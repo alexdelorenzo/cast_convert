@@ -35,7 +35,7 @@ $ cast-convert inspect --name '1st Gen' video.mp4
   Must convert from:
     - File Container: mp4
     - Video Codec: vp9
-    - Resolution Height: 640
+    - Resolution: 640x480
     - Frame Rate: 29.970
     - Audio Codec: mp3
   To:
@@ -55,7 +55,7 @@ $ cast-convert inspect --name '1st Gen' video.mp4
   Must convert from:
     - File Container: mp4
     - Video Codec: vp9
-    - Resolution Height: 640
+    - Resolution: 640x480
     - Frame Rate: 29.970
     - Audio Codec: dts
   To:
@@ -182,7 +182,7 @@ $ cast-convert inspect --name '1st Gen' ~/video.webm
   Must convert from:
     - Container: webm
     - Codec: vp9
-    - Resolution: 406
+    - Resolution: 406x260
     - Fps: 25.000
     - Level: 0
   To:
