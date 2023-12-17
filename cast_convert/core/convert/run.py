@@ -102,7 +102,7 @@ GLOBAL_ARGS: Final[Args] = [
 GLOBAL_OPTS: Final[Options] = {}
 
 
-def get_encoder(codec: Codecs) -> Alias:
+def get_encoder(codec: Codecs | Subtitle) -> Alias:
   encoders: Aliases
 
   match codec:
@@ -234,8 +234,8 @@ def get_output_opts(
   if (profile := formats.video_profile) and (codec := profile.codec):
     opts[FfmpegOpt.vcodec] = get_encoder(codec)
 
-  if codec := formats.subtitle:
-    opts[FfmpegOpt.scodec] = get_encoder(codec)
+  if subtitle := formats.subtitle:
+    opts[FfmpegOpt.scodec] = get_encoder(subtitle)
 
   if not profile:
     return opts
