@@ -123,7 +123,7 @@ class Width(int, WithName):
 type Components = Width | Height | int | float
 
 
-# @total_ordering
+@total_ordering
 class Resolution(NamedTuple):
   """Resolution"""
 
