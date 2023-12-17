@@ -9,7 +9,7 @@ class StreamNotFoundException(CastConvertException):
   pass
 
 
-class FormatError(CastConvertException):
+class FormatError(CastConvertException, ValueError):
   pass
 
 
