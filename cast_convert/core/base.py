@@ -130,20 +130,7 @@ class Resolution(NamedTuple):
   width: Width
   height: Height
 
-  def __lt__(self, other: Self | Components | Any) -> bool:
-    match other:
-      case Resolution(width, height):
-        return self.width < width or self.height < height
-
-      case Height(height) | int(height) | float(height):
-        return self.height < height
-
-      case Width(width) | int(width) | float(width):
-        return self.width < width
-
-      case _:
-        raise ValueError(f"Can't compare with {other}")
-
+  @override
   def __eq__(self, other: Self | Components | Any) -> bool:
     match other:
       case Resolution(width, height):
@@ -156,7 +143,22 @@ class Resolution(NamedTuple):
         return self.width == width
 
       case _:
-        raise ValueError(f"Can't compare with {other}")
+        raise CannotCompare(f"Can't compare {self!r} with {other}")
+
+  @override
+  def __lt__(self, other: Self | Components | Any) -> bool:
+    match other:
+      case Resolution(width, height):
+        return self.width < width or self.height < height
+
+      case Height(height) | int(height) | float(height):
+        return self.height < height
+
+      case Width(width) | int(width) | float(width):
+        return self.width < width
+
+      case _:
+        raise CannotCompare(f"Can't compare {self!r} with {other}")
 
   def __str__(self) -> str:
     return f"{self.width}{RESOLUTION_SEP}{self.height}"
@@ -234,7 +236,7 @@ class HasName(Protocol):
 @runtime_checkable
 class IsCompatible(Protocol):
   def is_compatible(self, other: Metadata) -> bool:
-    raise CannotCompare(f"Can't compare {self} with {other}")
+    raise CannotCompare(f"Can't compare {self=!r} with {other!r}")
 
 
 @runtime_checkable
@@ -309,7 +311,7 @@ def handle_errors(*exceptions: type[Exception], strategy: Strategy = Strategy.qu
             raise Exit(Rc.err) from e
 
           case Strategy.skip:
-            log.warning(f'[{strategy}] Encountered error: {e}, skipping.')
+            log.warning(f'[{strategy=}] Encountered error: {e}, skipping.')
 
     return decorated
 
