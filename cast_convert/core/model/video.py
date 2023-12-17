@@ -103,7 +103,7 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
   fps = Fps(video.original_frame_rate or video.frame_rate or DEFAULT_VIDEO_FPS)
 
   if not fps and (mode := video.frame_rate_mode):
-    log.warning(f"Assuming VFR, detected FPS: {mode}")
+    log.warning(f"Assuming variable frame rate: {fps=}, {mode=}")
     fps = VariableFps
 
   return VideoProfile(
@@ -129,12 +129,13 @@ def profile_to_level(profile: str | None) -> Level:
       return Level(level)
 
     case rest:
-      log.warning(f"Unknown profile format: {rest}")
+      log.warning(f"Unknown profile format: {rest}, using default.")
       return DEFAULT_VIDEO_LEVEL
 
   log.debug(f"[Encoder profile] '{profile}' -> ({name=}, {level=})")
 
   if not (level := normalize(level, str.isnumeric)):
+    log.warning(f"Cannot determine level from {level=}, non-numeric. Using default.")
     return DEFAULT_VIDEO_LEVEL
 
   match [*level]:
@@ -145,6 +146,7 @@ def profile_to_level(profile: str | None) -> Level:
       small = ''.join(small)
       return Level(f'{big}.{small}')
 
+  log.warning(f"Cannot determine level from {level=}, using default.")
   return DEFAULT_VIDEO_LEVEL
 
 
