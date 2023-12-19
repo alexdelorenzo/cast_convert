@@ -17,7 +17,7 @@ type NameMethod = Callable[[Self], str]
 
 
 type Item[T, U] = T | U | None
-type Paths = set[Path]
+Paths = set[Path]
 
 type Decorated[**P, T] = Callable[P, T]
 type Decoratable[**P, T] = Callable[P, T]
