@@ -14,10 +14,7 @@ from .exceptions import CannotCompare
 
 type Components = Width | Height | int | float
 type NameMethod = Callable[[Self], str]
-
-
 type Item[T, U] = T | U | None
-Paths = set[Path]
 
 type Decorated[**P, T] = Callable[P, T]
 type Decoratable[**P, T] = Callable[P, T]
@@ -28,6 +25,9 @@ log = logging.getLogger(__name__)
 
 RESOLUTION_SEP: Final[str] = 'x'
 VFR_DESCRIPTION: Final[str] = 'Variable frame rate'
+
+
+Paths = set[Path]
 
 
 class Decimal(Decimal):
