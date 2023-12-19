@@ -8,7 +8,8 @@ from pathlib import Path
 from typing import Self, Type
 import logging
 
-from ..base import IsCompatible, MIN_FUZZY_MATCH_SCORE, first, get_fuzzy_match, get_name
+from ..base import MIN_FUZZY_MATCH_SCORE, first, get_fuzzy_match, get_name
+from ..protocols import IsCompatible
 from ..convert.transcode import transcode_to
 from ..exceptions import UnknownFormat
 from ..media.codecs import AudioCodec, Container, Containers, Subtitle, Subtitles, VideoCodec

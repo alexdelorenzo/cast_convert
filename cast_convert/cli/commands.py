@@ -12,7 +12,8 @@ from typer.models import ArgumentInfo, OptionInfo
 from .helpers import _get_command, _inspect, show_devices
 from .. import CLI_ENTRY, COPYRIGHT_NOTICE, DESCRIPTION, LICENSE, PROJECT_HOME, __version__
 from ..core.base import DEFAULT_JOBS, DEFAULT_LOG_LEVEL, DEFAULT_MODEL, \
-  DEFAULT_THREADS, LogLevel, Rc, Strategy, bad_file_exit, setup_logging
+  DEFAULT_THREADS, bad_file_exit, setup_logging
+from ..core.enums import LogLevel, Rc, Strategy
 
 from ..core.convert.run import convert_paths
 from ..core.convert.watch import convert_videos

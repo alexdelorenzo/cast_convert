@@ -14,7 +14,9 @@ from ..core.convert.transcode import should_transcode, show_transcode_dismissal
 from ..core.media.codecs import AudioCodec
 from ..core.model.device import Device, Devices, get_device_fuzzy, get_devices_from_file
 from ..core.model.video import Video
-from ..core.base import DEFAULT_REPLACE, DEFAULT_THREADS, Peekable, Rc, Strategy, get_error_handler
+from ..core.base import DEFAULT_REPLACE, DEFAULT_THREADS, get_error_handler
+from ..core.types import Peekable
+from ..core.enums import Rc, Strategy
 from ..core.fmt import esc, tabs
 from ..core.parse import DEVICE_INFO
 from ..core.exceptions import UnknownFormat

@@ -92,7 +92,7 @@ def get_default_video_profile(device: Device, video: Video) -> VideoProfile | No
     if profile and (transcoded := transcode_video_profile(video_profile, profile))
   }
 
-  unique_weights: set[int] = set(weights.values())
+  unique_weights: set[Weight] = set(weights.values())
 
   if len(unique_weights) == ALL_SAME:
     log.info(f'Choosing first {get_name(VideoProfile)} from {device.name}')

@@ -12,7 +12,8 @@ import ffmpeg
 from ffmpeg.nodes import FilterableStream, OutputStream
 
 from .transcode import should_transcode, show_transcode_dismissal
-from ..base import DEFAULT_REPLACE, DEFAULT_THREADS, JOIN_COMMAND, Resolution, Strategy, first, get_error_handler
+from ..base import DEFAULT_REPLACE, DEFAULT_THREADS, JOIN_COMMAND, first, get_error_handler
+from ..enums import Strategy
 from ..exceptions import UnknownFormat
 from ..media.codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
 from ..media.formats import Formats

@@ -9,9 +9,11 @@ from watchfiles import Change, awatch
 
 from .run import convert_from_name_path
 from ..base import DEFAULT_JOBS, DEFAULT_MODEL, DEFAULT_REPLACE, DEFAULT_THREADS, \
-  FILESIZE_CHECK_WAIT, NO_SIZE, Paths, Strategy, get_error_handler
+  FILESIZE_CHECK_WAIT, NO_SIZE, get_error_handler
+from ..enums import Strategy
 from ..exceptions import UnknownFormat
 from ..model.video import Video
+from ..types import Paths
 
 
 log = logging.getLogger(__name__)
@@ -28,7 +30,7 @@ def is_open_in_proc(file: Path | str) -> bool:
 
     except Exception as e:
       log.exception(e)
-      log.error(f"Couldn't read open files for {proc.pid} {proc.name()}")
+      log.error(f"Couldn't read open files for {proc.pid} {proc.name()}, continuing.")
 
     if file in files:
       return True

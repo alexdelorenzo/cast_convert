@@ -9,9 +9,10 @@ from typing import Self, cast
 from pymediainfo import MediaInfo
 
 from ..base import (
-  AT, DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL, Fps, IsCompatible, LEVEL_SEP,
-  Level, Resolution, VariableFps,
+  AT, LEVEL_SEP,
 )
+from ..types import DEFAULT_VIDEO_FPS, DEFAULT_VIDEO_LEVEL, Fps, Level, Resolution, VariableFps
+from ..protocols import IsCompatible
 from ..fmt import normalize
 from ..media.codecs import AudioCodec, Container, Subtitle, VideoCodec
 from ..media.formats import Formats, VideoFormat, is_compatible
@@ -97,8 +98,8 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
     if (codec := VideoCodec.from_info(fmt)) is not VideoCodec.unknown:
       break
 
-  height, width = video.height, video.width
-  profile = video.format_profile
+  resolution = Resolution.new(video.width, video.height)
+  level = profile_to_level(video.format_profile)
 
   fps = Fps(video.original_frame_rate or video.frame_rate or DEFAULT_VIDEO_FPS)
 
@@ -108,9 +109,9 @@ def get_video_profile(data: MediaInfo) -> VideoProfile | None:
 
   return VideoProfile(
     codec=codec,
-    resolution=Resolution.new(width, height),
+    resolution=resolution,
     fps=fps,
-    level=profile_to_level(profile)
+    level=level,
   )
 
 
