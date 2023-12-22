@@ -106,7 +106,7 @@ class Resolution(NamedTuple):
         raise CannotCompare(f"Can't compare {self!r} with {other}")
 
   def __str__(self) -> str:
-    return RESOLUTION_SEP.join(self)
+    return RESOLUTION_SEP.join(map(str, self))
 
   @classproperty
   def name(cls: type[Self]) -> str:
