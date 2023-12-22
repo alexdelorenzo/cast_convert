@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import AsyncIterable, Iterable
 from pathlib import Path
-from collections.abc import Iterable, AsyncIterable
 from typing import Final
 
 from aiopath import AsyncPath
@@ -9,17 +9,17 @@ from rich import print
 from rich.markup import escape
 from typer import Exit
 
+from ..core.base import DEFAULT_REPLACE, DEFAULT_THREADS, get_error_handler
 from ..core.convert.run import get_ffmpeg_cmd, get_stream
 from ..core.convert.transcode import should_transcode, show_transcode_dismissal
+from ..core.enums import Rc, Strategy
+from ..core.exceptions import UnknownFormat
+from ..core.fmt import esc, tabs
 from ..core.media.codecs import AudioCodec
 from ..core.model.device import Device, Devices, get_device_fuzzy, get_devices_from_file
 from ..core.model.video import Video
-from ..core.base import DEFAULT_REPLACE, DEFAULT_THREADS, get_error_handler
-from ..core.types import Peekable
-from ..core.enums import Rc, Strategy
-from ..core.fmt import esc, tabs
 from ..core.parse import DEVICE_INFO
-from ..core.exceptions import UnknownFormat
+from ..core.types import Peekable
 
 
 GLOB_FILES_RECURSIVE: Final[str] = '**/*.*'
@@ -143,3 +143,12 @@ async def gen_paths(*paths: Path) -> AsyncIterable[Path]:
 
     yield path
 
+
+def inspect_directory(name: str, path: Path, error: Strategy) -> Rc | None:
+  rc = None
+
+  for path in path.iterdir():
+    if _inspect(name, path, error):
+      rc = Rc.must_convert
+
+  return rc
