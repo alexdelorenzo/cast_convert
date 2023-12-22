@@ -5,12 +5,12 @@ from decimal import Decimal
 from functools import total_ordering
 from pathlib import Path
 from types import FunctionType, MethodType
-from typing import Any, Callable, Final, Iterable, NamedTuple, Protocol, Self, override, runtime_checkable
+from typing import Any, Callable, Final, Iterable, NamedTuple, Self, override
 
 from more_itertools import peekable
 
 from .exceptions import CannotCompare
-from .protocols import HasName
+from .protocols import HasName, IsCompatible
 
 
 type Components = Width | Height | int | float
@@ -139,24 +139,18 @@ class Level(FormattedDecimal, WithName):
   pass
 
 
-class Height(int, WithName):
+class Height(int, WithName, IsCompatible):
   """Resolution Height"""
 
   def is_compatible(self, other: Self) -> bool:
     return self >= other
 
 
-class Width(int, WithName):
+class Width(int, WithName, IsCompatible):
   """Resolution Height"""
 
   def is_compatible(self, other: Self) -> bool:
     return self >= other
-
-
-@runtime_checkable
-class HasItems(Protocol):
-  def __bool__(self) -> bool:
-    return has_items(self)
 
 
 VariableFps: Final[Fps] = Fps('-1')
@@ -185,14 +179,3 @@ def get_name(obj: Any) -> str:
 
     case _:
       return type(obj).__name__
-
-
-def has_items(obj: Any) -> bool:
-  try:
-    items = iter(obj)
-
-  except TypeError as e:
-    log.warning(f"[{e}] Can't get an iterator for type {get_name(obj)}")
-    items = obj.__dict__.values()
-
-  return any(item is not None for item in items)
