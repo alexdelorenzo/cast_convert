@@ -8,6 +8,7 @@ from aiopath import AsyncPath
 from rich import print
 from rich.markup import escape
 from typer import Exit
+from filetype import is_video, is_audio
 
 from ..core.base import DEFAULT_REPLACE, DEFAULT_THREADS, get_error_handler
 from ..core.convert.run import get_ffmpeg_cmd, get_stream
@@ -148,6 +149,9 @@ def inspect_directory(name: str, path: Path, error: Strategy) -> Rc | None:
   rc = None
 
   for path in path.iterdir():
+    if not is_video(path) or not is_audio(path):
+      continue
+
     if _inspect(name, path, error):
       rc = Rc.must_convert
 
