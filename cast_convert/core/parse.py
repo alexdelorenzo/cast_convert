@@ -1,16 +1,20 @@
 from __future__ import annotations
+
 from pathlib import Path
 from typing import Any, Final
 
 from yaml import safe_load
 
 
+ASSET_DIRNAME: Final[str] = 'assets'
+SUPPORT_FILENAME: Final[str] = 'support.yml'
+
 CORE_DIR: Final[Path] = Path(__file__).parent.absolute()
 SOURCE_DIR: Final[Path] = CORE_DIR.parent.absolute()
-ASSET_DIR: Final[Path] = SOURCE_DIR / 'assets'
+ASSET_DIR: Final[Path] = SOURCE_DIR / ASSET_DIRNAME
 
-DEVICE_INFO: Final[Path] = ASSET_DIR / 'support.yml'
-SUPPORT_INFO: Final[Path] = ASSET_DIR / 'support.yml'
+DEVICE_INFO: Final[Path] = ASSET_DIR / SUPPORT_FILENAME
+SUPPORT_INFO: Final[Path] = ASSET_DIR / SUPPORT_FILENAME
 
 
 type Fmt = str
@@ -23,7 +27,6 @@ type FmtAliases = dict[Fmt, Aliases]
 type AliasFmts = dict[Alias, Fmt]
 
 type FmtExtensions = dict[Fmt, Extension]
-
 type FfmpegCodecs = dict[str, FmtAliases]
 
 type Yaml = dict[str, Any] | list[Yaml] | dict[str, Yaml]
