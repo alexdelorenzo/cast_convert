@@ -10,7 +10,8 @@ import logging
 from more_itertools import unzip
 from rich import print
 
-from ..base import first, get_name
+from ..base import first
+from ..protocols import get_name
 from ..fmt import esc
 from ..media.codecs import Container, Subtitle
 from ..media.formats import Formats

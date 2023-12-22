@@ -4,7 +4,7 @@ import logging
 from enum import StrEnum, auto
 from typing import Self, Type
 
-from ..base import get_name
+from ..protocols import get_name
 from ..types import WithName
 from ..fmt import normalize
 from ..parse import ALIAS_FMTS

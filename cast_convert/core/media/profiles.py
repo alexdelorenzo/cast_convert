@@ -9,9 +9,9 @@ from unpackable import Unpackable
 
 from .codecs import AudioCodec, Codec, Codecs, ProfileName, VideoCodec
 from ..base import (
-  CODEC_BIAS, NEW_LINE, get_name,
+  CODEC_BIAS, NEW_LINE,
 )
-from ..protocols import AsDict, AsText, HasItems, HasName, HasWeight, IsCompatible, NO_BIAS
+from ..protocols import AsDict, AsText, HasItems, HasName, HasWeight, IsCompatible, NO_BIAS, get_name
 from ..types import DEFAULT_PROFILE_FPS, DEFAULT_PROFILE_LEVEL, DEFAULT_PROFILE_RESOLUTION, Fps, Level, \
   Resolution, WithName
 

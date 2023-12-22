@@ -14,7 +14,8 @@ from typer import Exit
 
 from .enums import LogLevel, Rc, Strategy
 from .exceptions import UnknownFormat
-from .types import Decoratable, Decorated, Decorator, Item, get_name
+from .types import Decoratable, Decorated, Decorator, Item
+from .protocols import get_name
 
 
 if TYPE_CHECKING:

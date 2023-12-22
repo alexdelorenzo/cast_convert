@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import logging
 from abc import abstractmethod
+from types import FunctionType, MethodType
 from typing import Any, Final, Protocol, runtime_checkable, TYPE_CHECKING
 
 from .exceptions import CannotCompare
-from .types import get_name, log
-
 
 if TYPE_CHECKING:
   from .media.formats import Metadata
@@ -72,3 +71,21 @@ def has_items(obj: Any) -> bool:
     items = obj.__dict__.values()
 
   return any(item is not None for item in items)
+
+
+def get_name(obj: Any) -> str:
+  match obj:
+    case type() as cls:
+      return cls.__name__
+
+    case (FunctionType() | MethodType()) as func:
+      return func.__name__
+
+    case has_name if name := getattr(has_name, '__name__', None):
+      return name
+
+    case HasName() as has_name:
+      return has_name.name
+
+    case _:
+      return type(obj).__name__

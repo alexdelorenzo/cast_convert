@@ -4,13 +4,12 @@ import logging
 from decimal import Decimal
 from functools import total_ordering
 from pathlib import Path
-from types import FunctionType, MethodType
 from typing import Any, Callable, Final, Iterable, NamedTuple, Self, override
 
 from more_itertools import peekable
 
 from .exceptions import CannotCompare
-from .protocols import HasName, IsCompatible
+from .protocols import IsCompatible, get_name
 
 
 type Components = Width | Height | int | float
@@ -161,21 +160,3 @@ DEFAULT_VIDEO_LEVEL: Final[Level] = Level()
 DEFAULT_PROFILE_LEVEL: Final[Level] = Level('0.0')
 
 DEFAULT_PROFILE_RESOLUTION: Final[Resolution] = Resolution(Width(1280), Height(720))
-
-
-def get_name(obj: Any) -> str:
-  match obj:
-    case type() as cls:
-      return cls.__name__
-
-    case (FunctionType() | MethodType()) as func:
-      return func.__name__
-
-    case has_name if name := getattr(has_name, '__name__', None):
-      return name
-
-    case HasName() as has_name:
-      return has_name.name
-
-    case _:
-      return type(obj).__name__

@@ -5,8 +5,8 @@ from typing import NamedTuple
 
 from .codecs import AudioCodec, Codecs, Container, Subtitle, VideoCodec
 from .profiles import AudioProfile, Profile, Profiles, VideoProfile, is_video_profile_compatible
-from ..base import NEW_LINE, get_name
-from ..protocols import HasName, NO_BIAS, has_items
+from ..base import NEW_LINE
+from ..protocols import HasName, NO_BIAS, get_name, has_items
 
 
 type VideoFormat = Codecs | Profiles | Container | Subtitle
