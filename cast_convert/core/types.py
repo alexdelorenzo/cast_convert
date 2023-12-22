@@ -10,6 +10,7 @@ from typing import Any, Callable, Final, Iterable, NamedTuple, Protocol, Self, o
 from more_itertools import peekable
 
 from .exceptions import CannotCompare
+from .protocols import HasName
 
 
 type Components = Width | Height | int | float
@@ -30,7 +31,7 @@ VFR_DESCRIPTION: Final[str] = 'Variable frame rate'
 Paths = set[Path]
 
 
-class Decimal(Decimal):
+class FormattedDecimal(Decimal):
   @override
   def __format__(self, *args, **kwargs) -> str:
     return str(self)
@@ -57,7 +58,7 @@ class WithName:
   name: NameMethod = classproperty(with_name)
 
 
-class Fps(Decimal, WithName):
+class Fps(FormattedDecimal, WithName):
   """Frame rate"""
 
   def __str__(self) -> str:
@@ -105,7 +106,7 @@ class Resolution(NamedTuple):
         raise CannotCompare(f"Can't compare {self!r} with {other}")
 
   def __str__(self) -> str:
-    return f"{self.width}{RESOLUTION_SEP}{self.height}"
+    return RESOLUTION_SEP.join(self)
 
   @classproperty
   def name(cls: type[Self]) -> str:
@@ -133,7 +134,7 @@ class Peekable[T](peekable, Iterable[T]):
     return not self
 
 
-class Level(Decimal, WithName):
+class Level(FormattedDecimal, WithName):
   """Encoder Level"""
   pass
 
