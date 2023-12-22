@@ -9,7 +9,7 @@ from rich import print
 from typer import Argument, Context, Exit, Option, Typer
 from typer.models import ArgumentInfo, OptionInfo
 
-from .helpers import _get_command, _inspect, show_devices
+from .helpers import _get_command, _inspect, inspect_directory, show_devices
 from .. import CLI_ENTRY, COPYRIGHT_NOTICE, DESCRIPTION, LICENSE, PROJECT_HOME, __version__
 from ..core.base import DEFAULT_JOBS, DEFAULT_LOG_LEVEL, DEFAULT_MODEL, \
   DEFAULT_THREADS, bad_file_exit, setup_logging
@@ -116,7 +116,6 @@ LONG_DESCRIPTION: Final[str] = f"""
   {COPYRIGHT_NOTICE}. License: {LICENSE}
 """
 
-
 cli: Final[Typer] = Typer(
   no_args_is_help=True,
   help=LONG_DESCRIPTION,
@@ -187,7 +186,10 @@ def inspect(
   rc: int = Rc.ok
 
   for path in paths:
-    if _inspect(name, path, error):
+    if path.is_dir():
+      rc = inspect_directory(name, path, error) or rc
+
+    elif _inspect(name, path, error):
       rc = Rc.must_convert
 
   raise Exit(rc)
