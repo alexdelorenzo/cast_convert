@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from enum import Enum, StrEnum, auto
-from typing import Self, Type
+from typing import Self
 
 from .base import NormalizedFormat
 from ..base import SUBTITLE_SEP
@@ -106,7 +106,7 @@ class Subtitle(NormalizedFormat, StrEnum):
   dwebvtt = alias(webvtt)
 
   @classmethod
-  def from_info(cls: Type[Self], info: str | None) -> Self | None:
+  def from_info(cls: type[Self], info: str | None) -> Self | None:
     if not info:
       return None
 
