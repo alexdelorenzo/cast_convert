@@ -13,7 +13,7 @@ class FormatError(CastConvertException, ValueError):
   pass
 
 
-class CannotCompare(FormatError):
+class CannotCompare(CastConvertException, TypeError):
   pass
 
 
