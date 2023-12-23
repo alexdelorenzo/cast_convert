@@ -80,10 +80,10 @@ class Resolution(NamedTuple):
       case Resolution(width, height):
         return self.width == width and self.height == height
 
-      case Height(height) | int(height) | float(height) | Decimal(height):
+      case Height(height):
         return self.height == height
 
-      case Width(width) | int(width) | float(width) | Decimal(width):
+      case Width(width):
         return self.width == width
 
       case _:
@@ -95,10 +95,10 @@ class Resolution(NamedTuple):
       case Resolution(width, height):
         return self.width < width or self.height < height
 
-      case Height(height) | int(height) | float(height) | Decimal(height):
+      case Height(height):
         return self.height < height
 
-      case Width(width) | int(width) | float(width) | Decimal(width):
+      case Width(width):
         return self.width < width
 
       case _:
