@@ -16,8 +16,8 @@ type Components = Width | Height | int | float
 type NameMethod = Callable[[Self], str]
 type Item[T, U] = T | U | None
 
-type Decorated[**P, T] = Callable[P, T]
 type Decoratable[**P, T] = Callable[P, T]
+type Decorated[**P, T] = Callable[P, T]
 type Decorator[**P, T] = Callable[[Decoratable], Decorated]
 
 
@@ -138,18 +138,17 @@ class Level(FormattedDecimal, WithName):
   pass
 
 
-class Height(int, WithName, IsCompatible):
-  """Resolution Height"""
-
+class Component(int, WithName, IsCompatible):
   def is_compatible(self, other: Self) -> bool:
     return self >= other
 
 
-class Width(int, WithName, IsCompatible):
+class Height(Component):
   """Resolution Height"""
 
-  def is_compatible(self, other: Self) -> bool:
-    return self >= other
+
+class Width(Component):
+  """Resolution Width"""
 
 
 VariableFps: Final[Fps] = Fps('-1')

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterable, Iterable
 from pathlib import Path
-from typing import Final
+from typing import Final, NoReturn
 
 from aiopath import AsyncPath
 from rich import print
@@ -53,7 +53,7 @@ def _get_command(
   threads: int = DEFAULT_THREADS,
   error: Strategy = Strategy.quit,
   subtitle: Path | None = None,
-) -> bool:
+) -> bool | NoReturn:
   video = Video.from_path(path)
 
   if not (device := _get_device_from_name(name)):
