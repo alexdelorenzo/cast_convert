@@ -140,7 +140,7 @@ class Level(FormattedDecimal, WithName):
 
 
 @total_ordering
-class Component(int, WithName, IsCompatible, Hashable):
+class Component(int, Hashable, IsCompatible, WithName):
   @override
   def __eq__(self, other: Self | Resolution) -> bool:
     match self, other:
@@ -191,7 +191,7 @@ class Component(int, WithName, IsCompatible, Hashable):
 
   @override
   def __hash__(self):
-    return hash(int(self))
+    return super().__hash__()
 
   def is_compatible(self, other: Self) -> bool:
     return self >= other
