@@ -77,7 +77,7 @@ class Resolution(NamedTuple):
   @override
   def __eq__(self, other: Self | Components | Any) -> bool:
     match other:
-      case Resolution(width, height):
+      case width, height:
         return self.width == width and self.height == height
 
       case Height(height):
@@ -92,8 +92,8 @@ class Resolution(NamedTuple):
   @override
   def __lt__(self, other: Self | Components | Any) -> bool:
     match other:
-      case Resolution(width, height):
-        return self.width < width or self.height < height
+      case width, height:
+        return self.width < width and self.height < height
 
       case Height(height):
         return self.height < height
@@ -117,7 +117,7 @@ class Resolution(NamedTuple):
     return cls.new(width, height)
 
   @classmethod
-  def new(cls: type[Self], width: int = 0, height: int = 0) -> Self:
+  def new(cls: type[Self], width: int | str = 0, height: int | str = 0) -> Self:
     return cls(Width(width), Height(height))
 
   def is_compatible(self, other: Resolution) -> bool:
