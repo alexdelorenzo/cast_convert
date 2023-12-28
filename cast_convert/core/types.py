@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Hashable
 from decimal import Decimal
 from functools import total_ordering
 from pathlib import Path
@@ -139,7 +140,8 @@ class Level(FormattedDecimal, WithName):
 
 
 @total_ordering
-class Component(int, WithName, IsCompatible):
+class Component(int, WithName, IsCompatible, Hashable):
+  @override
   def __eq__(self, other: Self | Resolution) -> bool:
     match self, other:
       case Height(height), Height(other):
@@ -163,6 +165,7 @@ class Component(int, WithName, IsCompatible):
       case _:
         raise CannotCompare(f"Can't compare {self!r} with {other}")
 
+  @override
   def __lt__(self, other: Self | Resolution) -> bool:
     match self, other:
       case Height(height), Height(other):
@@ -185,6 +188,10 @@ class Component(int, WithName, IsCompatible):
 
       case _:
         raise CannotCompare(f"Can't compare {self!r} with {other}")
+
+  @override
+  def __hash__(self):
+    return hash(int(self))
 
   def is_compatible(self, other: Self) -> bool:
     return self >= other
