@@ -272,13 +272,12 @@ def get_video_filters(
   stream: FilterableStream,
   formats: Formats,
 ) -> FilterableStream | None:
-  if not formats.video_profile:
+  if not (profile := formats.video_profile):
     return None
 
-  video_codec, resolution, fps, level = formats.video_profile
   filters: FilterableStream | None = None
 
-  if resolution:
+  if resolution := profile.resolution:
     width, height = resolution
 
     filters = ffmpeg.filter(
