@@ -276,10 +276,11 @@ def get_video_filters(
     return None
 
   video_codec, resolution, fps, level = formats.video_profile
-  width, height = resolution
   filters: FilterableStream | None = None
 
   if resolution:
+    width, height = resolution
+
     filters = ffmpeg.filter(
       stream,
       FfmpegOpt.scale,
