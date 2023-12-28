@@ -157,7 +157,7 @@ class Component(int, Hashable, IsCompatible, WithName):
         return width == other
 
       case Width(), Height() | Height(), Width():
-        raise CannotCompare(f"Can't compare {self=} with {other=}")
+        raise CannotCompare(f"Can't compare Height with Width")
 
       case int(this), int(other):
         return int(this) == int(other)
