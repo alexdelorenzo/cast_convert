@@ -138,7 +138,54 @@ class Level(FormattedDecimal, WithName):
   pass
 
 
+@total_ordering
 class Component(int, WithName, IsCompatible):
+  def __eq__(self, other: Self | Resolution) -> bool:
+    match self, other:
+      case Height(height), Height(other):
+        return height == int(other)
+
+      case Width(width), Width(other):
+        return width == int(other)
+
+      case Height(height), Resolution(_, int(other)):
+        return height == other
+
+      case Width(width), Resolution(int(other), _):
+        return width == other
+
+      case Width(), Height() | Height(), Width():
+        raise CannotCompare(f"Can't compare {self=} with {other=}")
+
+      case int(this), int(other):
+        return int(this) == int(other)
+
+      case _:
+        raise CannotCompare(f"Can't compare {self!r} with {other}")
+
+  def __lt__(self, other: Self | Resolution) -> bool:
+    match self, other:
+      case Height(height), Height(other):
+        return height < int(other)
+
+      case Width(width), Width(other):
+        return width < int(other)
+
+      case Height(height), Resolution(_, int(other)):
+        return height < other
+
+      case Width(width), Resolution(int(other), _):
+        return width < other
+
+      case Width(), Height() | Height(), Width():
+        raise CannotCompare(f"Can't compare Height with Width")
+
+      case int(this), int(other):
+        return int(this) < int(other)
+
+      case _:
+        raise CannotCompare(f"Can't compare {self!r} with {other}")
+
   def is_compatible(self, other: Self) -> bool:
     return self >= other
 
