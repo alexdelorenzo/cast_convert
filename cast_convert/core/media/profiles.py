@@ -92,7 +92,7 @@ class VideoProfile(Profile, IsCompatible):
   def is_compatible(self, other: Metadata) -> bool:
     match other:
       case VideoProfile() as profile:
-        return is_video_profile_compatible(self, other)
+        return is_video_profile_compatible(self, profile)
 
       case Resolution() as resolution:
         return is_resolution_compatible(self.resolution, resolution)
@@ -152,14 +152,14 @@ def is_resolution_compatible(
   resolution: Resolution | None,
   max_resolution: Resolution | None
 ) -> bool:
-  return resolution == max_resolution or resolution <= max_resolution
+  return resolution is max_resolution or resolution <= max_resolution
 
 
 def is_codec_compatible(
   codec: Codecs | None,
   other: Codecs | None,
 ) -> bool:
-  return codec is other
+  return codec is other or codec == other
 
 
 @cache
