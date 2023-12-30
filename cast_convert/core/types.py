@@ -13,6 +13,11 @@ from .exceptions import CannotCompare
 from .protocols import IsCompatible, get_name
 
 
+RESOLUTION_SEP: Final[str] = 'x'
+DOCSTRING_NAME_SEP: Final[str] = '\n'
+VFR_DESCRIPTION: Final[str] = 'Variable frame rate'
+
+
 type Components = Width | Height | int | float
 type NameMethod = Callable[[Self], str]
 type Item[T, U] = T | U | None
@@ -20,13 +25,6 @@ type Item[T, U] = T | U | None
 type Decoratable[**P, T] = Callable[P, T]
 type Decorated[**P, T] = Callable[P, T]
 type Decorator[**P, T] = Callable[[Decoratable], Decorated]
-
-
-log = logging.getLogger(__name__)
-
-RESOLUTION_SEP: Final[str] = 'x'
-VFR_DESCRIPTION: Final[str] = 'Variable frame rate'
-
 
 Paths = set[Path]
 
@@ -48,8 +46,8 @@ class classproperty(property):
 
 def with_name(self: Self) -> str:
   if doc := self.__doc__:
-    name, *_ = doc.split('\n')
-    return name
+    name, *_ = doc.split(DOCSTRING_NAME_SEP)
+    return name.strip()
 
   return get_name(self)
 
