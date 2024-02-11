@@ -127,10 +127,10 @@ class Device(IsCompatible):
 
   def can_play(self, video: Video) -> bool:
     return (
-      self.can_play_audio(video) and
-      self.can_play_video(video) and
-      self.can_play_container(video) and
-      self.can_play_subtitle(video)
+      self.can_play_audio(video)
+      and self.can_play_video(video)
+      and self.can_play_container(video)
+      and self.can_play_subtitle(video)
     )
 
   def transcode_to(
@@ -211,7 +211,7 @@ def is_compatible(device: Device, other: Metadata) -> bool:
     case Formats() as formats:
       return all(device.is_compatible(fmt) for fmt in formats if fmt)
 
-  super(Device, device).is_compatible(other)
+  return super(Device, device).is_compatible(other)
 
 
 type Devices = tuple[Device, ...]
