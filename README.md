@@ -26,7 +26,7 @@ the video so that it will play on the device.
 
 Cast Convert calculates the least amount of transcoding required to playback videos. It also has detailed support profiles for every format supported by each  device, whereas other transcoding options tend to force all videos into one format.
 
-For example, you may have a video named `video.mp4` that isn't compatible with your device. Cast Control can generate a transcoding plan that does the least amount of transcoding necessary instead of blindly transcoding every video into the same format.
+For example, you may have a video named `video.mp4` that isn't compatible with your device. Cast Convert can generate a transcoding plan that does the least amount of transcoding necessary instead of blindly transcoding every video into the same format.
 
 You can use `cast-convert inspect` to scan the video and come up with the most efficient transcoding plan:
 ```bash
