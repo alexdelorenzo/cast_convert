@@ -1,16 +1,21 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Controls as Controls
+import org.kde.kirigami as Kirigami
 
-ApplicationWindow {
-    visible: true
-    width: 600
-    height: 500
-    title: "HelloApp"
+Kirigami.ApplicationWindow {
+    Kirigami.FormLayout {
+        anchors.fill: parent
 
-    Text {
-        anchors.centerIn: parent
-        text: "Hello World"
-        font.pixelSize: 24
+        Controls.TextField {
+            Kirigami.FormData.label: "First name:"
+        }
+        Controls.TextField {
+            Kirigami.FormData.label: "Middle name:"
+            Kirigami.FormData.checkable: true
+            enabled: Kirigami.FormData.checked
+        }
+        Controls.TextField {
+            Kirigami.FormData.label: "Last name:"
+        }
     }
-
 }
