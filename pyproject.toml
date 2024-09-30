@@ -1,0 +1,45 @@
+[project]
+name = "cast_convert"
+version = "0.14.0"
+description = "📽️ Identify and convert videos to formats that are Chromecast supported."
+authors = [
+  { name = "Alex DeLorenzo", url = "https://alexdelorenzo.dev", email = "projects@alexdelorenzo.dev" }
+]
+dependencies = [
+  "PyYAML>=6.0, <7.0",
+  "aiopath>=0.7.7, <0.8.0",
+  "ffmpeg-python>=0.2.0, <0.3.0",
+  "filetype>=1.2.0, <1.3.0",
+  "more_itertools>=10.1.0, <11.0.0",
+  "psutil>=5.9.4, <6.0.0",
+  "pymediainfo>=6.1.0, <7.0.0",
+  "rich>=13.7.0, <14.0.0",
+  "thefuzz>=0.20.0, <0.21.0",
+  "typer[all]>=0.9.0, <0.10.0",
+  "unpackable>=0.0.4, <0.1.0",
+  "watchfiles>=0.21.0, <0.22.0",
+]
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "CC BY-NC-ND 4.0" }
+homepage = "https://github.com/alexdelorenzo/cast_contvert"
+
+[project.urls]
+repository = "https://github.com/alexdelorenzo/cast_contvert"
+
+[project.scripts]
+cast-convert = "cast_convert.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cast_convert"]
