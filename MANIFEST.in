@@ -1,6 +1,0 @@
-include README.md
-include requirements.txt
-include LICENSE
-include setup.py
-
-include cast_convert/assets/*.yml
